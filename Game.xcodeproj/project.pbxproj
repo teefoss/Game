@@ -25,6 +25,23 @@
 /* Begin PBXFileReference section */
 		6076642728C68F8400CD99E5 /* Game */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Game; sourceTree = BUILT_PRODUCTS_DIR; };
 		6076642A28C68F8400CD99E5 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		6076643128C68F9900CD99E5 /* Game.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Game.entitlements; sourceTree = "<group>"; };
+		6076643328C68FB200CD99E5 /* genlib.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = genlib.c; sourceTree = "<group>"; };
+		6076643428C68FB200CD99E5 /* input.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = input.h; sourceTree = "<group>"; };
+		6076643528C68FB200CD99E5 /* text.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = text.h; sourceTree = "<group>"; };
+		6076643628C68FB200CD99E5 /* video.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = video.c; sourceTree = "<group>"; };
+		6076643728C68FB200CD99E5 /* mathlib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mathlib.h; sourceTree = "<group>"; };
+		6076643828C68FB200CD99E5 /* texture.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = texture.c; sourceTree = "<group>"; };
+		6076643928C68FB200CD99E5 /* genlib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = genlib.h; sourceTree = "<group>"; };
+		6076643A28C68FB200CD99E5 /* input.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = input.c; sourceTree = "<group>"; };
+		6076643B28C68FB200CD99E5 /* video.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = video.h; sourceTree = "<group>"; };
+		6076643C28C68FB200CD99E5 /* text.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = text.c; sourceTree = "<group>"; };
+		6076643D28C68FB200CD99E5 /* texture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = texture.h; sourceTree = "<group>"; };
+		6076643E28C68FB200CD99E5 /* mathlib.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = mathlib.c; sourceTree = "<group>"; };
+		6076644028C68FB200CD99E5 /* atari_4x8.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = atari_4x8.h; sourceTree = "<group>"; };
+		6076644128C68FB200CD99E5 /* cp437_8x8.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cp437_8x8.h; sourceTree = "<group>"; };
+		6076644228C68FB200CD99E5 /* nes_16x16.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nes_16x16.h; sourceTree = "<group>"; };
+		6076644328C68FB200CD99E5 /* cp437_8x16.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cp437_8x16.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,9 +74,50 @@
 		6076642928C68F8400CD99E5 /* Game */ = {
 			isa = PBXGroup;
 			children = (
+				6076644428C68FB800CD99E5 /* Assets */,
+				6076643228C68FB200CD99E5 /* mylib */,
+				6076643128C68F9900CD99E5 /* Game.entitlements */,
 				6076642A28C68F8400CD99E5 /* main.c */,
 			);
 			path = Game;
+			sourceTree = "<group>";
+		};
+		6076643228C68FB200CD99E5 /* mylib */ = {
+			isa = PBXGroup;
+			children = (
+				6076643328C68FB200CD99E5 /* genlib.c */,
+				6076643428C68FB200CD99E5 /* input.h */,
+				6076643528C68FB200CD99E5 /* text.h */,
+				6076643628C68FB200CD99E5 /* video.c */,
+				6076643728C68FB200CD99E5 /* mathlib.h */,
+				6076643828C68FB200CD99E5 /* texture.c */,
+				6076643928C68FB200CD99E5 /* genlib.h */,
+				6076643A28C68FB200CD99E5 /* input.c */,
+				6076643B28C68FB200CD99E5 /* video.h */,
+				6076643C28C68FB200CD99E5 /* text.c */,
+				6076643D28C68FB200CD99E5 /* texture.h */,
+				6076643E28C68FB200CD99E5 /* mathlib.c */,
+				6076643F28C68FB200CD99E5 /* fonts */,
+			);
+			path = mylib;
+			sourceTree = "<group>";
+		};
+		6076643F28C68FB200CD99E5 /* fonts */ = {
+			isa = PBXGroup;
+			children = (
+				6076644028C68FB200CD99E5 /* atari_4x8.h */,
+				6076644128C68FB200CD99E5 /* cp437_8x8.h */,
+				6076644228C68FB200CD99E5 /* nes_16x16.h */,
+				6076644328C68FB200CD99E5 /* cp437_8x16.h */,
+			);
+			path = fonts;
+			sourceTree = "<group>";
+		};
+		6076644428C68FB800CD99E5 /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Assets;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -238,6 +296,7 @@
 		6076642F28C68F8400CD99E5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Game/Game.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = D54ZHB8K4R;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -251,6 +310,7 @@
 		6076643028C68F8400CD99E5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Game/Game.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = D54ZHB8K4R;
 				ENABLE_HARDENED_RUNTIME = YES;
