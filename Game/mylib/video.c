@@ -87,8 +87,6 @@ void GoWindowed(void)
 
 static float scaleX;
 static float scaleY;
-static int windowWidth;
-static int windowHeight;
 
 void ToggleFullscreen(fullscreen_t mode)
 {

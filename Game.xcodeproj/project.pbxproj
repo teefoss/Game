@@ -97,18 +97,18 @@
 			isa = PBXGroup;
 			children = (
 				6076643F28C68FB200CD99E5 /* fonts */,
-				6076643328C68FB200CD99E5 /* genlib.c */,
 				6076643928C68FB200CD99E5 /* genlib.h */,
-				6076643A28C68FB200CD99E5 /* input.c */,
+				6076643328C68FB200CD99E5 /* genlib.c */,
 				6076643428C68FB200CD99E5 /* input.h */,
-				6076643E28C68FB200CD99E5 /* mathlib.c */,
+				6076643A28C68FB200CD99E5 /* input.c */,
 				6076643728C68FB200CD99E5 /* mathlib.h */,
-				6076643C28C68FB200CD99E5 /* text.c */,
+				6076643E28C68FB200CD99E5 /* mathlib.c */,
 				6076643528C68FB200CD99E5 /* text.h */,
-				6076643828C68FB200CD99E5 /* texture.c */,
+				6076643C28C68FB200CD99E5 /* text.c */,
 				6076643D28C68FB200CD99E5 /* texture.h */,
-				6076643628C68FB200CD99E5 /* video.c */,
+				6076643828C68FB200CD99E5 /* texture.c */,
 				6076643B28C68FB200CD99E5 /* video.h */,
+				6076643628C68FB200CD99E5 /* video.c */,
 			);
 			path = mylib;
 			sourceTree = "<group>";
@@ -315,8 +315,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Game/Game.entitlements;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5HPHAB4C2D;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				HEADER_SEARCH_PATHS = /usr/local/include/SDL2;
 				LIBRARY_SEARCH_PATHS = /usr/local/lib/;
@@ -329,8 +330,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Game/Game.entitlements;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5HPHAB4C2D;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				HEADER_SEARCH_PATHS = /usr/local/include/SDL2;
 				LIBRARY_SEARCH_PATHS = /usr/local/lib/;

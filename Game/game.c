@@ -5,9 +5,9 @@
 //  Created by Thomas Tillistrand on 9/5/22.
 //
 
+#include "game.h"
 #include "mylib/video.h"
 #include <SDL.h>
-#include "game.h"
 
 static void
 GameLoop(void)
@@ -25,7 +25,6 @@ GameMain(void)
     InitWindow(info);
     SDL_PumpEvents();
     
-    // game loop
     GameLoop();
     
     // clean up
