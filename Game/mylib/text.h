@@ -7,7 +7,7 @@
 #ifndef __TEXT_H__
 #define __TEXT_H__
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 typedef enum {
     FONT_ATARI_4X8,

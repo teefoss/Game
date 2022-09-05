@@ -4,7 +4,7 @@
 #ifndef __TEXTURE_H__
 #define __TEXTURE_H__
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 /// Load all .bmp files in directory
 ///

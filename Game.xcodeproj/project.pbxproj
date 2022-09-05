@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		56CA3EB828C69FFD00AE2DD5 /* game.c in Sources */ = {isa = PBXBuildFile; fileRef = 56CA3EB728C69FFD00AE2DD5 /* game.c */; };
+		56CA3EB928C6AA7E00AE2DD5 /* genlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076643328C68FB200CD99E5 /* genlib.c */; };
+		56CA3EBA28C6AA7E00AE2DD5 /* input.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076643A28C68FB200CD99E5 /* input.c */; };
+		56CA3EBB28C6AA7E00AE2DD5 /* mathlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076643E28C68FB200CD99E5 /* mathlib.c */; };
+		56CA3EBC28C6AA7E00AE2DD5 /* text.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076643C28C68FB200CD99E5 /* text.c */; };
+		56CA3EBD28C6AA7E00AE2DD5 /* texture.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076643828C68FB200CD99E5 /* texture.c */; };
+		56CA3EBE28C6AA7E00AE2DD5 /* video.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076643628C68FB200CD99E5 /* video.c */; };
 		6076642B28C68F8400CD99E5 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076642A28C68F8400CD99E5 /* main.c */; };
 /* End PBXBuildFile section */
 
@@ -23,6 +30,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		56CA3EB628C69FFD00AE2DD5 /* game.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = game.h; sourceTree = "<group>"; };
+		56CA3EB728C69FFD00AE2DD5 /* game.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = game.c; sourceTree = "<group>"; };
 		6076642728C68F8400CD99E5 /* Game */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Game; sourceTree = BUILT_PRODUCTS_DIR; };
 		6076642A28C68F8400CD99E5 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		6076643128C68F9900CD99E5 /* Game.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Game.entitlements; sourceTree = "<group>"; };
@@ -78,6 +87,8 @@
 				6076643228C68FB200CD99E5 /* mylib */,
 				6076643128C68F9900CD99E5 /* Game.entitlements */,
 				6076642A28C68F8400CD99E5 /* main.c */,
+				56CA3EB628C69FFD00AE2DD5 /* game.h */,
+				56CA3EB728C69FFD00AE2DD5 /* game.c */,
 			);
 			path = Game;
 			sourceTree = "<group>";
@@ -85,19 +96,19 @@
 		6076643228C68FB200CD99E5 /* mylib */ = {
 			isa = PBXGroup;
 			children = (
+				6076643F28C68FB200CD99E5 /* fonts */,
 				6076643328C68FB200CD99E5 /* genlib.c */,
-				6076643428C68FB200CD99E5 /* input.h */,
-				6076643528C68FB200CD99E5 /* text.h */,
-				6076643628C68FB200CD99E5 /* video.c */,
-				6076643728C68FB200CD99E5 /* mathlib.h */,
-				6076643828C68FB200CD99E5 /* texture.c */,
 				6076643928C68FB200CD99E5 /* genlib.h */,
 				6076643A28C68FB200CD99E5 /* input.c */,
-				6076643B28C68FB200CD99E5 /* video.h */,
-				6076643C28C68FB200CD99E5 /* text.c */,
-				6076643D28C68FB200CD99E5 /* texture.h */,
+				6076643428C68FB200CD99E5 /* input.h */,
 				6076643E28C68FB200CD99E5 /* mathlib.c */,
-				6076643F28C68FB200CD99E5 /* fonts */,
+				6076643728C68FB200CD99E5 /* mathlib.h */,
+				6076643C28C68FB200CD99E5 /* text.c */,
+				6076643528C68FB200CD99E5 /* text.h */,
+				6076643828C68FB200CD99E5 /* texture.c */,
+				6076643D28C68FB200CD99E5 /* texture.h */,
+				6076643628C68FB200CD99E5 /* video.c */,
+				6076643B28C68FB200CD99E5 /* video.h */,
 			);
 			path = mylib;
 			sourceTree = "<group>";
@@ -177,7 +188,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				56CA3EB928C6AA7E00AE2DD5 /* genlib.c in Sources */,
+				56CA3EBA28C6AA7E00AE2DD5 /* input.c in Sources */,
+				56CA3EBB28C6AA7E00AE2DD5 /* mathlib.c in Sources */,
+				56CA3EBC28C6AA7E00AE2DD5 /* text.c in Sources */,
+				56CA3EBD28C6AA7E00AE2DD5 /* texture.c in Sources */,
+				56CA3EBE28C6AA7E00AE2DD5 /* video.c in Sources */,
 				6076642B28C68F8400CD99E5 /* main.c in Sources */,
+				56CA3EB828C69FFD00AE2DD5 /* game.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -298,7 +316,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Game/Game.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = D54ZHB8K4R;
+				DEVELOPMENT_TEAM = 5HPHAB4C2D;
 				ENABLE_HARDENED_RUNTIME = YES;
 				HEADER_SEARCH_PATHS = /usr/local/include/SDL2;
 				LIBRARY_SEARCH_PATHS = /usr/local/lib/;
@@ -312,7 +330,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Game/Game.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = D54ZHB8K4R;
+				DEVELOPMENT_TEAM = 5HPHAB4C2D;
 				ENABLE_HARDENED_RUNTIME = YES;
 				HEADER_SEARCH_PATHS = /usr/local/include/SDL2;
 				LIBRARY_SEARCH_PATHS = /usr/local/lib/;

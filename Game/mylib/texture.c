@@ -7,7 +7,7 @@
 
 #include "texture.h"
 #include "genlib.h"
-#include "window.h"
+#include "video.h"
 #include <dirent.h> // TODO: check if this is portable
 
 #define MAX_TEXTURES    1024

@@ -14,7 +14,7 @@
 #include <string.h>
 #include <sys/time.h>
 #include <math.h>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 #ifdef __cplusplus
 extern "C" {

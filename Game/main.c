@@ -5,10 +5,11 @@
 //  Created by Thomas Foster on 9/5/22.
 //
 
-#include <stdio.h>
+#include "game.h"
 
-int main(int argc, const char * argv[]) {
-    // insert code here...
-    printf("Hello, World!\n");
+int
+main(void)
+{
+    GameMain();
     return 0;
 }

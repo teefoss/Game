@@ -7,7 +7,7 @@
 #define __VIDEO_H__
 
 #include "genlib.h"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 typedef struct {
     const char * title;
