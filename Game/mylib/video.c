@@ -42,15 +42,10 @@ void InitWindow(window_info_t info) {
         (   renderer,
             info.render.logicalWidth,
             info.render.logicalHeight );
-    } else {
-        SDL_RenderSetLogicalSize(renderer, info.width, info.height);
     }
 
     if ( info.render.scaleX || info.render.scaleY ) {
-        SDL_RenderSetScale
-        (   renderer,
-            info.render.scaleX ? info.render.scaleX : 1.0f,
-            info.render.scaleY ? info.render.scaleY : 1.0f );
+        SDL_RenderSetScale(renderer, info.render.scaleX, info.render.scaleY);
     }
 }
 
