@@ -29,14 +29,12 @@ typedef enum {
 extern const u8 * keyboard;
 extern SDL_GameController * controller;
 
-inline bool
-IsKeyDown(SDL_Scancode scancode)
+inline bool IsKeyDown(SDL_Scancode scancode)
 {
     return keyboard[scancode];
 }
 
-inline bool
-IsButtonDown(SDL_GameControllerButton button)
+inline bool IsButtonDown(SDL_GameControllerButton button)
 {
     return SDL_GameControllerGetButton(controller, button);
 }

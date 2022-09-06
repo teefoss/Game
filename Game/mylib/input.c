@@ -8,16 +8,14 @@
 const u8 * keyboard;
 SDL_GameController * controller; // TODO: support 4 controllers
 
-static void
-Shutdown(void)
+static void Shutdown(void)
 {
     if ( controller ) {
         SDL_GameControllerClose(controller);
     }
 }
 
-vec2_t
-ControllerStickDirection(controllerSide_t stick)
+vec2_t ControllerStickDirection(controllerSide_t stick)
 {
     Sint16 x, y;
 
@@ -44,8 +42,7 @@ ControllerStickDirection(controllerSide_t stick)
     return direction;
 }
 
-float
-ControllerTriggerState(controllerSide_t trigger)
+float ControllerTriggerState(controllerSide_t trigger)
 {
     float n;
     if ( trigger == SIDE_LEFT ) {
@@ -57,8 +54,7 @@ ControllerTriggerState(controllerSide_t trigger)
     return n / 0x7FFF;
 }
 
-void
-ConnectController(void)
+void ConnectController(void)
 {
     if ( controller ) {
         return;
@@ -80,8 +76,7 @@ ConnectController(void)
     }
 }
 
-void
-DisconnectController(void)
+void DisconnectController(void)
 {
     if ( !controller )
         return;
@@ -91,8 +86,7 @@ DisconnectController(void)
     controller = NULL;
 }
 
-void
-InitInput(void)
+void InitInput(void)
 {
     keyboard = SDL_GetKeyboardState(NULL);
 

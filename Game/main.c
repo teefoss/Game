@@ -7,8 +7,7 @@
 
 #include "game.h"
 
-int
-main(void)
+int main(void)
 {
     GameMain();
     return 0;

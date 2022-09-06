@@ -97,8 +97,7 @@ void RandomizeNoise(u32 seed);
 /// - Parameter frequency: Scaling value.
 /// - Parameter persistense: `0.0...1.0`
 /// - Parameter lacunarity: > `1.0`
-float
-Noise2
+float Noise2
 (   float x,
     float y,
     float z,
@@ -110,8 +109,7 @@ Noise2
 
 /// Perlin noise at point x, y, z. Uses common default noise parameters. Use
 /// `Perlin2` if you need to specify these parameters.
-inline float
-Noise(float x, float y, float z)
+inline float Noise(float x, float y, float z)
 {
     return Noise2(x, y, z, 0.01, 6, 1.0, 0.5, 2.0);
 }

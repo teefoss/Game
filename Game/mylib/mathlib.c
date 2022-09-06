@@ -1,8 +1,7 @@
 #include "mathlib.h"
 #include <math.h>
 
-float
-Lerp(float a, float b, float w)
+float Lerp(float a, float b, float w)
 {
     if ( fabsf( a - b ) < 1.0f ) {
         return b;
@@ -21,16 +20,14 @@ Lerp(float a, float b, float w)
 // or a segment drawn between those points.
 //
 
-static double
-sq(double x)
+static double sq(double x)
 {
     return x * x;
 }
 
 static const double eps = 1e-14;
 
-bool
-LineCircleIntersection
+bool LineCircleIntersection
 (   vec2_t p1,
     vec2_t p2,
     vec2_t cp,
@@ -105,8 +102,7 @@ LineCircleIntersection
 //    }
 }
 
-int
-RectDiagonalLength(int w, int h)
+int RectDiagonalLength(int w, int h)
 {
     return (int)sqrt(w * w + h * h);
 }
@@ -115,22 +111,19 @@ RectDiagonalLength(int w, int h)
 
 static u32 next = 1;
 
-void
-SeedRandom(u32 seed)
+void SeedRandom(u32 seed)
 {
     next = seed;
 }
 
-void
-Randomize(void)
+void Randomize(void)
 {
     next = (u32)time(NULL);
 }
 
 // https://lemire.me/blog/
 
-static inline u32
-Wyhash32(void)
+static inline u32 Wyhash32(void)
 {
     uint64_t tmp;
     uint32_t m1, m2;
@@ -144,28 +137,24 @@ Wyhash32(void)
     return m2;
 }
 
-u32
-Random(u32 min, u32 max)
+u32 Random(u32 min, u32 max)
 {
     return Wyhash32() % (max - min + 1) + min;
 }
 
-static inline float
-_RandomFloat(void)
+static inline float _RandomFloat(void)
 {
     return (float)((double)Wyhash32() / (double)RANDOM_MAX);
 }
 
-float
-RandomFloat(float min, float max)
+float RandomFloat(float min, float max)
 {
     return _RandomFloat() * (max - min) + min;
 }
 
 #pragma mark - VECTOR
 
-bool
-LerpVector(vec2_t * v, const vec2_t * to, float w)
+bool LerpVector(vec2_t * v, const vec2_t * to, float w)
 {
     float dx = to->x - v->x;
     float dy = to->y - v->y;
@@ -192,8 +181,7 @@ LerpVector(vec2_t * v, const vec2_t * to, float w)
     return x_arrived && y_arrived;
 }
 
-vec2_t
-NormalizeVector(vec2_t v)
+vec2_t NormalizeVector(vec2_t v)
 {
     vec2_t result = { 0, 0 };
 
@@ -209,8 +197,7 @@ NormalizeVector(vec2_t v)
     return result;
 }
 
-vec2_t
-RotateVector(vec2_t v, float radians)
+vec2_t RotateVector(vec2_t v, float radians)
 {
     vec2_t result;
     result.x = cos(radians) * v.x - sin(radians) * v.y;
@@ -219,8 +206,7 @@ RotateVector(vec2_t v, float radians)
     return result;
 }
 
-void
-WrapPosition(vec2_t * position, int w, int h)
+void WrapPosition(vec2_t * position, int w, int h)
 {
     position->x = fmod(position->x + w, w);
     position->y = fmod(position->y + h, h);
@@ -323,20 +309,17 @@ static uint8_t p[P_SIZE] = {
     141, 128, 195, 78, 66, 215, 61, 156, 180,
 };
 
-static float
-fade(float t)
+static float fade(float t)
 {
     return t*t*t*(t*(t*6 - 15) + 10);
 }
 
-static float
-lerp(float t, float a, float b)
+static float lerp(float t, float a, float b)
 {
     return a + t*(b - a);
 }
 
-static float
-grad(int hash, float x, float y, float z)
+static float grad(int hash, float x, float y, float z)
 {
     int h = hash & 15;
     float u = h<8 ? x : y,
@@ -349,8 +332,7 @@ grad(int hash, float x, float y, float z)
 // Adapted from Java code by Thomas Foster
 //
 
-static float
-perlin(float x, float y, float z)
+static float perlin(float x, float y, float z)
 {
     int X = (int)floor(x) & 255;
     int Y = (int)floor(y) & 255;
@@ -375,8 +357,7 @@ perlin(float x, float y, float z)
 
 }
 
-void
-RandomizeNoise(u32 seed)
+void RandomizeNoise(u32 seed)
 {
     memcpy(p, originalPermutation, sizeof(p)); // restart
     SeedRandom(seed);
@@ -391,8 +372,7 @@ RandomizeNoise(u32 seed)
     }
 }
 
-float
-Noise2
+float Noise2
 (   float x,
     float y,
     float z,

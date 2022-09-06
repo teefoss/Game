@@ -6,24 +6,41 @@
 //
 
 #include "game.h"
+#include "mylib/genlib.h"
 #include "mylib/video.h"
 #include <SDL.h>
 
-static void
-GameLoop(void)
+#define FPS 60.0f
+
+void DoFrame(float dt)
 {
-    while (1) {
-        SDL_Delay(10);
+    
+}
+
+static void GameLoop(void)
+{
+    float old_time = ProgramTime();
+    while ( true ) {
+        float new_time = ProgramTime();
+        float dt = new_time - old_time;
+
+        if ( dt < 1.0f / FPS ) {
+            SDL_Delay(1);
+            continue;
+        }
+
+        DoFrame(dt);
+
+        old_time = new_time;
     }
 }
 
-void
-GameMain(void)
+void GameMain(void)
 {
     // initialization
-    windowInfo_t info = { 0 };
+    window_info_t info = { 0 };
     InitWindow(info);
-    SDL_PumpEvents();
+    SDL_PumpEvents(); // TODO: temp
     
     GameLoop();
     

@@ -13,9 +13,9 @@ typedef struct {
     int width;
     int height;
     const unsigned char * data;
-} fontInfo_t;
+} font_info_t;
 
-static fontInfo_t info[] = {
+static font_info_t info[] = {
     [FONT_ATARI_4X8]    = {  4,  8, atari_4x8   },
     [FONT_CP437_8X8]    = {  8,  8, cp437_8x8   },
     [FONT_CP437_8X16]   = {  8, 16, cp437_8x16  },

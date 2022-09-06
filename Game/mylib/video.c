@@ -10,7 +10,7 @@ static void CleanUp(void)
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
 }
 
-void InitWindow(windowInfo_t info) {
+void InitWindow(window_info_t info) {
     if ( !SDL_WasInit(SDL_INIT_VIDEO) ) {
         if ( SDL_InitSubSystem(SDL_INIT_VIDEO) != 0 ) {
             Error("could not init SDL video subsystem: %s", SDL_GetError());
@@ -54,9 +54,9 @@ void InitWindow(windowInfo_t info) {
     }
 }
 
-windowInfo_t WindowInfo(void)
+window_info_t WindowInfo(void)
 {
-    windowInfo_t info;
+    window_info_t info;
     info.title = SDL_GetWindowTitle(window);
     SDL_GetWindowPosition(window, &info.x, &info.y);
     SDL_GetWindowSize(window, &info.width, &info.height);
@@ -151,6 +151,20 @@ void DrawCircle (int x0, int y0, int radius)
     }
 }
 
+SDL_Texture * CreateTexture(int w, int h)
+{
+    SDL_Texture * texture = SDL_CreateTexture
+    (   renderer,
+        SDL_PIXELFORMAT_RGBA8888,
+        SDL_TEXTUREACCESS_TARGET,
+        w, h );
+
+    if ( texture == NULL ) {
+        Error("could not create texture (%s)\n", SDL_GetError());
+    }
+
+    return texture;
+}
 
 extern inline void Clear(void);
 extern inline void Present(void);
