@@ -12,9 +12,19 @@
 
 #define FPS 60.0f
 
-void DoFrame(float dt)
+bool DoFrame(float dt)
 {
-    
+    SDL_Event event;
+    while ( SDL_PollEvent(&event) ) {
+        switch ( event.type ) {
+            case SDL_QUIT:
+                return false;
+            default:
+                break;
+        }
+    }
+
+    return true;
 }
 
 static void GameLoop(void)
@@ -29,7 +39,9 @@ static void GameLoop(void)
             continue;
         }
 
-        DoFrame(dt);
+        if ( !DoFrame(dt) ) {
+            return;
+        }
 
         old_time = new_time;
     }
@@ -40,8 +52,7 @@ void GameMain(void)
     // initialization
     window_info_t info = { 0 };
     InitWindow(&info);
-    SDL_PumpEvents(); // TODO: temp
-    
+
     GameLoop();
     
     // clean up
