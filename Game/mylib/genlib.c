@@ -19,6 +19,16 @@ void print_sdl_rect(const char * name, SDL_Rect r)
     printf("%s: x: %d, y: %d, w: %d, h: %d\n", name, r.x, r.y, r.w, r.h);
 }
 
+const char * GetExtension(const char * path)
+{
+    const char * dot = strrchr(path, '.'); // find the last dot
+    if ( dot == NULL || dot == path ) {
+        return "";
+    }
+
+    return dot + 1;
+}
+
 FILE * OpenFile(const char * file_name, const char * mode)
 {
     FILE * file = fopen(file_name, mode);

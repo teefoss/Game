@@ -8,6 +8,8 @@
 #include "texture.h"
 #include "genlib.h"
 #include "video.h"
+
+#include <SDL_image.h>
 #include <dirent.h> // TODO: check if this is portable
 
 #define MAX_TEXTURES    1024
@@ -32,11 +34,17 @@ static void CleanupTextures(void)
     }
 }
 
-void LoadTextures(const char * directoryName)
+void LoadTextures(const char * directory_name, const char * file_extension)
 {
-    DIR * dir = opendir(directoryName);
+    if ( strcmp(file_extension, "png") == 0 ) {
+        if ( IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG ) {
+            Error("failed to init SDL_Image");
+        }
+    }
+
+    DIR * dir = opendir(directory_name);
     if ( dir == NULL ) {
-        Error("could not open directory '%s'", directoryName);
+        Error("could not open directory '%s'", directory_name);
     }
 
     numTextures = 0;
@@ -44,29 +52,48 @@ void LoadTextures(const char * directoryName)
     while (( entry = readdir(dir) )) {
         const char * file = entry->d_name;
 
+        // skip the '.' and '..'
         if ( strcmp(".", file) == 0 || strcmp("..", file) == 0 ) {
             continue;
         }
 
+        // skip files with non-matching extension
+        const char * this_extension = GetExtension(file);
+        if ( strcmp(this_extension, file_extension) != 0 ) {
+            continue;
+        }
+
+        // make storage for the path of the image file to be
+        // opened (directory + file name)
         char * path = calloc
-        (   strlen(directoryName) + strlen(file) + 2,
+        (   strlen(directory_name) + strlen(file) + 2,
             sizeof(*path) );
 
-        strcat(path, directoryName);
-        if ( directoryName[strlen(directoryName) - 1] != '/' ) {
+        // create the path
+        strcat(path, directory_name);
+        if ( directory_name[strlen(directory_name) - 1] != '/' ) {
             strcat(path, "/");
         }
         strcat(path, file);
 
-        SDL_Surface * surface = SDL_LoadBMP(path);
+        // load the image as a surface
+        SDL_Surface * surface;
+        if ( strcmp(file_extension, "bmp") == 0 ) {
+            surface = SDL_LoadBMP(path);
+            Uint32 key = SDL_MapRGB(surface->format, KEY_R, KEY_G, KEY_B);
+            SDL_SetColorKey(surface, SDL_TRUE, key);
+        } else if ( strcmp(file_extension, "png") == 0 ) {
+            surface = IMG_Load(path);
+        } else {
+            Error("unsupported image format: %s", file_extension);
+        }
+
         if ( surface == NULL ) {
             CleanupTextures();
             Error("failed to create surface (%s)", file);
         }
 
-        Uint32 key = SDL_MapRGB(surface->format, KEY_R, KEY_G, KEY_B);
-        SDL_SetColorKey(surface, SDL_TRUE, key);
-
+        // create a texture from the suface, its file name is the key.
         textures[numTextures].key = SDL_strdup(file);
         textures[numTextures].texture
             = SDL_CreateTextureFromSurface(renderer, surface);
@@ -83,7 +110,7 @@ void LoadTextures(const char * directoryName)
     printf
     (   "LoadTextures: loaded %d textures from '%s'\n",
         numTextures,
-        directoryName );
+        directory_name );
 
     atexit(CleanupTextures);
     closedir(dir);

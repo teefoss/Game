@@ -101,6 +101,9 @@ PRINT_DECL(print_ulong, unsigned long);
 PRINT_DECL(print_sdl_point, SDL_Point);
 PRINT_DECL(print_sdl_rect, SDL_Rect);
 
+/// Get the file extention for `path` (excluding the dot).
+const char * GetExtension(const char * path);
+
 /// Open file and terminate program if it fails.
 /// - Parameter mode: One of the standard `fopen()` modes,
 ///   e.g. `"r"` (read), `"w"` (write)
