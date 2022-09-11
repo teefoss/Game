@@ -9,24 +9,14 @@
 #include "genlib.h"
 #include <SDL.h>
 
-typedef struct {            // default value / set?
+typedef struct {            // default value:
     const char * title;     // ""
     int x;                  // SDL_WINDOWPOS_CENTERED
     int y;                  // SDL_WINDOWPOS_CENTERED
     int width;              // 640
     int height;             // 480
-    int flags;              // 0
-
-    // TODO: some of this is in progress...
-    struct {
-        int flags;          // 0
-        int outputWidth;    // not set if 0
-        int outputHeight;   // not set if 0
-        int logicalWidth;   // not set if 0
-        int logicalHeight;  // not set if 0
-        float scaleX;       // not set if 0
-        float scaleY;       // not set if 0
-    } render;
+    int window_flags;       // 0
+    int render_flags;       // 0
 } window_info_t;
 
 typedef enum {
@@ -40,8 +30,9 @@ typedef enum {
 extern SDL_Renderer * renderer;
 
 /// Initialize window and renderer with options specified in `info`.
-/// - Parameter info: Zero values signal to use default values or to not set.
-void InitWindow(window_info_t info);
+/// - Parameter info: `NULL` or Zero values indicate default values
+///   should be used.
+void InitWindow(window_info_t * info);
 
 /// Get current information about the window.
 window_info_t WindowInfo(void);
@@ -110,6 +101,7 @@ inline void DrawTexture(SDL_Texture * texture, SDL_Rect * src, SDL_Rect * dst)
     SDL_RenderCopy(renderer, texture, src, dst);
 }
 
+/// Create an SDL_Texture with that can be used as a rendering target.
 SDL_Texture * CreateTexture(int w, int h);
 
 #endif /* __VIDEO_H__ */

@@ -10,7 +10,7 @@ static void CleanUp(void)
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
 }
 
-void InitWindow(window_info_t info) {
+void InitWindow(window_info_t * info) {
     if ( !SDL_WasInit(SDL_INIT_VIDEO) ) {
         if ( SDL_InitSubSystem(SDL_INIT_VIDEO) != 0 ) {
             Error("could not init SDL video subsystem: %s", SDL_GetError());
@@ -19,33 +19,37 @@ void InitWindow(window_info_t info) {
 
     atexit(CleanUp);
 
+    window_info_t _info;
+    if ( info == NULL ) {
+        _info = (window_info_t){
+            .title = "",
+            .x = SDL_WINDOWPOS_CENTERED,
+            .y = SDL_WINDOWPOS_CENTERED,
+            .width = 640,
+            .height = 480,
+            .window_flags = 0,
+            .render_flags = 0
+        };
+    } else {
+        _info = *info;
+    }
+
     window = SDL_CreateWindow
-    (   info.title,
-        info.x == 0 ? SDL_WINDOWPOS_CENTERED : info.x,
-        info.y == 0 ? SDL_WINDOWPOS_CENTERED : info.y,
-        info.width == 0 ? 640 : info.width,
-        info.height == 0 ? 480 : info.height,
-        info.flags );
+    (   _info.title,
+        _info.x == 0 ? SDL_WINDOWPOS_CENTERED : _info.x,
+        _info.y == 0 ? SDL_WINDOWPOS_CENTERED : _info.y,
+        _info.width == 0 ? 640 : _info.width,
+        _info.height == 0 ? 480 : _info.height,
+        _info.window_flags );
 
     if ( window == NULL ) {
         Error("could not create window: %s", SDL_GetError());
     }
 
-    renderer = SDL_CreateRenderer(window, -1, info.render.flags);
+    renderer = SDL_CreateRenderer(window, -1, _info.render_flags);
 
     if ( renderer == NULL ) {
         Error("could not create renderer: %s", SDL_GetError());
-    }
-
-    if ( info.render.logicalWidth && info.render.logicalHeight ) {
-        SDL_RenderSetLogicalSize
-        (   renderer,
-            info.render.logicalWidth,
-            info.render.logicalHeight );
-    }
-
-    if ( info.render.scaleX || info.render.scaleY ) {
-        SDL_RenderSetScale(renderer, info.render.scaleX, info.render.scaleY);
     }
 }
 
@@ -55,17 +59,7 @@ window_info_t WindowInfo(void)
     info.title = SDL_GetWindowTitle(window);
     SDL_GetWindowPosition(window, &info.x, &info.y);
     SDL_GetWindowSize(window, &info.width, &info.height);
-    info.flags = SDL_GetWindowFlags(window);
-    //info.render.flags = ?
-    SDL_GetRendererOutputSize
-    (   renderer,
-        &info.render.outputWidth,
-        &info.render.outputHeight );
-    SDL_RenderGetLogicalSize
-    (   renderer,
-        &info.render.logicalWidth,
-        &info.render.logicalHeight );
-    SDL_RenderGetScale(renderer, &info.render.scaleX, &info.render.scaleY);
+    info.window_flags = SDL_GetWindowFlags(window);
 
     return info;
 }

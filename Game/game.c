@@ -39,7 +39,7 @@ void GameMain(void)
 {
     // initialization
     window_info_t info = { 0 };
-    InitWindow(info);
+    InitWindow(&info);
     SDL_PumpEvents(); // TODO: temp
     
     GameLoop();
