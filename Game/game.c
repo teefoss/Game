@@ -10,6 +10,14 @@
 #include "mylib/video.h"
 #include <SDL.h>
 
+// The internal resolution of the game.
+// Aspect ratio is 16:9
+// TODO: support non-16:9 ratios?
+// This makes a visible area of 32 x 18 tiles (16 x 16 pixels)
+#define GAME_WIDTH  512
+#define GAME_HEIGHT 288
+#define DRAW_SCALE  3
+
 #define FPS 60.0f
 
 bool DoFrame(float dt)
@@ -50,8 +58,13 @@ static void GameLoop(void)
 void GameMain(void)
 {
     // initialization
-    window_info_t info = { 0 };
+    window_info_t info = {
+        .width = GAME_WIDTH * DRAW_SCALE,
+        .height = GAME_HEIGHT * DRAW_SCALE
+    };
+
     InitWindow(&info);
+    SDL_RenderSetLogicalSize(renderer, GAME_WIDTH, GAME_HEIGHT);
 
     GameLoop();
     
