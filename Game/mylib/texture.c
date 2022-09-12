@@ -27,7 +27,6 @@ texture_t textures[MAX_TEXTURES];
 
 static void CleanupTextures(void)
 {
-    puts("clean up textures");
     for ( int i = 0; i < numTextures; i++ ) {
         free(textures[i].key);
         SDL_DestroyTexture(textures[i].texture);

@@ -19,6 +19,8 @@
 #define MIN(a, b) ((a < b) ? (a) : (b))
 #define DEG2RAD(a) ( ((a) * M_PI) / 180.0f )
 #define RAD2DEG(a) ( ((a) * 180.0f) / M_PI )
+#define SQR(x) ((x) * (x))
+#define DISTANCE(x1, y1, x2, y2) sqrt(SQR(x2 - x1) + SQR(y2 - y1))
 
 // map x, which is in the range `a...b` to the range `c...d`
 #define MAP(x, a, b, c, d) ((x - a) * (d - c) / (b - a) + c)
