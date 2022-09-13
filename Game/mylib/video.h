@@ -101,6 +101,15 @@ inline void DrawTexture(SDL_Texture * texture, SDL_Rect * src, SDL_Rect * dst)
     SDL_RenderCopy(renderer, texture, src, dst);
 }
 
+inline void DrawTextureFlip
+(   SDL_Texture * texture,
+    SDL_Rect * src,
+    SDL_Rect * dst,
+    SDL_RendererFlip flip )
+{
+    SDL_RenderCopyEx(renderer, texture, src, dst, 0.0, NULL, flip);
+}
+
 /// Create an SDL_Texture with that can be used as a rendering target.
 SDL_Texture * CreateTexture(int w, int h);
 

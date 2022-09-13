@@ -63,6 +63,13 @@ static bool DoFrame(world_t * world, float dt)
     RenderWorld(world);
     render_ms = SDL_GetTicks() - render_start;
 
+    // debug move world camera:
+    float camera_movement = 4.0f * dt; // 2 tiles per second
+    if ( keyboard[SDL_SCANCODE_UP] )    world->camera.y -= camera_movement;
+    if ( keyboard[SDL_SCANCODE_DOWN] )  world->camera.y += camera_movement;
+    if ( keyboard[SDL_SCANCODE_LEFT] )  world->camera.x -= camera_movement;
+    if ( keyboard[SDL_SCANCODE_RIGHT] ) world->camera.x += camera_movement;
+
     // debug geometry:
     if ( show_geometry ) {
         SetRGBA(255, 0, 0, 255);

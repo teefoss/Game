@@ -7,10 +7,13 @@
 
 #include "world.h"
 #include "game.h"
+#include "sprites.h"
+
 #include "mylib/genlib.h"
 #include "mylib/input.h"
 #include "mylib/texture.h"
 #include "mylib/video.h"
+
 #include <stdlib.h>
 
 #define HORIZONTAL_NUM_TILES ((float)GAME_WIDTH / (float)TILE_SIZE)
@@ -148,6 +151,66 @@ world_t * CreateWorld(void)
     return world;
 }
 
+// Determine the maximum point at which rect 'inner' can
+// be placed in rect 'outer', accounting for a margin
+static SDL_Point RectInRectMaxPoint
+(   const SDL_Rect * inner,
+    const SDL_Rect * outer,
+    int margin )
+{
+    SDL_Point pt;
+    pt.x = outer->w - inner->w - margin;
+    pt.y = outer->h - inner->h - margin;
+
+    return pt;
+}
+
+// Used by RenderGrassEffectTexture().
+// Render flowers n stuff onto effect texture.
+static void RenderGrassDecoration(sprite_id_t id, u8 sprite_variety)
+{
+    sprite_t * s = &sprites[id];
+    SDL_Rect area = { .w = TILE_SIZE, .h = TILE_SIZE };
+    SDL_Point max = RectInRectMaxPoint(&s->location, &area, 1);
+    DrawSprite(s, Random(1, max.x), Random(1, max.y), sprite_variety);
+}
+
+static void RenderGrassEffectTexture(tile_t * tile, int tile_x, int tile_y)
+{
+    tile->effect = CreateTexture(TILE_SIZE, TILE_SIZE);
+    SDL_SetTextureBlendMode(tile->effect, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderTarget(renderer, tile->effect);
+
+    SetRGBA(0, 0, 0, 0);
+    Clear();
+
+    // Render moss.
+    SetRGBA(78, 138, 36, 255);
+    for ( int py = 0; py < TILE_SIZE; py++ ) {
+        for ( int px = 0; px < TILE_SIZE; px++ ) {
+            int wx = tile_x * 16 + px; // world pixel coord
+            int wy = tile_y * 16 + py;
+            float noise = Noise2(wx, wy, 1.0f, 0.01f, 8, 1.0f, 0.5f, 2.0f);
+            SeedRandom(wx * wy); // TODO: more than one prng
+            if ( noise > 0.1f || (noise > 0.05f && Random(0, 3) == 0) ) {
+                DrawPoint(px, py);
+            }
+        }
+    }
+
+    // Sprinkle some foliage.
+    // Most tiles have grass, occasionally a flower.
+    if ( Random(0, 1) == 1 ) {
+        if ( Random(0, 12) == 12 ) {
+            RenderGrassDecoration(SPRITE_PLUS_FLOWER, tile->variety);
+        } else {
+            RenderGrassDecoration(SPRITE_GRASS_BLADES, tile->variety);
+        }
+    }
+
+    SDL_SetRenderTarget(renderer, NULL);
+}
+
 static void RenderGrass
 (   tile_t * tile,
     tile_t ** adjacent_tiles,
@@ -172,27 +235,7 @@ static void RenderGrass
 
     // Generate effect texture for this tile if needed.
     if ( tile->effect == NULL ) {
-        tile->effect = CreateTexture(TILE_SIZE, TILE_SIZE);
-        SDL_SetTextureBlendMode(tile->effect, SDL_BLENDMODE_BLEND);
-        SDL_SetRenderTarget(renderer, tile->effect);
-        SetRGBA(0, 0, 0, 0);
-        Clear();
-
-        // Render moss onto effect texture.
-        SetRGBA(78, 138, 36, 255);
-        for ( int py = 0; py < TILE_SIZE; py++ ) {
-            for ( int px = 0; px < TILE_SIZE; px++ ) {
-                int wx = x * 16 + px; // world pixel coord
-                int wy = y * 16 + py;
-                float noise = Noise2(wx, wy, 1.0f, 0.01f, 8, 1.0f, 0.5f, 2.0f);
-                SeedRandom(wx * wy); // TODO: more than one prng
-                if ( noise > 0.1f || (noise > 0.05f && Random(0, 3) == 0) ) {
-                    DrawPoint(px, py);
-                }
-            }
-        }
-
-        SDL_SetRenderTarget(renderer, NULL);
+        RenderGrassEffectTexture(tile, x, y);
     }
 
     DrawTexture(tile->effect, NULL, dst);

@@ -8,6 +8,7 @@
 #ifndef world_h
 #define world_h
 
+#include "gobject.h"
 #include "mylib/mathlib.h"
 
 #define WORLD_WIDTH  512
@@ -38,9 +39,9 @@ typedef struct tile tile_t;
 struct tile {
     terrain_t terrain;
 
-    // Some tiles have extra, per-tile
-    // visual effects. This can be generated
-    // dynamically as needed.
+    // Some tiles have extra, per-tile decoration/
+    // visual effects that are laid over the regular texture
+    // This can be generated dynamically as needed.
     SDL_Texture * effect;
 
     // A value that can be used to
@@ -50,6 +51,8 @@ struct tile {
 
 typedef struct {
     tile_t tiles[WORLD_WIDTH * WORLD_HEIGHT];
+    gobject_t objects[1000];
+
     SDL_Texture * debug_texture; // rendering of entire world
 
     // The camera unit is world tiles, e.g., camera = { 12.5, 15.5 } means

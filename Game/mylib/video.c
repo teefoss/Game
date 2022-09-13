@@ -164,3 +164,8 @@ extern inline void SetRGBA(u8 r, u8 g, u8 b, u8 a);
 extern inline void SetColor(SDL_Color color);
 extern inline void SetGray(u8 gray);
 extern inline void DrawTexture(SDL_Texture * t, SDL_Rect * src, SDL_Rect * dst);
+extern inline void DrawTextureFlip
+(   SDL_Texture * texture,
+    SDL_Rect * src,
+    SDL_Rect * dst,
+    SDL_RendererFlip flip );
