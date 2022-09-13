@@ -52,9 +52,6 @@ typedef struct {
     tile_t tiles[WORLD_WIDTH * WORLD_HEIGHT];
     SDL_Texture * debug_texture; // rendering of entire world
 
-    // debug
-    bool effect_textures_on;
-
     // The camera unit is world tiles, e.g., camera = { 12.5, 15.5 } means
     // the center of tile (12, 15) is centered on screen.
     vec2_t camera;

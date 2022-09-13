@@ -47,9 +47,6 @@ static bool DoFrame(world_t * world, float dt)
                     case SDLK_F3:
                         show_geometry = !show_geometry;
                         break;
-                    case SDLK_F4:
-                        world->effect_textures_on = !world->effect_textures_on;
-                        break;
                     default:
                         break;
                 }

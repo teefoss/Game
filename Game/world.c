@@ -148,6 +148,75 @@ world_t * CreateWorld(void)
     return world;
 }
 
+static void RenderGrass
+(   tile_t * tile,
+    tile_t ** adjacent_tiles,
+    int x,
+    int y,
+    SDL_Texture * grass_texture,
+    SDL_Rect * dst )
+{
+    SDL_Rect src = {
+        .y = 0,
+        .w = TILE_SIZE,
+        .h = TILE_SIZE
+    };
+
+    if ( tile->variety % 12 == 0 ) {
+        src.x = TILE_SIZE * (tile->variety < 128 ? 1 : 2);
+    } else {
+        src.x = 0;
+    }
+
+    DrawTexture(GetTexture("grass.png"), &src, dst);
+
+    // Generate effect texture for this tile if needed.
+    if ( tile->effect == NULL ) {
+        tile->effect = CreateTexture(TILE_SIZE, TILE_SIZE);
+        SDL_SetTextureBlendMode(tile->effect, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderTarget(renderer, tile->effect);
+        SetRGBA(0, 0, 0, 0);
+        Clear();
+
+        // Render moss onto effect texture.
+        SetRGBA(78, 138, 36, 255);
+        for ( int py = 0; py < TILE_SIZE; py++ ) {
+            for ( int px = 0; px < TILE_SIZE; px++ ) {
+                int wx = x * 16 + px; // world pixel coord
+                int wy = y * 16 + py;
+                float noise = Noise2(wx, wy, 1.0f, 0.01f, 8, 1.0f, 0.5f, 2.0f);
+                SeedRandom(wx * wy); // TODO: more than one prng
+                if ( noise > 0.1f || (noise > 0.05f && Random(0, 3) == 0) ) {
+                    DrawPoint(px, py);
+                }
+            }
+        }
+
+        SDL_SetRenderTarget(renderer, NULL);
+    }
+
+    DrawTexture(tile->effect, NULL, dst);
+
+    // Draw highlights at water edges.
+    SetRGBA(122, 214, 56, 255);
+    if ( adjacent_tiles[NORTH]->terrain <= TERRAIN_SHALLOW_WATER ) {
+        SDL_RenderDrawLine(renderer, dst->x, dst->y, dst->x + TILE_SIZE + 1, dst->y);
+    }
+
+    if ( adjacent_tiles[WEST]->terrain <= TERRAIN_SHALLOW_WATER ) {
+        SDL_RenderDrawLine(renderer, dst->x, dst->y, dst->x, dst->y + TILE_SIZE);
+    }
+
+    if ( adjacent_tiles[EAST]->terrain <= TERRAIN_SHALLOW_WATER ) {
+        SDL_RenderDrawLine
+        (   renderer,
+            dst->x + TILE_SIZE - 1,
+            dst->y,
+            dst->x + TILE_SIZE - 1,
+            dst->y + TILE_SIZE - 1 );
+    }
+}
+
 static void RenderVisibleTerrain(world_t * world)
 {
     // Find the upper left visible tile.
@@ -210,53 +279,13 @@ static void RenderVisibleTerrain(world_t * world)
                 case TERRAIN_GRASS:
                 case TERRAIN_FOREST:
                 case TERRAIN_DARK_FOREST:
-                    src.y = 0;
-                    DrawTexture(grass_texture, &src, &dst);
-
-                    // generate effect texture for this tile if needed
-                    if ( tile->effect == NULL ) {
-                        tile->effect = CreateTexture(TILE_SIZE, TILE_SIZE);
-                        SDL_SetTextureBlendMode(tile->effect, SDL_BLENDMODE_BLEND);
-                        SDL_SetRenderTarget(renderer, tile->effect);
-                        SetRGBA(0, 0, 0, 0);
-                        Clear();
-
-                        // render moss onto effect texture
-                        SetRGBA(78, 138, 36, 255);
-                        for ( int y = 0; y < TILE_SIZE; y++ ) {
-                            for ( int x = 0; x < TILE_SIZE; x++ ) {
-                                int wx = tile_x * 16 + x; // world pixel coord
-                                int wy = tile_y * 16 + y;
-                                float noise = Noise2(wx, wy, 1.0f, 0.01f, 8, 1.0f, 0.5f, 2.0f);
-                                SeedRandom(wx * wy); // TODO: more than one prng
-                                if ( noise > 0.1f
-                                    || (noise > 0.05f && Random(0, 3) == 0) ) {
-                                    DrawPoint(x, y);
-                                }
-                            }
-                        }
-
-                        SDL_SetRenderTarget(renderer, NULL);
-                    }
-
-                    if ( world->effect_textures_on ) {
-                        DrawTexture(tile->effect, NULL, &dst);
-                    }
-
-                    // draw highlights at water edges
-                    SetRGBA(122, 214, 56, 255);
-                    if ( adjacent_tiles[NORTH]->terrain <= TERRAIN_SHALLOW_WATER ) {
-                        SDL_RenderDrawLine(renderer, dst.x, dst.y, dst.x + TILE_SIZE + 1, dst.y);
-                    }
-
-                    if ( adjacent_tiles[WEST]->terrain <= TERRAIN_SHALLOW_WATER ) {
-                        SDL_RenderDrawLine(renderer, dst.x, dst.y, dst.x, dst.y + TILE_SIZE);
-                    }
-
-                    if ( adjacent_tiles[EAST]->terrain <= TERRAIN_SHALLOW_WATER ) {
-                        SDL_RenderDrawLine(renderer, dst.x + TILE_SIZE - 1, dst.y, dst.x + TILE_SIZE - 1, dst.y + TILE_SIZE - 1);
-                    }
-
+                    RenderGrass
+                    (   tile,
+                        adjacent_tiles,
+                        tile_x,
+                        tile_y,
+                        grass_texture,
+                        &dst );
                     break;
                 default:
                     break;
