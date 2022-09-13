@@ -6,7 +6,7 @@
 //
 
 #include "game.h"
-#include "world.h"
+#include "w_world.h"
 
 #include "mylib/genlib.h"
 #include "mylib/video.h"

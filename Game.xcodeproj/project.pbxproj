@@ -14,11 +14,13 @@
 		56CA3EBC28C6AA7E00AE2DD5 /* text.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076643C28C68FB200CD99E5 /* text.c */; };
 		56CA3EBD28C6AA7E00AE2DD5 /* texture.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076643828C68FB200CD99E5 /* texture.c */; };
 		56CA3EBE28C6AA7E00AE2DD5 /* video.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076643628C68FB200CD99E5 /* video.c */; };
-		603B178128CEC94C00CF0E8A /* world.c in Sources */ = {isa = PBXBuildFile; fileRef = 603B178028CEC94C00CF0E8A /* world.c */; };
+		603B178128CEC94C00CF0E8A /* w_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 603B178028CEC94C00CF0E8A /* w_main.c */; };
 		6076642B28C68F8400CD99E5 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076642A28C68F8400CD99E5 /* main.c */; };
 		60E0BDC428D021EA00413F7B /* gobject.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E0BDC328D021EA00413F7B /* gobject.c */; };
 		60E0BDC728D0244200413F7B /* sprite.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E0BDC628D0244200413F7B /* sprite.c */; };
 		60E0BDCA28D0264A00413F7B /* sprites.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E0BDC928D0264A00413F7B /* sprites.c */; };
+		60E497CF28D12B3C00F4A322 /* w_render.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E497CE28D12B3C00F4A322 /* w_render.c */; };
+		60E497D128D12D9800F4A322 /* w_generation.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E497D028D12D9800F4A322 /* w_generation.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -36,8 +38,8 @@
 /* Begin PBXFileReference section */
 		56CA3EB628C69FFD00AE2DD5 /* game.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = game.h; sourceTree = "<group>"; };
 		56CA3EB728C69FFD00AE2DD5 /* game.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = game.c; sourceTree = "<group>"; };
-		603B177F28CEC94C00CF0E8A /* world.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = world.h; sourceTree = "<group>"; };
-		603B178028CEC94C00CF0E8A /* world.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = world.c; sourceTree = "<group>"; };
+		603B177F28CEC94C00CF0E8A /* w_world.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = w_world.h; sourceTree = "<group>"; };
+		603B178028CEC94C00CF0E8A /* w_main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = w_main.c; sourceTree = "<group>"; };
 		6076642728C68F8400CD99E5 /* Game */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Game; sourceTree = BUILT_PRODUCTS_DIR; };
 		6076642A28C68F8400CD99E5 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		6076643128C68F9900CD99E5 /* Game.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Game.entitlements; sourceTree = "<group>"; };
@@ -64,6 +66,8 @@
 		60E0BDC628D0244200413F7B /* sprite.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sprite.c; sourceTree = "<group>"; };
 		60E0BDC828D0264A00413F7B /* sprites.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sprites.h; sourceTree = "<group>"; };
 		60E0BDC928D0264A00413F7B /* sprites.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sprites.c; sourceTree = "<group>"; };
+		60E497CE28D12B3C00F4A322 /* w_render.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = w_render.c; sourceTree = "<group>"; };
+		60E497D028D12D9800F4A322 /* w_generation.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = w_generation.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,8 +110,10 @@
 				60E0BDC328D021EA00413F7B /* gobject.c */,
 				60E0BDC828D0264A00413F7B /* sprites.h */,
 				60E0BDC928D0264A00413F7B /* sprites.c */,
-				603B177F28CEC94C00CF0E8A /* world.h */,
-				603B178028CEC94C00CF0E8A /* world.c */,
+				603B177F28CEC94C00CF0E8A /* w_world.h */,
+				603B178028CEC94C00CF0E8A /* w_main.c */,
+				60E497D028D12D9800F4A322 /* w_generation.c */,
+				60E497CE28D12B3C00F4A322 /* w_render.c */,
 			);
 			path = Game;
 			sourceTree = "<group>";
@@ -209,9 +215,11 @@
 				60E0BDCA28D0264A00413F7B /* sprites.c in Sources */,
 				56CA3EBC28C6AA7E00AE2DD5 /* text.c in Sources */,
 				60E0BDC428D021EA00413F7B /* gobject.c in Sources */,
+				60E497D128D12D9800F4A322 /* w_generation.c in Sources */,
+				60E497CF28D12B3C00F4A322 /* w_render.c in Sources */,
 				56CA3EBD28C6AA7E00AE2DD5 /* texture.c in Sources */,
 				56CA3EBE28C6AA7E00AE2DD5 /* video.c in Sources */,
-				603B178128CEC94C00CF0E8A /* world.c in Sources */,
+				603B178128CEC94C00CF0E8A /* w_main.c in Sources */,
 				6076642B28C68F8400CD99E5 /* main.c in Sources */,
 				56CA3EB828C69FFD00AE2DD5 /* game.c in Sources */,
 			);

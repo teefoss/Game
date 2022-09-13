@@ -1,5 +1,5 @@
 //
-//  world.h
+//  w_world.h
 //  Game
 //
 //  Created by Thomas Foster on 9/11/22.
@@ -63,6 +63,13 @@ typedef struct {
 ///
 /// - Returns: A pointer to the allocated world. Caller should free the pointer.
 world_t * CreateWorld(void);
+
+tile_t * GetTile(tile_t * tiles, int x, int y);
+void GetAdjacentTiles
+(   int x,
+    int y,
+    tile_t * world_tiles,
+    tile_t * out[NUM_DIRECTIONS] );
 
 void RenderWorld(world_t * world);
 void DestroyWorld(world_t * world); // maybe FreeWorld would be more positive?

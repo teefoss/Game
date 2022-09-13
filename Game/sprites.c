@@ -6,7 +6,6 @@
 //
 
 #include "sprites.h"
-#include "world.h"
 
 sprite_t sprites[NUM_SPRITES] = {
     [SPRITE_BEACH] = {
