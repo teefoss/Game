@@ -35,8 +35,7 @@ typedef enum {
     NUM_TERRAIN_TYPES,
 } terrain_t;
 
-typedef struct tile tile_t;
-struct tile {
+typedef struct {
     terrain_t terrain;
 
     // Some tiles have extra, per-tile decoration/
@@ -47,7 +46,7 @@ struct tile {
     // A value that can be used to
     // randomize various tile properties.
     u8 variety;
-};
+} tile_t;
 
 typedef struct {
     tile_t tiles[WORLD_WIDTH * WORLD_HEIGHT];

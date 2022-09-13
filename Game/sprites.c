@@ -9,6 +9,12 @@
 #include "world.h"
 
 sprite_t sprites[NUM_SPRITES] = {
+    [SPRITE_BEACH] = {
+        .texture_name = "beach.png",
+        .location = { 0, 0, 16, 16 },
+        .num_frames = 4,
+        .flip = SDL_FLIP_HORIZONTAL,
+    },
     [SPRITE_GRASS] = {
         .texture_name = "grass.png",
         .location = { 0, 0, 16, 16 },

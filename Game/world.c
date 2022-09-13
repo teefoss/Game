@@ -319,6 +319,8 @@ static void RenderVisibleTerrain(world_t * world)
                     break;
                 }
                 case TERRAIN_BEACH:
+                    DrawSprite(&sprites[SPRITE_BEACH], dst.x, dst.y, tile->variety);
+                    break;
                 case TERRAIN_GRASS:
                 case TERRAIN_FOREST:
                 case TERRAIN_DARK_FOREST:

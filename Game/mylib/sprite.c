@@ -16,7 +16,7 @@ void DrawSprite(sprite_t * sprite, int x, int y, u8 variety)
         src.x += sprite->location.w * (variety % sprite->num_frames);
     }
 
-    if ( sprite->flip && Random(0, 1) ) {
+    if ( sprite->flip && variety % 2 == 0 ) {
         DrawTextureFlip(GetTexture(sprite->texture_name), &src, &dst, sprite->flip);
     } else {
         DrawTexture(GetTexture(sprite->texture_name), &src, &dst);

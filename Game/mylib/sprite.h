@@ -15,7 +15,8 @@ typedef struct {
     u8 num_frames; // If not animated, refers to the number of varients.
     u8 current_frame;
     u8 fps;
-    // For sprites with varients, will be randomly flipped.
+
+    // Sprites with varients will be randomly flipped.
     // Use SDL_RendererFlip values OR'd together
     u8 flip;
 } sprite_t;
