@@ -51,15 +51,30 @@ static void RenderGrassEffectTexture(tile_t * tile, int tile_x, int tile_y)
     Clear();
 
     // Render moss.
-    SetRGBA(78, 138, 36, 255);
+
+//    SetRGBA(93, 163, 42, 255); // darker shade of same grass color
+//    SetRGBA(114, 201, 52, 255); // faintly lighter shade of same grass color
     for ( int py = 0; py < TILE_SIZE; py++ ) {
         for ( int px = 0; px < TILE_SIZE; px++ ) {
             int wx = tile_x * 16 + px; // world pixel coord
             int wy = tile_y * 16 + py;
-            float noise = Noise2(wx, wy, 1.0f, 0.01f, 8, 1.0f, 0.5f, 2.0f);
+            float noise = Noise2(wx, wy, 1.0f, 0.01f, 8, 1.0f, 0.5f, 2.5f);
             SeedRandom(wx * wy); // TODO: more than one prng
-            if ( noise > 0.1f || (noise > 0.05f && Random(0, 3) == 0) ) {
+
+            if ( noise > 0.2f ) { //}|| (noise > 0.05f && Random(0, 3) == 0) ) {
+                SetRGBA(78, 138, 36, 255); // darker green
                 DrawPoint(px, py);
+            } else if ( noise > 0.1 ) {
+                SetRGBA(114, 201, 52, 255); // faintly lighter shade of same grass color
+                DrawPoint(px, py);
+            }
+
+            if ( noise > 0.7f ) {
+                if ( Random(0, 15) == 15 ) {
+                    DrawSprite(&sprites[SPRITE_TINY_YELLOW_FLOWER], px, py, 0);
+                }
+            } else if ( noise > 0.45f && Random(0, 20) == 20 ) {
+                DrawSprite(&sprites[SPRITE_TINY_BLUE_FLOWER], px, py, 0);
             }
         }
     }
@@ -185,8 +200,6 @@ static void RenderVisibleTerrain(world_t * world)
                     break;
                 }
                 case TERRAIN_BEACH:
-                    DrawSprite(&sprites[SPRITE_BEACH], dst.x, dst.y, tile->variety);
-                    break;
                 case TERRAIN_GRASS:
                 case TERRAIN_FOREST:
                 case TERRAIN_DARK_FOREST:

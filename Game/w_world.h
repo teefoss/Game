@@ -8,7 +8,7 @@
 #ifndef world_h
 #define world_h
 
-#include "gobject.h"
+#include "actor.h"
 #include "mylib/mathlib.h"
 
 #define WORLD_WIDTH  512
@@ -50,7 +50,7 @@ typedef struct {
 
 typedef struct {
     tile_t tiles[WORLD_WIDTH * WORLD_HEIGHT];
-    gobject_t objects[1000];
+    actor_t actors[1000];
 
     SDL_Texture * debug_texture; // rendering of entire world
 

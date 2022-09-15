@@ -8,17 +8,25 @@ void DrawSprite(sprite_t * sprite, int x, int y, u8 variety)
 {
     SDL_Rect src = sprite->location;
     SDL_Rect dst = { x, y, sprite->location.w, sprite->location.h };
+    SDL_Texture * texture = GetTexture(sprite->texture_name);
 
-    if ( sprite->animated ) {
+    if ( sprite->flags & SPRITE_FLAG_ANIMATED ) {
         // TODO: handle fps
         // src.x += sprite->location.w * sprite->current_frame;
-    } else if ( sprite->num_frames > 0 ) {
-        src.x += sprite->location.w * (variety % sprite->num_frames);
-    }
-
-    if ( sprite->flip && variety % 2 == 0 ) {
-        DrawTextureFlip(GetTexture(sprite->texture_name), &src, &dst, sprite->flip);
+        DrawTexture(texture, &src, &dst);
     } else {
-        DrawTexture(GetTexture(sprite->texture_name), &src, &dst);
+        if ( sprite->flags & SPRITE_FLAG_VARIETY ) {
+            // select a random varient
+            src.x += sprite->location.w * variety % sprite->num_frames;
+        }
+
+        SDL_RendererFlip flip = 0;
+        if ( sprite->flags & SPRITE_FLAG_HORIZONTAL_FLIPPABLE && Random(0, 1) ) {
+            flip |= SDL_FLIP_HORIZONTAL;
+        }
+        if ( sprite->flags & SPRITE_FLAG_VERTICAL_FLIPPABLE && Random(0, 1) ) {
+            flip |= SDL_FLIP_VERTICAL;
+        }
+        DrawTextureFlip(texture, &src, &dst, flip);
     }
 }
