@@ -154,6 +154,8 @@ float RandomFloat(float min, float max)
 
 #pragma mark - VECTOR
 
+extern inline vec2_t AddVectors(vec2_t a, vec2_t b);
+
 bool LerpVector(vec2_t * v, const vec2_t * to, float w)
 {
     float dx = to->x - v->x;

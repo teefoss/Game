@@ -8,12 +8,13 @@
 #ifndef world_h
 #define world_h
 
-#include "actor.h"
+#include "a_actor.h"
 #include "mylib/mathlib.h"
 
 #define WORLD_WIDTH  512
 #define WORLD_HEIGHT 512
 #define TILE_SIZE 16
+#define CHUNCK_SIZE 32
 
 typedef enum {
     NORTH,
@@ -50,7 +51,7 @@ typedef struct {
 
 typedef struct {
     tile_t tiles[WORLD_WIDTH * WORLD_HEIGHT];
-    actor_t actors[1000];
+    actor_storage_t actors;
 
     SDL_Texture * debug_texture; // rendering of entire world
 

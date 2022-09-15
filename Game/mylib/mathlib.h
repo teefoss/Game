@@ -63,6 +63,10 @@ bool LineCircleIntersection
 
 int RectDiagonalLength(int w, int h);
 
+inline vec2_t AddVectors(vec2_t a, vec2_t b) {
+    return (vec2_t){ a.x + b.x, a.y + b.y };
+}
+
 /// Linearly interpolate factor v to vector `to` with factor `w`.
 /// - Returns: true if vector `v` is within 1 of vector `to`.
 bool LerpVector(vec2_t * v, const vec2_t * to, float w);

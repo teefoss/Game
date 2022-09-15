@@ -1,19 +1,14 @@
 //
-//  gobject.c
+//  a_storage.c
 //  Game
 //
-//  Created by Thomas Foster on 9/12/22.
+//  Created by Thomas Foster on 9/15/22.
 //
 
-#include "actor.h"
-#include "mylib/genlib.h"
+#include "a_actor.h"
 
-actor_t * AddActor(actor_storage_t * storage, actor_type_t type)
+actor_t * AddActor(actor_storage_t * storage, actor_t actor)
 {
-    actor_t actor = {
-        .type = type,
-    };
-
     if ( storage->num_actors == MAX_ACTORS ) {
         printf("%s: out of space, please increase MAX_ACTORS\n", __func__);
     }

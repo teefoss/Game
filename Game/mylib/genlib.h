@@ -24,7 +24,7 @@ extern "C" {
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 #define FOR_EACH_INDEX(arr, i) for (int i = 0; i < ARRAY_SIZE(arr); i++)
 #define MS2TICKS(ms, fps) ((float)(ms) / (1000.0f / (float)fps))
-#define SWAP(a, b) { typeof(a) temp = a; a = b; b = tmp; }
+#define SWAP(a, b) { typeof(a) temp = a; a = b; b = temp; }
 
 // declare pt (something with a .x and .y) prior to use
 #define LOOP_2D(pt, w, h)   for ( pt.y = 0; pt.y < h; pt.y++ ) \

@@ -16,11 +16,13 @@
 		56CA3EBE28C6AA7E00AE2DD5 /* video.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076643628C68FB200CD99E5 /* video.c */; };
 		603B178128CEC94C00CF0E8A /* w_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 603B178028CEC94C00CF0E8A /* w_main.c */; };
 		6076642B28C68F8400CD99E5 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076642A28C68F8400CD99E5 /* main.c */; };
-		60E0BDC428D021EA00413F7B /* actor.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E0BDC328D021EA00413F7B /* actor.c */; };
+		60E0BDC428D021EA00413F7B /* a_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E0BDC328D021EA00413F7B /* a_main.c */; };
 		60E0BDC728D0244200413F7B /* sprite.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E0BDC628D0244200413F7B /* sprite.c */; };
 		60E0BDCA28D0264A00413F7B /* sprites.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E0BDC928D0264A00413F7B /* sprites.c */; };
 		60E497CF28D12B3C00F4A322 /* w_render.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E497CE28D12B3C00F4A322 /* w_render.c */; };
 		60E497D128D12D9800F4A322 /* w_generation.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E497D028D12D9800F4A322 /* w_generation.c */; };
+		60E4986D28D3707300F4A322 /* a_definitions.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E4986C28D3707300F4A322 /* a_definitions.c */; };
+		60E4986F28D3727500F4A322 /* a_storage.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E4986E28D3727500F4A322 /* a_storage.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -60,14 +62,17 @@
 		6076644228C68FB200CD99E5 /* nes_16x16.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nes_16x16.h; sourceTree = "<group>"; };
 		6076644328C68FB200CD99E5 /* cp437_8x16.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cp437_8x16.h; sourceTree = "<group>"; };
 		60E0BDC128CEEF1A00413F7B /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Assets; sourceTree = "<group>"; };
-		60E0BDC228D021EA00413F7B /* actor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = actor.h; sourceTree = "<group>"; };
-		60E0BDC328D021EA00413F7B /* actor.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = actor.c; sourceTree = "<group>"; };
+		60E0BDC228D021EA00413F7B /* a_actor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = a_actor.h; sourceTree = "<group>"; };
+		60E0BDC328D021EA00413F7B /* a_main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = a_main.c; sourceTree = "<group>"; };
 		60E0BDC528D0244200413F7B /* sprite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sprite.h; sourceTree = "<group>"; };
 		60E0BDC628D0244200413F7B /* sprite.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sprite.c; sourceTree = "<group>"; };
 		60E0BDC828D0264A00413F7B /* sprites.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sprites.h; sourceTree = "<group>"; };
 		60E0BDC928D0264A00413F7B /* sprites.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sprites.c; sourceTree = "<group>"; };
 		60E497CE28D12B3C00F4A322 /* w_render.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = w_render.c; sourceTree = "<group>"; };
 		60E497D028D12D9800F4A322 /* w_generation.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = w_generation.c; sourceTree = "<group>"; };
+		60E4986C28D3707300F4A322 /* a_definitions.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = a_definitions.c; sourceTree = "<group>"; };
+		60E4986E28D3727500F4A322 /* a_storage.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = a_storage.c; sourceTree = "<group>"; };
+		60E4987028D37D6100F4A322 /* a_types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = a_types.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,8 +111,11 @@
 				6076642A28C68F8400CD99E5 /* main.c */,
 				56CA3EB628C69FFD00AE2DD5 /* game.h */,
 				56CA3EB728C69FFD00AE2DD5 /* game.c */,
-				60E0BDC228D021EA00413F7B /* actor.h */,
-				60E0BDC328D021EA00413F7B /* actor.c */,
+				60E0BDC228D021EA00413F7B /* a_actor.h */,
+				60E4987028D37D6100F4A322 /* a_types.h */,
+				60E4986C28D3707300F4A322 /* a_definitions.c */,
+				60E0BDC328D021EA00413F7B /* a_main.c */,
+				60E4986E28D3727500F4A322 /* a_storage.c */,
 				60E0BDC828D0264A00413F7B /* sprites.h */,
 				60E0BDC928D0264A00413F7B /* sprites.c */,
 				603B177F28CEC94C00CF0E8A /* w_world.h */,
@@ -209,18 +217,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				56CA3EB928C6AA7E00AE2DD5 /* genlib.c in Sources */,
+				60E4986F28D3727500F4A322 /* a_storage.c in Sources */,
 				56CA3EBA28C6AA7E00AE2DD5 /* input.c in Sources */,
 				60E0BDC728D0244200413F7B /* sprite.c in Sources */,
 				56CA3EBB28C6AA7E00AE2DD5 /* mathlib.c in Sources */,
 				60E0BDCA28D0264A00413F7B /* sprites.c in Sources */,
 				56CA3EBC28C6AA7E00AE2DD5 /* text.c in Sources */,
-				60E0BDC428D021EA00413F7B /* actor.c in Sources */,
+				60E0BDC428D021EA00413F7B /* a_main.c in Sources */,
 				60E497D128D12D9800F4A322 /* w_generation.c in Sources */,
 				60E497CF28D12B3C00F4A322 /* w_render.c in Sources */,
 				56CA3EBD28C6AA7E00AE2DD5 /* texture.c in Sources */,
 				56CA3EBE28C6AA7E00AE2DD5 /* video.c in Sources */,
 				603B178128CEC94C00CF0E8A /* w_main.c in Sources */,
 				6076642B28C68F8400CD99E5 /* main.c in Sources */,
+				60E4986D28D3707300F4A322 /* a_definitions.c in Sources */,
 				56CA3EB828C69FFD00AE2DD5 /* game.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

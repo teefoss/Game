@@ -105,6 +105,54 @@ static void GenerateTerrain(world_t * world)
     world->camera.y = half_height - 30.5f;
 }
 
+void SpawnPlayer(world_t * world)
+{
+    // make a list of grass tiles ordered by how close they are to the
+    // the center of the world and selector
+
+    int center_x = WORLD_WIDTH / 2;
+    int center_y = WORLD_HEIGHT / 2;
+
+    int num_potentials = 0;
+    struct potential_tile {
+        int x;
+        int y;
+        int distance;
+    } potentials[WORLD_WIDTH * WORLD_HEIGHT];
+
+    // fill the list
+    for ( int y = 0; y < WORLD_HEIGHT; y++ ) {
+        for ( int x = 0; x < WORLD_WIDTH; x++ ) {
+            tile_t * tile = GetTile(world->tiles, x, y);
+            if ( tile->terrain == TERRAIN_GRASS ) {
+                potentials[num_potentials].x = x;
+                potentials[num_potentials].y = y;
+                potentials[num_potentials].distance
+                    = DISTANCE(x, y, center_x, center_y);
+                num_potentials++;
+            }
+        }
+    }
+
+    // sort the list
+    for ( int i = 0; i < num_potentials; i++ ) {
+        for ( int j = i + 1; j < num_potentials; j++ ) {
+            if ( potentials[j].distance < potentials[i].distance) {
+                SWAP(potentials[i], potentials[j]);
+            }
+        }
+    }
+
+    if ( num_potentials < 50 ) {
+        Error("Somehow there are < 50 grass tiles in the world!");
+    }
+
+    int i = Random(0, 49);
+    vec2_t position = { potentials[i].x, potentials[i].y };
+    position = AddVectors(position, (vec2_t){ 0.5f, 0.5f }); // center in tile
+    SpawnActor(ACTOR_PLAYER, position, &world->actors);
+}
+
 world_t * CreateWorld(void)
 {
     world_t * world = malloc(sizeof(*world));
@@ -113,6 +161,7 @@ world_t * CreateWorld(void)
     }
 
     GenerateTerrain(world);
+    SpawnPlayer(world);
 
     return world;
 }
