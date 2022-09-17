@@ -51,3 +51,15 @@ void DestroyWorld(world_t * world)
     
     free(world);
 }
+
+void UpdateWorld(world_t * world, float dt)
+{
+    // Update positions, etc.
+    for ( int i = 0; i < world->actors.num_actors; i++ ) {
+        UpdateActor(&world->actors.array[i], dt);
+    }
+
+    // TODO: handle collisions
+
+    CleanActorStorage(&world->actors); // remove any removables
+}

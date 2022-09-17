@@ -74,5 +74,6 @@ void GetAdjacentTiles
 
 void RenderWorld(world_t * world);
 void DestroyWorld(world_t * world); // maybe FreeWorld would be more positive?
+void UpdateWorld(world_t * world, float dt);
 
 #endif /* world_h */

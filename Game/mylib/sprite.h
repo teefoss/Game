@@ -19,15 +19,14 @@ typedef struct {
     u8 draw_order; // lower values are drawn first (in back)
     SDL_Rect location; // source rect in sprite sheet
     u8 num_frames; // If not animated, refers to the number of varients.
-    u8 current_frame;
     u8 fps;
     sprite_flags_t flags;
-
-    // Sprites with varients will be randomly flipped.
-    // Use SDL_RendererFlip values OR'd together
-    u8 flip;
 } sprite_t;
 
+/// Draw sprite at pixel coordinate (x, y).
+///
+/// - Parameter frame: The current animation frame is sprite is animated, or
+///   a number to randomly select which sprite varient is drawn.
 void DrawSprite(sprite_t * sprite, int x, int y, u8 frame);
 
 #endif /* SPRITE_H */

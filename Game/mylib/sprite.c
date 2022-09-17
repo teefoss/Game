@@ -4,20 +4,19 @@
 #include "video.h"
 
 // NB: this does not handle sprite scaling, maybe it should
-void DrawSprite(sprite_t * sprite, int x, int y, u8 variety)
+void DrawSprite(sprite_t * sprite, int x, int y, u8 frame)
 {
     SDL_Rect src = sprite->location;
     SDL_Rect dst = { x, y, sprite->location.w, sprite->location.h };
     SDL_Texture * texture = GetTexture(sprite->texture_name);
 
     if ( sprite->flags & SPRITE_FLAG_ANIMATED ) {
-        // TODO: handle fps
-        // src.x += sprite->location.w * sprite->current_frame;
+        src.x += sprite->location.w * frame;
         DrawTexture(texture, &src, &dst);
     } else {
         if ( sprite->flags & SPRITE_FLAG_VARIETY ) {
             // select a random varient
-            src.x += sprite->location.w * variety % sprite->num_frames;
+            src.x += sprite->location.w * frame % sprite->num_frames;
         }
 
         SDL_RendererFlip flip = 0;

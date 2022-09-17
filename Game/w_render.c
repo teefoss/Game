@@ -226,4 +226,16 @@ static void RenderVisibleTerrain(world_t * world)
 void RenderWorld(world_t * world)
 {
     RenderVisibleTerrain(world);
+
+    for ( int i = 0; i < world->actors.num_actors; i++ ) {
+        actor_t * actor = &world->actors.array[i];
+        sprite_t * sprite = GetActorSprite(actor);
+
+        if ( sprite ) {
+            int screen_x = GAME_WIDTH / 2 - world->camera.x - actor->position.x;
+            int screen_y = GAME_HEIGHT / 2 - world->camera.y - actor->position.y;
+
+            DrawSprite(sprite, screen_x, screen_y, 0);
+        }
+    }
 }

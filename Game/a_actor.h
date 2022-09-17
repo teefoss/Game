@@ -29,6 +29,8 @@ struct actor {
     actor_flags_t flags;
 
     sprite_t * sprite;
+    float current_frame;
+    
     actor_state_t * state;
 };
 
@@ -53,6 +55,8 @@ typedef struct {
 // a_main.c
 
 void SpawnActor(actor_type_t type, vec2_t position, actor_storage_t * storage);
+sprite_t * GetActorSprite(actor_t * actor);
+void UpdateActor(actor_t * actor, float dt);
 
 // -----------------------------------------------------------------------------
 // a_definitions.c

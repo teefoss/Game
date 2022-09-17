@@ -63,8 +63,14 @@ bool LineCircleIntersection
 
 int RectDiagonalLength(int w, int h);
 
-inline vec2_t AddVectors(vec2_t a, vec2_t b) {
+inline vec2_t AddVectors(vec2_t a, vec2_t b)
+{
     return (vec2_t){ a.x + b.x, a.y + b.y };
+}
+
+inline vec2_t ScaleVector(vec2_t v, float s)
+{
+    return (vec2_t){ v.x * s, v.y * s };
 }
 
 /// Linearly interpolate factor v to vector `to` with factor `w`.
