@@ -8,6 +8,11 @@
 #include "sprites.h"
 
 sprite_t sprites[NUM_SPRITES] = {
+    [SPRITE_PLAYER_STAND] = {
+        .texture_name = "player.png",
+        .location = { 0, 0, 16, 32 },
+        .num_frames = 1,
+    },
     [SPRITE_GRASS] = {
         .texture_name = "grass.png",
         .location = { 0, 0, 16, 16 },

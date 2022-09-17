@@ -43,7 +43,7 @@ void UpdateActor(actor_t * actor, float dt)
 
     if ( actor->state ) {
         if ( actor->state->update ) {
-            actor->state->update(actor);
+            actor->state->update(actor, dt);
         }
     }
 }

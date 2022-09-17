@@ -24,7 +24,7 @@ typedef struct actor_state actor_state_t;
 struct actor {
     actor_type_t type;
 
-    vec2_t position;
+    vec2_t position; // the bottom center of the visible sprite
     vec2_t velocity;
     actor_flags_t flags;
 
@@ -32,16 +32,16 @@ struct actor {
     float current_frame;
     
     actor_state_t * state;
+    int state_timer;
 };
 
 struct actor_state {
-    int ticks; // when zero, change to next state
     int length; // state length in ticks
     actor_state_t * next_state;
-
     sprite_t * sprite; // &sprites[id]
 
-    void (* update)(actor_t * self);
+    void (* handle_input)(actor_t * self);
+    void (* update)(actor_t * self, float dt);
     void (* contact)(actor_t * self, actor_t * other);
 };
 

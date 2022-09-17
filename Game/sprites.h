@@ -16,6 +16,7 @@ typedef enum {
 } draw_order_t;
 
 typedef enum {
+    SPRITE_PLAYER_STAND,
     SPRITE_BEACH,
     SPRITE_GRASS,
     SPRITE_PLUS_FLOWER,

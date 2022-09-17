@@ -232,8 +232,11 @@ void RenderWorld(world_t * world)
         sprite_t * sprite = GetActorSprite(actor);
 
         if ( sprite ) {
-            int screen_x = GAME_WIDTH / 2 - world->camera.x - actor->position.x;
-            int screen_y = GAME_HEIGHT / 2 - world->camera.y - actor->position.y;
+            int screen_x = GAME_WIDTH / 2 - (world->camera.x - actor->position.x);
+            int screen_y = GAME_HEIGHT / 2 - (world->camera.y - actor->position.y);
+
+            screen_x -= sprite->location.w / 2;
+            screen_y -= sprite->location.h;
 
             DrawSprite(sprite, screen_x, screen_y, 0);
         }

@@ -108,7 +108,7 @@ static void GenerateTerrain(world_t * world)
 void SpawnPlayer(world_t * world)
 {
     // make a list of grass tiles ordered by how close they are to the
-    // the center of the world and selector
+    // the center of the world and select one at random
 
     int center_x = WORLD_WIDTH / 2;
     int center_y = WORLD_HEIGHT / 2;
@@ -134,7 +134,7 @@ void SpawnPlayer(world_t * world)
         }
     }
 
-    // sort the list
+    // sort the list by distance: earlier indices are closer to center of world
     for ( int i = 0; i < num_potentials; i++ ) {
         for ( int j = i + 1; j < num_potentials; j++ ) {
             if ( potentials[j].distance < potentials[i].distance) {
@@ -143,11 +143,14 @@ void SpawnPlayer(world_t * world)
         }
     }
 
-    if ( num_potentials < 50 ) {
-        Error("Somehow there are < 50 grass tiles in the world!");
+    const int spawn_tile_count = 256;
+    if ( num_potentials < spawn_tile_count ) {
+        Error("Somehow there are < %d grass tiles in the world!", spawn_tile_count);
     }
 
-    int i = Random(0, 49);
+    // select one of the 50 grass tiles closest to the center of world.
+    Randomize();
+    int i = Random(0, spawn_tile_count - 1);
     vec2_t position = { potentials[i].x, potentials[i].y };
     position = AddVectors(position, (vec2_t){ 0.5f, 0.5f }); // center in tile
     SpawnActor(ACTOR_PLAYER, position, &world->actors);

@@ -56,6 +56,8 @@ static bool DoFrame(world_t * world, float dt)
         }
     }
 
+    UpdateWorld(world, dt);
+
     SetGray(0);
     Clear();
 
@@ -64,11 +66,13 @@ static bool DoFrame(world_t * world, float dt)
     render_ms = SDL_GetTicks() - render_start;
 
     // debug move world camera:
+#if 0
     float camera_movement = 4.0f * dt; // 2 tiles per second
     if ( keyboard[SDL_SCANCODE_UP] )    world->camera.y -= camera_movement;
     if ( keyboard[SDL_SCANCODE_DOWN] )  world->camera.y += camera_movement;
     if ( keyboard[SDL_SCANCODE_LEFT] )  world->camera.x -= camera_movement;
     if ( keyboard[SDL_SCANCODE_RIGHT] ) world->camera.x += camera_movement;
+#endif
 
     // debug geometry:
     if ( show_geometry ) {

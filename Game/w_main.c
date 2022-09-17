@@ -54,9 +54,23 @@ void DestroyWorld(world_t * world)
 
 void UpdateWorld(world_t * world, float dt)
 {
-    // Update positions, etc.
+    // Let any actors that respond to input do so.
     for ( int i = 0; i < world->actors.num_actors; i++ ) {
-        UpdateActor(&world->actors.array[i], dt);
+        actor_t * actor = &world->actors.array[i];
+
+        if ( actor->state && actor->state->handle_input ) {
+            actor->state->handle_input(actor);
+        }
+    }
+
+    // Update actors.
+    for ( int i = 0; i < world->actors.num_actors; i++ ) {
+        actor_t * actor = &world->actors.array[i];
+
+        UpdateActor(actor, dt);
+        if ( actor->type == ACTOR_PLAYER ) {
+            world->camera = actor->position; // update camera position
+        }
     }
 
     // TODO: handle collisions
