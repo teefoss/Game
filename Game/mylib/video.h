@@ -27,6 +27,7 @@ typedef enum {
     DESKTOP = SDL_WINDOW_FULLSCREEN_DESKTOP,
 } fullscreen_t;
 
+extern SDL_Window * window;
 extern SDL_Renderer * renderer;
 
 /// Initialize window and renderer with options specified in `info`.

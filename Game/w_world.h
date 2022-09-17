@@ -55,8 +55,6 @@ typedef struct {
 
     SDL_Texture * debug_texture; // rendering of entire world
 
-    // The camera unit is world tiles, e.g., camera = { 12.5, 15.5 } means
-    // the center of tile (12, 15) is centered on screen.
     vec2_t camera;
 } world_t;
 
@@ -65,6 +63,7 @@ typedef struct {
 /// - Returns: A pointer to the allocated world. Caller should free the pointer.
 world_t * CreateWorld(void);
 
+SDL_Point TileToWorldPixel(vec2_t position);
 tile_t * GetTile(tile_t * tiles, int x, int y);
 void GetAdjacentTiles
 (   int x,

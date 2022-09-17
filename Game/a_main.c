@@ -1,5 +1,5 @@
 //
-//  gobject.c
+//  a_main.c
 //  Game
 //
 //  Created by Thomas Foster on 9/12/22.
@@ -7,8 +7,9 @@
 
 #include "a_actor.h"
 #include "mylib/genlib.h"
+#include "w_world.h"
 
-sprite_t * GetActorSprite(actor_t * actor)
+sprite_t * GetActorSprite(const actor_t * actor)
 {
     if ( actor->state != NULL ) {
         return actor->state->sprite;
@@ -46,4 +47,20 @@ void UpdateActor(actor_t * actor, float dt)
             actor->state->update(actor, dt);
         }
     }
+}
+
+SDL_Rect ActorRect(const actor_t * actor)
+{
+    sprite_t * sprite = GetActorSprite(actor);
+    SDL_Rect rect = {
+        .x = actor->position.x * TILE_SIZE,
+        .y = actor->position.y * TILE_SIZE,
+        .w = sprite ? sprite->location.w : 0,
+        .h = sprite ? sprite->location.h : 0
+    };
+
+    rect.x -= rect.w / 2;
+    rect.y -= rect.h;
+
+    return rect;
 }

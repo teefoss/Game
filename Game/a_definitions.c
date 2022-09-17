@@ -9,7 +9,7 @@
 #include "sprites.h"
 #include "mylib/input.h"
 
-#define PLAYER_VELOCITY 1.5f
+#define PLAYER_VELOCITY 2.0f
 #define PLAYER_ACCEL 0.1f
 
 void PlayerHandleInput(actor_t * player)

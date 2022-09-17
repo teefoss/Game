@@ -107,6 +107,36 @@ int RectDiagonalLength(int w, int h)
     return (int)sqrt(w * w + h * h);
 }
 
+typedef struct { int left, top, right, bottom; } box_t;
+
+box_t BoxFromRect(SDL_Rect rect)
+{
+    return (box_t){ rect.x, rect.y, rect.x + rect.h, rect.y + rect.h };
+}
+
+// https://noonat.github.io/intersect/
+
+bool RectInRect(SDL_Rect a, SDL_Rect b)
+{
+    int right[2]    = { a.x, b.x };
+    int left[2]     = { a.x + a.w, b.x + b.w };
+    int top[2]      = { a.y, b.y };
+    int bottom[2]   = { a.y + a.h, b.y + b.h };
+
+    return
+       right[0] >= right[1]
+    && left[0] <= left[1]
+    && top[0] >= top[1]
+    && bottom[0] <= bottom[1];
+}
+
+bool RectsIntersect(SDL_Rect a, SDL_Rect b)
+{
+    return
+    (abs((a.x + a.w / 2) - (b.x + b.w / 2)) * 2 < (a.w + b.w)) &&
+    (abs((a.y + a.h / 2) - (b.y + b.h / 2)) * 2 < (a.h + b.h));
+}
+
 #pragma mark - RANDOM
 
 static u32 next = 1;

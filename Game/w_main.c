@@ -69,7 +69,7 @@ void UpdateWorld(world_t * world, float dt)
 
         UpdateActor(actor, dt);
         if ( actor->type == ACTOR_PLAYER ) {
-            world->camera = actor->position; // update camera position
+            world->camera = actor->position;
         }
     }
 

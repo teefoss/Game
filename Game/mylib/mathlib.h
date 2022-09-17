@@ -62,6 +62,8 @@ bool LineCircleIntersection
 /*, bool segment */ );
 
 int RectDiagonalLength(int w, int h);
+bool RectInRect(SDL_Rect a, SDL_Rect b);
+bool RectsIntersect(SDL_Rect a, SDL_Rect b);
 
 inline vec2_t AddVectors(vec2_t a, vec2_t b)
 {

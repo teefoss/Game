@@ -105,6 +105,9 @@ static void GenerateTerrain(world_t * world)
     world->camera.y = half_height - 30.5f;
 }
 
+// track occupied tiles during generation
+static bool occupied[WORLD_HEIGHT][WORLD_WIDTH];
+
 void SpawnPlayer(world_t * world)
 {
     // make a list of grass tiles ordered by how close they are to the
@@ -152,19 +155,42 @@ void SpawnPlayer(world_t * world)
     Randomize();
     int i = Random(0, spawn_tile_count - 1);
     vec2_t position = { potentials[i].x, potentials[i].y };
+    occupied[(int)position.y][(int)position.y] = true;
     position = AddVectors(position, (vec2_t){ 0.5f, 0.5f }); // center in tile
     SpawnActor(ACTOR_PLAYER, position, &world->actors);
 }
 
 world_t * CreateWorld(void)
 {
-    world_t * world = malloc(sizeof(*world));
+    world_t * world = calloc(1, sizeof(*world));
     if ( world == NULL ) {
         Error("could not allocate world");
     }
 
+    memset(occupied, 0, sizeof(occupied));
+
     GenerateTerrain(world);
     SpawnPlayer(world);
+
+    // testing: spawn trees
+    for ( int y = 0; y < WORLD_HEIGHT; y++ ) {
+        for ( int x = 0; x < WORLD_WIDTH; x++ ) {
+            if ( occupied[y][x] ) {
+                continue;
+            }
+
+            tile_t * tile = GetTile(world->tiles, x, y);
+            if ( tile->terrain == TERRAIN_GRASS
+                && !occupied[y][x]
+                && Random(0, 10) == 10 )
+            {
+                vec2_t v = { x + 0.5f, y + 0.5f };
+                printf("spawning tree at tile %d, %d\n", x, y);
+                SpawnActor(ACTOR_TREE, v, &world->actors);
+                occupied[y][x] = true;
+            }
+        }
+    }
 
     return world;
 }

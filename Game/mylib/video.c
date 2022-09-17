@@ -1,6 +1,6 @@
 #include "video.h"
 
-static SDL_Window * window;
+SDL_Window * window;
 SDL_Renderer * renderer;
 
 static void CleanUp(void)

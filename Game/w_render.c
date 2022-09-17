@@ -141,32 +141,42 @@ static void RenderGrass
     }
 }
 
+static SDL_Rect GetVisibleRect(vec2_t camera)
+{
+    SDL_Rect r = {
+        .x = camera.x * TILE_SIZE - GAME_WIDTH / 2,
+        .y = camera.y * TILE_SIZE - GAME_HEIGHT / 2
+    };
+    SDL_GetWindowSize(window, &r.w, &r.h);
+
+    return r;
+}
+
 static void RenderVisibleTerrain(world_t * world)
 {
+    SDL_Rect visible_rect = GetVisibleRect(world->camera);
+
     // Find the upper left visible tile.
-    int corner_tile_x = (int)world->camera.x - HORIZONTAL_NUM_TILES / 2.0f;
-    int corner_tile_y = (int)world->camera.y - VERTICAL_NUM_TILES / 2.0f;
+    int corner_tile_x = visible_rect.x / TILE_SIZE;
+    int corner_tile_y = visible_rect.y / TILE_SIZE;
     //printf("ul corner tile: %d, %d\n", corner_tile_x, corner_tile_y);
 
     SDL_Texture * grass_texture = GetTexture("grass.png");
     SDL_Texture * water_texture = GetTexture("shallow-water.png");
 
-    vec2_t fraction = {
-        .x = world->camera.x - (int)world->camera.x,
-        .y = world->camera.y - (int)world->camera.y
-    };
-
     SDL_Rect dst = {
-        .y = -fraction.y * (float)TILE_SIZE,
         .w = TILE_SIZE,
         .h = TILE_SIZE,
+    };
+
+    SDL_Rect src = {
+        .w = TILE_SIZE,
+        .h = TILE_SIZE
     };
 
     for (int tile_y = corner_tile_y;
          tile_y <= corner_tile_y + VERTICAL_NUM_TILES + 1;
          tile_y++ ) {
-
-        dst.x = -fraction.x * (float)TILE_SIZE;
 
         for (int tile_x = corner_tile_x;
              tile_x <= corner_tile_x + HORIZONTAL_NUM_TILES + 1;
@@ -176,13 +186,10 @@ static void RenderVisibleTerrain(world_t * world)
             tile_t * adjacent_tiles[NUM_DIRECTIONS];
             GetAdjacentTiles(tile_x, tile_y, world->tiles, adjacent_tiles);
 
-            SDL_Rect src = {
-                .x = TILE_SIZE * (tile->variety % 4), // TODO: #define 4
-                .w = TILE_SIZE,
-                .h = TILE_SIZE
-            };
+            src.x = TILE_SIZE * (tile->variety % 4); // TODO: #define 4
+            dst.x = tile_x * TILE_SIZE - visible_rect.x;
+            dst.y = tile_y * TILE_SIZE - visible_rect.y;
 
-            // TODO: this is an awful, awful mess
             switch ( tile->terrain ) {
                 case TERRAIN_DEEP_WATER:
                     // TODO: render deep water
@@ -223,22 +230,50 @@ static void RenderVisibleTerrain(world_t * world)
 
 }
 
+SDL_Point TileToWorldPixel(vec2_t position)
+{
+    return (SDL_Point){ position.x * TILE_SIZE, position.y * TILE_SIZE };
+}
+
+SDL_Point TileToScreenPixel(vec2_t camera, vec2_t position)
+{
+    SDL_Point camera_world_pixel = TileToWorldPixel(camera);
+    SDL_Point position_world_pixel = TileToWorldPixel(position);
+
+    return (SDL_Point){
+        GAME_WIDTH / 2 - camera_world_pixel.x - position_world_pixel.x,
+        GAME_HEIGHT / 2 - camera_world_pixel.y - position_world_pixel.y
+    };
+}
+
+actor_storage_t visible_actors;
+
 void RenderWorld(world_t * world)
 {
     RenderVisibleTerrain(world);
 
+    SDL_Rect visible_rect = GetVisibleRect(world->camera);
+
+    visible_actors.num_actors = 0;
     for ( int i = 0; i < world->actors.num_actors; i++ ) {
         actor_t * actor = &world->actors.array[i];
+
+        if ( GetActorSprite(actor)
+            && RectsIntersect(visible_rect, ActorRect(&world->actors.array[i])) )
+        {
+            AddActor(&visible_actors, world->actors.array[i]);
+        }
+    }
+
+    for ( int i = 0; i < visible_actors.num_actors; i++ ) {
+        actor_t * actor = &visible_actors.array[i];
         sprite_t * sprite = GetActorSprite(actor);
 
         if ( sprite ) {
-            int screen_x = GAME_WIDTH / 2 - (world->camera.x - actor->position.x);
-            int screen_y = GAME_HEIGHT / 2 - (world->camera.y - actor->position.y);
-
-            screen_x -= sprite->location.w / 2;
-            screen_y -= sprite->location.h;
-
-            DrawSprite(sprite, screen_x, screen_y, 0);
+            SDL_Rect r = ActorRect(actor);
+            r.x -= visible_rect.x;
+            r.y -= visible_rect.y;
+            DrawSprite(sprite, r.x, r.y, 0);
         }
     }
 }

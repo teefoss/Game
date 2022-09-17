@@ -12,7 +12,7 @@
 #include "mylib/mathlib.h"
 #include "mylib/sprite.h"
 
-#define MAX_ACTORS 1000
+#define MAX_ACTORS 5000
 
 typedef enum {
     ACTOR_FLAG_SOLID = 0x0001,
@@ -24,7 +24,7 @@ typedef struct actor_state actor_state_t;
 struct actor {
     actor_type_t type;
 
-    vec2_t position; // the bottom center of the visible sprite
+    vec2_t position; // in tiles, the bottom center of the visible sprite
     vec2_t velocity;
     actor_flags_t flags;
 
@@ -51,12 +51,27 @@ typedef struct {
     u16 num_actors;
 } actor_storage_t;
 
+//
+//  Actor Quadtree Storage
+//
+#define ACTOR_TREE_NODE_SIZE 4
+#define ACTOR_TREE_NUM_LEVELS 6 // 512 x 512 world, max level = 16 x 16
+typedef struct actor_tree_node actor_tree_node_t;
+struct actor_tree_node {
+    int num_actors;
+    actor_t actors[ACTOR_TREE_NODE_SIZE];
+    SDL_Rect bounds;
+    int level;
+    actor_tree_node_t * quadrants[4];
+};
+
 // -----------------------------------------------------------------------------
 // a_main.c
 
 void SpawnActor(actor_type_t type, vec2_t position, actor_storage_t * storage);
-sprite_t * GetActorSprite(actor_t * actor);
+sprite_t * GetActorSprite(const actor_t * actor);
 void UpdateActor(actor_t * actor, float dt);
+SDL_Rect ActorRect(const actor_t * actor);
 
 // -----------------------------------------------------------------------------
 // a_definitions.c
@@ -76,5 +91,13 @@ void FlagActorForRemoval(actor_storage_t * storage, int index);
 
 /// Remove any actors that were flagged for removal.
 void CleanActorStorage(actor_storage_t * storage);
+
+actor_tree_node_t * InitActorTreeNode(SDL_Rect bounds, int level);
+bool ActorTreeInsert_r(actor_tree_node_t * node, actor_t actor);
+void GetActorsInRect_r
+(   actor_storage_t * fill,
+    actor_tree_node_t * node,
+    SDL_Rect rect );
+void FreeActorTree_r(actor_tree_node_t * node);
 
 #endif /* actor_h */
