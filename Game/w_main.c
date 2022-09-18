@@ -55,7 +55,7 @@ void DestroyWorld(world_t * world)
 void UpdateWorld(world_t * world, float dt)
 {
     // Let any actors that respond to input do so.
-    for ( int i = 0; i < world->actors.num_actors; i++ ) {
+    for ( int i = 0; i < world->actors.count; i++ ) {
         actor_t * actor = &world->actors.array[i];
 
         if ( actor->state && actor->state->handle_input ) {
@@ -64,7 +64,7 @@ void UpdateWorld(world_t * world, float dt)
     }
 
     // Update actors.
-    for ( int i = 0; i < world->actors.num_actors; i++ ) {
+    for ( int i = 0; i < world->actors.count; i++ ) {
         actor_t * actor = &world->actors.array[i];
 
         UpdateActor(actor, dt);
@@ -75,5 +75,10 @@ void UpdateWorld(world_t * world, float dt)
 
     // TODO: handle collisions
 
-    CleanActorStorage(&world->actors); // remove any removables
+    // remove any removeable actors
+    for ( int i = world->actors.count - 1; i >= 0; i-- ) {
+        if ( world->actors.array[i].flags & ACTOR_FLAG_REMOVE ) {
+            RemoveActor(&world->actors, i);
+        }
+    }
 }

@@ -15,7 +15,8 @@
 #define MAX_ACTORS 5000
 
 typedef enum {
-    ACTOR_FLAG_SOLID = 0x0001,
+    ACTOR_FLAG_REMOVE   = 0x0001,
+    ACTOR_FLAG_SOLID    = 0x0002,
 } actor_flags_t;
 
 typedef struct actor actor_t;
@@ -47,8 +48,7 @@ struct actor_state {
 
 typedef struct {
     actor_t array[MAX_ACTORS];
-    bool removed[MAX_ACTORS];
-    u16 num_actors;
+    u16 count;
 } actor_storage_t;
 
 //
@@ -85,12 +85,7 @@ actor_t GetActorDefinition(actor_type_t type);
 // a_storage.c
 
 actor_t * AddActor(actor_storage_t * storage, actor_t actor);
-
-/// Flag an actor for removal, to be removed later with `CleanActorStorage`.
-void FlagActorForRemoval(actor_storage_t * storage, int index);
-
-/// Remove any actors that were flagged for removal.
-void CleanActorStorage(actor_storage_t * storage);
+void RemoveActor(actor_storage_t * storage, int index);
 
 actor_tree_node_t * InitActorTreeNode(SDL_Rect bounds, int level);
 bool ActorTreeInsert_r(actor_tree_node_t * node, actor_t actor);

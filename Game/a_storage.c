@@ -10,42 +10,28 @@
 
 actor_t * AddActor(actor_storage_t * storage, actor_t actor)
 {
-    if ( storage->num_actors == MAX_ACTORS ) {
+    if ( storage->count == MAX_ACTORS ) {
         printf("%s: out of space, please increase MAX_ACTORS\n", __func__);
     }
 
-    storage->array[storage->num_actors] = actor;
-    storage->removed[storage->num_actors] = false;
-    storage->num_actors++;
+    storage->array[storage->count] = actor;
+    storage->count++;
 
-    return &storage->array[storage->num_actors - 1];
-}
-
-void FlagActorForRemoval(actor_storage_t * storage, int index)
-{
-    if ( index >= storage->num_actors ) {
-        Error("index out of range");
-    }
-
-    storage->removed[index] = true;
-}
-
-void CleanActorStorage(actor_storage_t * storage)
-{
-    for ( int i = storage->num_actors - 1; i >= 0; i-- ) {
-        if ( storage->removed[i] ) {
-            storage->array[i] = storage->array[--storage->num_actors];
-        }
-    }
+    return &storage->array[storage->count - 1];
 }
 
 void AppendActorStorage
 (   actor_storage_t * storage,
     const actor_storage_t * append )
 {
-    for ( int i = 0; i < append->num_actors; i++ ) {
+    for ( int i = 0; i < append->count; i++ ) {
         AddActor(storage, append->array[i]);
     }
+}
+
+void RemoveActor(actor_storage_t * storage, int index)
+{
+    storage->array[index] = storage->array[--storage->count];
 }
 
 actor_tree_node_t * InitActorTreeNode(SDL_Rect bounds, int level)

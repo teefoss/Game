@@ -254,8 +254,8 @@ void RenderWorld(world_t * world)
 
     SDL_Rect visible_rect = GetVisibleRect(world->camera);
 
-    visible_actors.num_actors = 0;
-    for ( int i = 0; i < world->actors.num_actors; i++ ) {
+    visible_actors.count = 0;
+    for ( int i = 0; i < world->actors.count; i++ ) {
         actor_t * actor = &world->actors.array[i];
 
         if ( GetActorSprite(actor)
@@ -265,7 +265,19 @@ void RenderWorld(world_t * world)
         }
     }
 
-    for ( int i = 0; i < visible_actors.num_actors; i++ ) {
+    for ( int i = 0; i < visible_actors.count; i++ ) {
+        for ( int j = i + 1; j < visible_actors.count; j++ ) {
+            if (visible_actors.array[i].position.y >
+                visible_actors.array[j].position.y)
+            {
+                actor_t temp = visible_actors.array[i];
+                visible_actors.array[i] = visible_actors.array[j];
+                visible_actors.array[j] = temp;
+            }
+        }
+    }
+
+    for ( int i = 0; i < visible_actors.count; i++ ) {
         actor_t * actor = &visible_actors.array[i];
         sprite_t * sprite = GetActorSprite(actor);
 
