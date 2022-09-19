@@ -52,33 +52,88 @@ void DestroyWorld(world_t * world)
     free(world);
 }
 
+SDL_Rect GetVisibleRect(vec2_t camera)
+{
+    SDL_Rect r = {
+        .x = camera.x * TILE_SIZE - GAME_WIDTH / 2,
+        .y = camera.y * TILE_SIZE - GAME_HEIGHT / 2,
+        .w = GAME_WIDTH,
+        .h = GAME_HEIGHT
+    };
+
+    return r;
+}
+
 void UpdateWorld(world_t * world, float dt)
 {
-    // Let any actors that respond to input do so.
-    for ( int i = 0; i < world->actors.count; i++ ) {
-        actor_t * actor = &world->actors.array[i];
+    actor_t * active_actors[MAX_ACTORS] = { 0 };
+    int num_active = 0;
 
-        if ( actor->state && actor->state->handle_input ) {
-            actor->state->handle_input(actor);
+    // Calculate the active rect:
+    // the visible rect + 'tile_margin' tiles on all sides
+    SDL_Rect active_rect = GetVisibleRect(world->camera);
+    int tile_margin = 8;
+    active_rect.w += tile_margin * TILE_SIZE * 2;
+    active_rect.h += tile_margin * TILE_SIZE * 2;
+    active_rect.x -= tile_margin * TILE_SIZE;
+    active_rect.y -= tile_margin * TILE_SIZE;
+
+    // Add all actors within the active rect, they will be processed.
+    for ( int i = 0; i < world->num_actors; i++ ) {
+        actor_t * actor = &world->actors[i];
+
+        if ( RectsIntersect(ActorRect(actor), active_rect) ) {
+            if ( num_active < MAX_ACTORS ) {
+                active_actors[num_active++] = actor;
+            }
+        }
+    }
+
+    // Let any actors that respond to input do so.
+    for ( actor_t ** actor = active_actors; *actor; actor++ ) {
+        if ( (*actor)->state && (*actor)->state->handle_input ) {
+            (*actor)->state->handle_input(*actor);
         }
     }
 
     // Update actors.
-    for ( int i = 0; i < world->actors.count; i++ ) {
-        actor_t * actor = &world->actors.array[i];
-
-        UpdateActor(actor, dt);
-        if ( actor->type == ACTOR_PLAYER ) {
-            world->camera = actor->position;
+    for ( actor_t ** actor = active_actors; *actor; actor++ ) {
+        UpdateActor(*actor, dt);
+        if ( (*actor)->type == ACTOR_PLAYER ) { // TODO: this goes elsewhere
+            LerpVector(&world->camera, &(*actor)->position, 0.1f);
         }
     }
 
-    // TODO: handle collisions
+    // Handle any collisions.
+    for ( int i = 0; i < num_active; i++ ) {
+        for ( int j = i + 1; j < num_active; j++ ) {
+            actor_t * ai = active_actors[i];
+            actor_t * aj = active_actors[j];
 
-    // remove any removeable actors
-    for ( int i = world->actors.count - 1; i >= 0; i-- ) {
-        if ( world->actors.array[i].flags & ACTOR_FLAG_REMOVE ) {
-            RemoveActor(&world->actors, i);
+            if ( RectsIntersect(ActorRect(ai), ActorRect(aj)) ) {
+                if ( ai->flags & ACTOR_FLAG_SOLID ) {
+                    // TODO: correct aj's position
+                } else if ( aj->flags & ACTOR_FLAG_SOLID ) {
+                    // TODO: correct ai's position
+                }
+
+                // contact each other
+                if ( ai->state && ai->state->contact ) {
+                    ai->state->contact(ai, aj);
+                }
+                if ( aj->state && aj->state->contact ) {
+                    aj->state->contact(aj, ai);
+                }
+            }
+        }
+    }
+
+    // Remove any actors that were flagged for removal. Loop through actual
+    // world actor array when removing so that the array will stay packed.
+    for ( int i = world->num_actors - 1; i >= 0; i-- ) {
+        if ( world->actors[i].flags & ACTOR_FLAG_REMOVE ) {
+            // Fast remove: move the last element to the element to be removed.
+            world->actors[i] = world->actors[--world->num_actors];
         }
     }
 }

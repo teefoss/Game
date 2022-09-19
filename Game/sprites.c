@@ -10,7 +10,7 @@
 sprite_t sprites[NUM_SPRITES] = {
     [SPRITE_PLAYER_STAND] = {
         .texture_name = "player.png",
-        .location = { 0, 0, 16, 32 },
+        .location = { 0, 0, 6, 24 },
         .num_frames = 1,
     },
     [SPRITE_GRASS] = {

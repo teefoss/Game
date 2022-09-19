@@ -51,9 +51,11 @@ typedef struct {
 
 typedef struct {
     tile_t tiles[WORLD_WIDTH * WORLD_HEIGHT];
-    actor_storage_t actors;
 
-    SDL_Texture * debug_texture; // rendering of entire world
+    actor_t actors[MAX_ACTORS];
+    int num_actors;
+
+    SDL_Texture * debug_texture; // rendering of entire world, for debuggery
 
     vec2_t camera;
 } world_t;
@@ -63,8 +65,8 @@ typedef struct {
 /// - Returns: A pointer to the allocated world. Caller should free the pointer.
 world_t * CreateWorld(void);
 
-SDL_Point TileToWorldPixel(vec2_t position);
 tile_t * GetTile(tile_t * tiles, int x, int y);
+
 void GetAdjacentTiles
 (   int x,
     int y,
@@ -74,5 +76,7 @@ void GetAdjacentTiles
 void RenderWorld(world_t * world);
 void DestroyWorld(world_t * world); // maybe FreeWorld would be more positive?
 void UpdateWorld(world_t * world, float dt);
+SDL_Rect GetVisibleRect(vec2_t camera);
+void UpdateDebugMap(tile_t * tiles,  SDL_Texture ** debug_map, vec2_t camera);
 
 #endif /* world_h */

@@ -17,6 +17,41 @@
 #define HORIZONTAL_NUM_TILES ((float)GAME_WIDTH / (float)TILE_SIZE)
 #define VERTICAL_NUM_TILES ((float)GAME_HEIGHT / (float)TILE_SIZE)
 
+void UpdateDebugMap(tile_t * tiles,  SDL_Texture ** debug_map, vec2_t camera)
+{
+    static const SDL_Color layer_colors[] = {
+        { 0x00, 0x00,  160, 0xFF },
+        {   32,   32,  200, 0xFF },
+        { 0xD2, 0xC2, 0x90, 0xFF },
+        { 0x22, 0x8B, 0x22, 0xFF },
+        { 0x11, 0x60, 0x11, 0xFF },
+        {   80,   80,   90, 0xFF },
+        {  248,  248,  248, 0xFF },
+    };
+
+    if ( *debug_map == NULL ) {
+        *debug_map = CreateTexture(WORLD_WIDTH, WORLD_HEIGHT);
+    }
+
+    SDL_SetRenderTarget(renderer, *debug_map);
+
+    for ( int y = 0; y < WORLD_HEIGHT; y++ ) {
+        for ( int x = 0; x < WORLD_WIDTH; x++ ) {
+            tile_t * tile = GetTile(tiles, x, y);
+
+            // render pixel to debug texture for this tile's terrain type
+            SetColor(layer_colors[tile->terrain]);
+            DrawPoint(x, y);
+        }
+    }
+
+    SetGray(255);
+    SDL_Rect vis_rect = GetVisibleRect(camera);
+    DrawRect(vis_rect);
+
+    SDL_SetRenderTarget(renderer, NULL);
+}
+
 // Determine the maximum point at which rect 'inner' can
 // be placed in rect 'outer', accounting for a margin
 static SDL_Point RectInRectMaxPoint
@@ -141,17 +176,6 @@ static void RenderGrass
     }
 }
 
-static SDL_Rect GetVisibleRect(vec2_t camera)
-{
-    SDL_Rect r = {
-        .x = camera.x * TILE_SIZE - GAME_WIDTH / 2,
-        .y = camera.y * TILE_SIZE - GAME_HEIGHT / 2
-    };
-    SDL_GetWindowSize(window, &r.w, &r.h);
-
-    return r;
-}
-
 static void RenderVisibleTerrain(world_t * world)
 {
     SDL_Rect visible_rect = GetVisibleRect(world->camera);
@@ -230,55 +254,36 @@ static void RenderVisibleTerrain(world_t * world)
 
 }
 
-SDL_Point TileToWorldPixel(vec2_t position)
-{
-    return (SDL_Point){ position.x * TILE_SIZE, position.y * TILE_SIZE };
-}
-
-SDL_Point TileToScreenPixel(vec2_t camera, vec2_t position)
-{
-    SDL_Point camera_world_pixel = TileToWorldPixel(camera);
-    SDL_Point position_world_pixel = TileToWorldPixel(position);
-
-    return (SDL_Point){
-        GAME_WIDTH / 2 - camera_world_pixel.x - position_world_pixel.x,
-        GAME_HEIGHT / 2 - camera_world_pixel.y - position_world_pixel.y
-    };
-}
-
-actor_storage_t visible_actors;
-
 void RenderWorld(world_t * world)
 {
     RenderVisibleTerrain(world);
 
     SDL_Rect visible_rect = GetVisibleRect(world->camera);
 
-    visible_actors.count = 0;
-    for ( int i = 0; i < world->actors.count; i++ ) {
-        actor_t * actor = &world->actors.array[i];
+    // Filter the world actor array: only visible actors
+    actor_t * visible_actors[MAX_ACTORS] = { 0 };
+    int num_visible = 0;
+    for ( int i = 0; i < world->num_actors; i++ ) {
+        actor_t * actor = &world->actors[i];
 
         if ( GetActorSprite(actor)
-            && RectsIntersect(visible_rect, ActorRect(&world->actors.array[i])) )
+            && RectsIntersect(visible_rect, ActorRect(actor)) )
         {
-            AddActor(&visible_actors, world->actors.array[i]);
+            visible_actors[num_visible++] = actor;
         }
     }
 
-    for ( int i = 0; i < visible_actors.count; i++ ) {
-        for ( int j = i + 1; j < visible_actors.count; j++ ) {
-            if (visible_actors.array[i].position.y >
-                visible_actors.array[j].position.y)
-            {
-                actor_t temp = visible_actors.array[i];
-                visible_actors.array[i] = visible_actors.array[j];
-                visible_actors.array[j] = temp;
+    // Sort the visible list by y position.
+    for ( int i = 0; i < num_visible; i++ ) {
+        for ( int j = i + 1; j < num_visible; j++ ) {
+            if ( visible_actors[i]->position.y > visible_actors[j]->position.y ) {
+                SWAP(visible_actors[i], visible_actors[j]);
             }
         }
     }
 
-    for ( int i = 0; i < visible_actors.count; i++ ) {
-        actor_t * actor = &visible_actors.array[i];
+    for ( int i = 0; i < num_visible; i++ ) {
+        actor_t * actor = visible_actors[i];
         sprite_t * sprite = GetActorSprite(actor);
 
         if ( sprite ) {

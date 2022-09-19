@@ -46,29 +46,14 @@ struct actor_state {
     void (* contact)(actor_t * self, actor_t * other);
 };
 
-typedef struct {
-    actor_t array[MAX_ACTORS];
-    u16 count;
-} actor_storage_t;
-
-//
-//  Actor Quadtree Storage
-//
-#define ACTOR_TREE_NODE_SIZE 4
-#define ACTOR_TREE_NUM_LEVELS 6 // 512 x 512 world, max level = 16 x 16
-typedef struct actor_tree_node actor_tree_node_t;
-struct actor_tree_node {
-    int num_actors;
-    actor_t actors[ACTOR_TREE_NODE_SIZE];
-    SDL_Rect bounds;
-    int level;
-    actor_tree_node_t * quadrants[4];
-};
-
 // -----------------------------------------------------------------------------
 // a_main.c
 
-void SpawnActor(actor_type_t type, vec2_t position, actor_storage_t * storage);
+void SpawnActor
+(   actor_type_t type,
+    vec2_t position,
+    actor_t * array,
+    int * array_count );
 sprite_t * GetActorSprite(const actor_t * actor);
 void UpdateActor(actor_t * actor, float dt);
 SDL_Rect ActorRect(const actor_t * actor);
@@ -80,19 +65,5 @@ SDL_Rect ActorRect(const actor_t * actor);
 ///
 /// An actor definition is a template used when creating new actors.
 actor_t GetActorDefinition(actor_type_t type);
-
-// -----------------------------------------------------------------------------
-// a_storage.c
-
-actor_t * AddActor(actor_storage_t * storage, actor_t actor);
-void RemoveActor(actor_storage_t * storage, int index);
-
-actor_tree_node_t * InitActorTreeNode(SDL_Rect bounds, int level);
-bool ActorTreeInsert_r(actor_tree_node_t * node, actor_t actor);
-void GetActorsInRect_r
-(   actor_storage_t * fill,
-    actor_tree_node_t * node,
-    SDL_Rect rect );
-void FreeActorTree_r(actor_tree_node_t * node);
 
 #endif /* actor_h */

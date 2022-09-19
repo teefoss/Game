@@ -7,6 +7,7 @@ PRINT_DEF(print_uchar, unsigned char, "%d")
 PRINT_DEF(print_int, int, "%d")
 PRINT_DEF(print_float, float, "%f")
 PRINT_DEF(print_double, double, "%f")
+PRINT_DEF(print_ushort, unsigned short, "%d")
 PRINT_DEF(print_ulong, unsigned long, "%lu")
 
 void print_sdl_point(const char * name, SDL_Point point)

@@ -36,6 +36,7 @@ extern "C" {
         double: print_double,       \
         float: print_float,         \
         unsigned long: print_ulong, \
+        unsigned short: print_ushort, \
         SDL_Point: print_sdl_point, \
         SDL_Rect: print_sdl_rect    \
     )(#var, var)
@@ -97,6 +98,7 @@ PRINT_DECL(print_uchar, unsigned char);
 PRINT_DECL(print_int, int);
 PRINT_DECL(print_float, float);
 PRINT_DECL(print_double, double);
+PRINT_DECL(print_ushort, unsigned short);
 PRINT_DECL(print_ulong, unsigned long);
 PRINT_DECL(print_sdl_point, SDL_Point);
 PRINT_DECL(print_sdl_rect, SDL_Rect);

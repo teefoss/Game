@@ -19,18 +19,6 @@ static const float terrain_elevations[NUM_TERRAIN_TYPES] = {
      1.00,
 };
 
-// for debug texture
-static SDL_Color layer_colors[] = {
-    { 0x00, 0x00,  160, 0xFF },
-    {   32,   32,  200, 0xFF },
-    { 0xD2, 0xC2, 0x90, 0xFF },
-    { 0x22, 0x8B, 0x22, 0xFF },
-    { 0x11, 0x60, 0x11, 0xFF },
-    {   80,   80,   90, 0xFF },
-    {  248,  248,  248, 0xFF },
-};
-
-
 // Used by GenerateTerrain() to initialize and set up a world tile at x, y, and
 // assign its properties according a noise value for the tile.
 static void
@@ -48,11 +36,6 @@ SetUpTile
     for ( int i = 0; i < NUM_TERRAIN_TYPES - 1; i++ ) {
         if ( tile_noise < terrain_elevations[i + 1] ) {
             tile->terrain = i;
-
-            // render pixel to debug texture for this tile's terrain type
-            SetColor(layer_colors[i]);
-            DrawPoint(x, y);
-
             break;
         }
     }
@@ -68,9 +51,6 @@ static void GenerateTerrain(world_t * world)
 
     float half_width = WORLD_WIDTH / 2.0f;
     float half_height = WORLD_HEIGHT / 2.0f;
-
-    world->debug_texture = CreateTexture(WORLD_WIDTH, WORLD_HEIGHT);
-    SDL_SetRenderTarget(renderer, world->debug_texture);
 
     for ( int y = 0; y < WORLD_HEIGHT; y++ ) {
         for ( int x = 0; x < WORLD_WIDTH; x++ ) {
@@ -98,8 +78,6 @@ static void GenerateTerrain(world_t * world)
             SetUpTile(x, y, GetTile(world->tiles, x, y), world->tiles, noise);
         }
     }
-
-    SDL_SetRenderTarget(renderer, NULL);
 
     world->camera.x = half_width + 40.5f;
     world->camera.y = half_height - 30.5f;
@@ -157,7 +135,9 @@ void SpawnPlayer(world_t * world)
     vec2_t position = { potentials[i].x, potentials[i].y };
     occupied[(int)position.y][(int)position.y] = true;
     position = AddVectors(position, (vec2_t){ 0.5f, 0.5f }); // center in tile
-    SpawnActor(ACTOR_PLAYER, position, &world->actors);
+    SpawnActor(ACTOR_PLAYER, position, world->actors, &world->num_actors);
+
+    world->camera = position;
 }
 
 world_t * CreateWorld(void)
@@ -186,7 +166,7 @@ world_t * CreateWorld(void)
             {
                 vec2_t v = { x + 0.5f, y + 0.5f };
                 printf("spawning tree at tile %d, %d\n", x, y);
-                SpawnActor(ACTOR_TREE, v, &world->actors);
+                SpawnActor(ACTOR_TREE, v, world->actors, &world->num_actors);
                 occupied[y][x] = true;
             }
         }

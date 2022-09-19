@@ -18,13 +18,17 @@ sprite_t * GetActorSprite(const actor_t * actor)
     }
 }
 
-void SpawnActor(actor_type_t type, vec2_t position, actor_storage_t * storage)
+void SpawnActor
+(   actor_type_t type,
+    vec2_t position,
+    actor_t * array,
+    int * array_count )
 {
     actor_t actor = GetActorDefinition(type);
     actor.type = type;
     actor.position = position;
 
-    AddActor(storage, actor);
+    array[(*array_count)++] = actor;
 }
 
 void UpdateActor(actor_t * actor, float dt)

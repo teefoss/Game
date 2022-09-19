@@ -427,3 +427,30 @@ float Noise2
 }
 
 extern inline float Noise(float x, float y, float z);
+
+
+/*
+
+ noise that wraps around:
+
+ Use this: https://gist.github.com/KdotJPG/f4db4491b341b8987f4a and ignore the 3rd coordinate.
+ It's not C# so you'll have to port it (shouldn't be too hard), but it is a tileable implementation I made a while back.
+ Note that the tileability technique used here is specific to 3D OpenSimplex, because it uses a rational lattice. It doesn't work for 2D or 4D.
+ This is probably the most "normal" way to do this. Just note that it only tiles in multiples of 6, because that's when the lattice lines back up with itself.
+ EDIT: Slight chance there's a bug that occurs when x, y, and z don't all tile with the same period. I haven't extensively tested this, I just made it as a quick solution once.
+ Alternatively, you can use this trick with 3D noise:
+ noise(
+     y / FEATURE_SIZE,
+     sin(x * 2pi / WIDTH) / 2pi * WIDTH / FEATURE_SIZE,
+     cos(x * 2pi / WIDTH) / 2pi * WIDTH / FEATURE_SIZE
+ );
+ Imagine this as wrapping around a cylinder, where the height equals the circumference.
+ Note: This results in a different "character" as you change in the X coordinate versus the Y coordinate. But depending on your use, that may either be good thing or a bad thing.
+ EDIT:
+ FEATURE_SIZE gets bigger as you want things in your terrain to get bigger.
+ Inside sin/cos, we multiply by 2pi and divide by WIDTH so that sin/cos roll over exactly once we've crossed over.
+ outside sin/cos, we divide by 2pi because the circumference is 2pi (we want to deal with multiples of the distance "one"), then we multiply by (WIDTH / FEATURE_SIZE) which is the number of times you want to go a distance of "one" in your noise over the entire width.
+ Also this generalizes straight to the 4D torus wrapping technique if you do the same thing for y.
+ There is also the interpolation trick mentioned a bit down. That works and it's easy to understand, but I generally recommend against it if you have the choice, because when you linearly interpolate two noise values, the average absolute value of the noise becomes less, and you will more often see taller hills towards the edges where you're predominantly seeing one noise function. You can technically try to come up with a function to equalize these differences, but keep in mind that it's not just the height that's changing, but the probability distribution of different heights.
+
+ */

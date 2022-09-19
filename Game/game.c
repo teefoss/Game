@@ -17,8 +17,19 @@
 #include <SDL.h>
 
 #define DRAW_SCALE  3
-
 #define FPS 60.0f
+
+
+typedef struct {
+    bool (* handle_event)(const SDL_Event * event);
+    void (* update)(world_t *, float);
+    void (* render)();
+} game_state_t;
+
+typedef struct {
+    game_state_t state;
+    int ticks;
+} game_t;
 
 // Debug info, toggled by function keys.
 static bool show_geometry;
@@ -28,11 +39,26 @@ static bool show_debug_info;
 static int frame;
 static int frame_ms;
 static int render_ms;
+static int update_ms;
 
-static bool DoFrame(world_t * world, float dt)
+game_state_t game_play = {
+    .handle_event = NULL,
+    .update = UpdateWorld,
+    .render = RenderWorld,
+};
+
+static bool DoFrame(game_t * game, world_t * world, float dt)
 {
     SDL_Event event;
     while ( SDL_PollEvent(&event) ) {
+        if ( game->state.handle_event ) {
+            if ( game->state.handle_event(&event) ) {
+                continue;
+            }
+        }
+
+        // The current game state did not handle this event. Handle any
+        // universal events, like quit:
         switch ( event.type ) {
             case SDL_QUIT:
                 return false;
@@ -43,6 +69,12 @@ static bool DoFrame(world_t * world, float dt)
                         break;
                     case SDLK_F2:
                         show_world = !show_world;
+                        if ( show_world ) {
+                            UpdateDebugMap
+                            (   world->tiles,
+                                &world->debug_texture,
+                                world->camera );
+                        }
                         break;
                     case SDLK_F3:
                         show_geometry = !show_geometry;
@@ -56,13 +88,17 @@ static bool DoFrame(world_t * world, float dt)
         }
     }
 
-    UpdateWorld(world, dt);
+    //UpdateWorld(world, dt);
+    int update_start = SDL_GetTicks();
+    game->state.update(world, dt);
+    update_ms = SDL_GetTicks() - update_start;
 
     SetGray(0);
     Clear();
 
     int render_start = SDL_GetTicks();
-    RenderWorld(world);
+    //RenderWorld(world);
+    game->state.render(world);
     render_ms = SDL_GetTicks() - render_start;
 
     // debug move world camera:
@@ -100,6 +136,7 @@ static bool DoFrame(world_t * world, float dt)
         int row = 0;
         Print(0, row++ * h, "Frame time: %2d ms", frame_ms);
         Print(0, row++ * h, "- Render time: %2d ms", render_ms);
+        Print(0, row++ * h, "- Update time: %2d ms", update_ms);
         Print(0, row++ * h, "Camera Tile: %.2f, %.2f", world->camera.x, world->camera.y);
     }
 
@@ -109,7 +146,7 @@ static bool DoFrame(world_t * world, float dt)
     return true;
 }
 
-static void GameLoop(world_t * world)
+static void GameLoop(game_t * game, world_t * world)
 {
     float old_time = ProgramTime();
     while ( true ) {
@@ -120,9 +157,13 @@ static void GameLoop(world_t * world)
             SDL_Delay(1);
             continue;
         }
+        if ( dt > 0.05f ) {
+            dt = 0.05;
+        }
+        //dt = 1.0f / FPS;
 
         int frame_start = SDL_GetTicks();
-        if ( !DoFrame(world, dt) ) {
+        if ( !DoFrame(game, world, dt) ) {
             return;
         }
         frame_ms = SDL_GetTicks() - frame_start;
@@ -147,15 +188,17 @@ void GameMain(void)
     SetTextRenderer(renderer);
     SetTextScale(2.0f, 2.0f);
 
-    // game / world init
+    game_t * game = calloc(1, sizeof(*game));
+    game->state = game_play;
     world_t * world = CreateWorld();
 
     // debug: check things aren't getting too big
     printf("tile data size: %zu bytes\n", sizeof(world->tiles[0]));
     printf("world data size: %zu bytes\n", sizeof(*world));
 
-    GameLoop(world);
+    GameLoop(game, world);
     
     // clean up
     DestroyWorld(world);
+    free(game);
 }
