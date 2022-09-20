@@ -254,7 +254,7 @@ static void RenderVisibleTerrain(world_t * world)
 
 }
 
-void RenderWorld(world_t * world)
+void RenderWorld(world_t * world, bool show_hitboxes)
 {
     RenderVisibleTerrain(world);
 
@@ -267,7 +267,7 @@ void RenderWorld(world_t * world)
         actor_t * actor = &world->actors[i];
 
         if ( GetActorSprite(actor)
-            && RectsIntersect(visible_rect, ActorRect(actor)) )
+            && RectsIntersect(visible_rect, GetActorVisibleRect(actor)) )
         {
             visible_actors[num_visible++] = actor;
         }
@@ -287,10 +287,19 @@ void RenderWorld(world_t * world)
         sprite_t * sprite = GetActorSprite(actor);
 
         if ( sprite ) {
-            SDL_Rect r = ActorRect(actor);
+            SDL_Rect r = GetActorVisibleRect(actor);
             r.x -= visible_rect.x;
             r.y -= visible_rect.y;
             DrawSprite(sprite, r.x, r.y, 0);
+
+            if ( show_hitboxes ) {
+                SDL_FRect hitbox = ActorHitbox(actor);
+                SetRGBA(90, 90, 255, 255);
+                hitbox.x -= visible_rect.x;
+                hitbox.y -= visible_rect.y;
+                SDL_Rect hitbox_i = { hitbox.x, hitbox.y, hitbox.w, hitbox.h };
+                DrawRect(hitbox_i);
+            }
         }
     }
 }

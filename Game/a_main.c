@@ -34,8 +34,9 @@ void SpawnActor
 void UpdateActor(actor_t * actor, float dt)
 {
     // update position
-    vec2_t scaled_velocity = ScaleVector(actor->velocity, dt);
-    actor->position = AddVectors(actor->position, scaled_velocity);
+//    actor->old_position = actor->position;
+//    vec2_t scaled_velocity = ScaleVector(actor->velocity, dt);
+//    actor->position = AddVectors(actor->position, scaled_velocity);
 
     // update sprite animation
     sprite_t * sprite = GetActorSprite(actor);
@@ -53,12 +54,12 @@ void UpdateActor(actor_t * actor, float dt)
     }
 }
 
-SDL_Rect ActorRect(const actor_t * actor)
+SDL_Rect GetActorVisibleRect(const actor_t * actor)
 {
     sprite_t * sprite = GetActorSprite(actor);
     SDL_Rect rect = {
-        .x = actor->position.x * TILE_SIZE,
-        .y = actor->position.y * TILE_SIZE,
+        .x = actor->position.x,
+        .y = actor->position.y,
         .w = sprite ? sprite->location.w : 0,
         .h = sprite ? sprite->location.h : 0
     };
@@ -67,4 +68,24 @@ SDL_Rect ActorRect(const actor_t * actor)
     rect.y -= rect.h;
 
     return rect;
+}
+
+vec2_t PositionFromHitbox(const actor_t * actor, SDL_FRect hitbox)
+{
+    return (vec2_t){
+        .x = hitbox.x + actor->hitbox_width / 2.0f,
+        .y = hitbox.y + actor->hitbox_height
+    };
+}
+
+SDL_FRect ActorHitbox(const actor_t * actor)
+{
+    SDL_FRect hitbox = {
+        .x = actor->position.x - actor->hitbox_width / 2.0f,
+        .y = actor->position.y - actor->hitbox_height,
+        .w = actor->hitbox_width,
+        .h = actor->hitbox_height
+    };
+
+    return hitbox;
 }

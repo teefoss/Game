@@ -137,6 +137,68 @@ bool RectsIntersect(SDL_Rect a, SDL_Rect b)
     (abs((a.y + a.h / 2) - (b.y + b.h / 2)) * 2 < (a.h + b.h));
 }
 
+bool LinesIntersect
+(   vec2_t a1, vec2_t a2,
+    vec2_t b1, vec2_t b2,
+    vec2_t * intersection)
+{
+    float adx = a2.x - a1.x;
+    float ady = a2.y - a1.y;
+    float bdx = b2.x - b1.x;
+    float bdy = b2.y - b1.y;
+    float cdx = a1.x - b1.x;
+    float cdy = a1.y - b1.y;
+
+    float s = (-ady * cdx + adx * cdy) / (-bdx * ady + adx * bdy);
+    float t = ( bdx * cdy - bdy * cdx) / (-bdx * ady + adx * bdy);
+
+    if ( s >= 0 && s <= 1 && t >= 0 && t <= 1 ) {
+        if ( intersection != NULL ) {
+            intersection->x = a1.x + (t * adx);
+            intersection->y = a1.y + (t * ady);
+        }
+        return true;
+    }
+
+    return false;
+}
+
+static void GetRectSides(SDL_Rect r, vec2_t sides[4][2])
+{
+    sides[RECT_SIDE_TOP][0]     = (vec2_t){ r.x, r.y };
+    sides[RECT_SIDE_TOP][1]     = (vec2_t){ r.x + r.w, r.y };
+    sides[RECT_SIDE_BOTTOM][0]  = (vec2_t){ r.x, r.y + r.h };
+    sides[RECT_SIDE_BOTTOM][1]  = (vec2_t){ r.x + r.w, r.y + r.h };
+    sides[RECT_SIDE_LEFT][0]    = sides[RECT_SIDE_TOP][0];
+    sides[RECT_SIDE_LEFT][1]    = sides[RECT_SIDE_BOTTOM][0];
+    sides[RECT_SIDE_RIGHT][0]   = sides[RECT_SIDE_TOP][1];
+    sides[RECT_SIDE_RIGHT][1]   = sides[RECT_SIDE_BOTTOM][1];
+}
+
+rect_side_t RectSideLineIntersection(vec2_t point, SDL_Rect rect)
+{
+    vec2_t rect_center = { rect.x + rect.w / 2, rect.y + rect.h / 2 };
+    vec2_t sides[4][2];
+    GetRectSides(rect, sides);
+
+    for ( rect_side_t side = RECT_SIDE_TOP; side < NUM_RECT_SIDES; side++ ) {
+        for ( int i = 0; i < NUM_RECT_SIDES; i++ ) {
+            bool intersected = LinesIntersect
+            (   point,
+                rect_center,
+                sides[side][0],
+                sides[side][1],
+                NULL );
+
+            if ( intersected ) {
+                return side;
+            }
+        }
+    }
+
+    return RECT_SIDE_NONE;
+}
+
 #pragma mark - RANDOM
 
 static u32 next = 1;
@@ -186,6 +248,7 @@ float RandomFloat(float min, float max)
 
 extern inline vec2_t AddVectors(vec2_t a, vec2_t b);
 extern inline vec2_t ScaleVector(vec2_t v, float s);
+extern inline vec2_t SubtractVectors(vec2_t a, vec2_t b);
 
 bool LerpVector(vec2_t * v, const vec2_t * to, float w)
 {

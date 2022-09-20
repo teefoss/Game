@@ -40,6 +40,7 @@ static int frame;
 static int frame_ms;
 static int render_ms;
 static int update_ms;
+static float debug_dt;
 
 game_state_t game_play = {
     .handle_event = NULL,
@@ -98,7 +99,7 @@ static bool DoFrame(game_t * game, world_t * world, float dt)
 
     int render_start = SDL_GetTicks();
     //RenderWorld(world);
-    game->state.render(world);
+    game->state.render(world, show_geometry);
     render_ms = SDL_GetTicks() - render_start;
 
     // debug move world camera:
@@ -112,9 +113,11 @@ static bool DoFrame(game_t * game, world_t * world, float dt)
 
     // debug geometry:
     if ( show_geometry ) {
-        SetRGBA(255, 0, 0, 255);
-        SDL_RenderDrawLine(renderer, GAME_WIDTH / 2, 0, GAME_WIDTH / 2, GAME_HEIGHT);
-        SDL_RenderDrawLine(renderer, 0, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT / 2);
+        int hw = GAME_WIDTH / 2;
+        int hh = GAME_HEIGHT / 2;
+        SetRGBA(255, 0, 0, 128);
+        SDL_RenderDrawLine(renderer, hw, 0, hw, hh);
+        SDL_RenderDrawLine(renderer, 0, hh, GAME_WIDTH, hh);
 
         for ( int y = 0; y <= GAME_HEIGHT / TILE_SIZE; y++ ) {
             for ( int x = 0; x <= GAME_WIDTH / TILE_SIZE; x++ ) {
@@ -137,6 +140,7 @@ static bool DoFrame(game_t * game, world_t * world, float dt)
         Print(0, row++ * h, "Frame time: %2d ms", frame_ms);
         Print(0, row++ * h, "- Render time: %2d ms", render_ms);
         Print(0, row++ * h, "- Update time: %2d ms", update_ms);
+        Print(0, row++ * h, "- dt: %.3f ms", debug_dt);
         Print(0, row++ * h, "Camera Tile: %.2f, %.2f", world->camera.x, world->camera.y);
     }
 
@@ -161,6 +165,7 @@ static void GameLoop(game_t * game, world_t * world)
             dt = 0.05;
         }
         //dt = 1.0f / FPS;
+        debug_dt = dt;
 
         int frame_start = SDL_GetTicks();
         if ( !DoFrame(game, world, dt) ) {

@@ -19,22 +19,26 @@ typedef enum {
     ACTOR_FLAG_SOLID    = 0x0002,
 } actor_flags_t;
 
-typedef struct actor actor_t;
 typedef struct actor_state actor_state_t;
 
-struct actor {
+typedef struct {
     actor_type_t type;
 
-    vec2_t position; // in tiles, the bottom center of the visible sprite
+    vec2_t position; // in world pixels, the bottom center of the visible sprite
     vec2_t velocity;
+    vec2_t old_position;
     actor_flags_t flags;
 
     sprite_t * sprite;
     float current_frame;
+    u8 hitbox_width;
+    u8 hitbox_height;
     
     actor_state_t * state;
     int state_timer;
-};
+
+    SDL_Rect hitbox;
+} actor_t;
 
 struct actor_state {
     int length; // state length in ticks
@@ -56,7 +60,17 @@ void SpawnActor
     int * array_count );
 sprite_t * GetActorSprite(const actor_t * actor);
 void UpdateActor(actor_t * actor, float dt);
-SDL_Rect ActorRect(const actor_t * actor);
+
+/// Actor's visible rect in world pixel space.
+SDL_Rect GetActorVisibleRect(const actor_t * actor);
+
+/// Actor's hitbox in world pixel space.
+SDL_FRect ActorHitbox(const actor_t * actor);
+SDL_Rect HitBox(sprite_t * sprite, vec2_t actor_position);
+vec2_t PositionFromHitbox(const actor_t * actor, SDL_FRect hitbox);
+
+bool ActorCollisionWithRect(actor_t * actor, SDL_Rect rect, vec2_t * point);
+void ClipActor(actor_t * actor, SDL_Rect actor_hitbox, SDL_Rect rect);
 
 // -----------------------------------------------------------------------------
 // a_definitions.c

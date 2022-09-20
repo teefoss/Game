@@ -29,6 +29,16 @@
 #define ADD_2D(a, b) (typeof(a)){ a.x + b.x, a.y + b.y }
 // ...
 
+typedef enum {
+    RECT_SIDE_TOP,
+    RECT_SIDE_BOTTOM,
+    RECT_SIDE_LEFT,
+    RECT_SIDE_RIGHT,
+
+    NUM_RECT_SIDES,
+    RECT_SIDE_NONE,
+} rect_side_t;
+
 typedef struct {
     float x;
     float y;
@@ -61,13 +71,26 @@ bool LineCircleIntersection
     double r
 /*, bool segment */ );
 
+/// For a line draw from `point` to `rect` center, return which side of `rect`
+/// is intersected.
+rect_side_t RectSideLineIntersection(vec2_t point, SDL_Rect rect);
+
 int RectDiagonalLength(int w, int h);
 bool RectInRect(SDL_Rect a, SDL_Rect b);
 bool RectsIntersect(SDL_Rect a, SDL_Rect b);
+bool LinesIntersect
+(   vec2_t a1, vec2_t a2,
+    vec2_t b1, vec2_t b2,
+    vec2_t * intersection);
 
 inline vec2_t AddVectors(vec2_t a, vec2_t b)
 {
     return (vec2_t){ a.x + b.x, a.y + b.y };
+}
+
+inline vec2_t SubtractVectors(vec2_t a, vec2_t b)
+{
+    return (vec2_t){ a.x - b.x, a.y - b.y };
 }
 
 inline vec2_t ScaleVector(vec2_t v, float s)

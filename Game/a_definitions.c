@@ -6,10 +6,11 @@
 //
 
 #include "a_actor.h"
+#include "w_world.h"
 #include "sprites.h"
 #include "mylib/input.h"
 
-#define PLAYER_VELOCITY 2.0f
+#define PLAYER_VELOCITY (1.5f * TILE_SIZE) // tiles / second
 #define PLAYER_ACCEL 0.1f
 
 void PlayerHandleInput(actor_t * player)
@@ -53,12 +54,16 @@ actor_state_t player_stand = {
 
 static actor_t actor_definitions[NUM_ACTOR_TYPES] = {
     [ACTOR_PLAYER] = {
-        .flags = ACTOR_FLAG_SOLID,
+        //.flags = ACTOR_FLAG_SOLID,
         .state = &player_stand,
+        .hitbox_width = 6,
+        .hitbox_height = 4,
     },
     [ACTOR_TREE] = {
         .flags = ACTOR_FLAG_SOLID,
         .sprite = &sprites[SPRITE_TREE],
+        .hitbox_width = 4,
+        .hitbox_height = 4,
     },
 };
 

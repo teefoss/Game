@@ -73,7 +73,7 @@ void GetAdjacentTiles
     tile_t * world_tiles,
     tile_t * out[NUM_DIRECTIONS] );
 
-void RenderWorld(world_t * world);
+void RenderWorld(world_t * world, bool show_hitboxes);
 void DestroyWorld(world_t * world); // maybe FreeWorld would be more positive?
 void UpdateWorld(world_t * world, float dt);
 SDL_Rect GetVisibleRect(vec2_t camera);

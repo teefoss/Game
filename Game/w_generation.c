@@ -9,6 +9,14 @@
 #include "w_world.h"
 #include "mylib/video.h"
 
+static vec2_t GetTileCenter(int x, int y)
+{
+    return (vec2_t){
+        x * TILE_SIZE + TILE_SIZE / 2,
+        y * TILE_SIZE + TILE_SIZE / 2
+    };
+}
+
 static const float terrain_elevations[NUM_TERRAIN_TYPES] = {
     -1.00, // deep ocean
     -0.45, // shallow ocean
@@ -132,9 +140,9 @@ void SpawnPlayer(world_t * world)
     // select one of the 50 grass tiles closest to the center of world.
     Randomize();
     int i = Random(0, spawn_tile_count - 1);
-    vec2_t position = { potentials[i].x, potentials[i].y };
-    occupied[(int)position.y][(int)position.y] = true;
-    position = AddVectors(position, (vec2_t){ 0.5f, 0.5f }); // center in tile
+    occupied[potentials[i].y][potentials[i].x] = true;
+
+    vec2_t position = GetTileCenter(potentials[i].x, potentials[i].y);
     SpawnActor(ACTOR_PLAYER, position, world->actors, &world->num_actors);
 
     world->camera = position;
@@ -164,8 +172,9 @@ world_t * CreateWorld(void)
                 && !occupied[y][x]
                 && Random(0, 10) == 10 )
             {
-                vec2_t v = { x + 0.5f, y + 0.5f };
-                printf("spawning tree at tile %d, %d\n", x, y);
+                vec2_t v = GetTileCenter(x, y);
+                v.x += RandomFloat(-TILE_SIZE / 2.0f, TILE_SIZE / 2.0f);
+                v.y += RandomFloat(-TILE_SIZE / 2.0f, TILE_SIZE / 2.0f);
                 SpawnActor(ACTOR_TREE, v, world->actors, &world->num_actors);
                 occupied[y][x] = true;
             }
