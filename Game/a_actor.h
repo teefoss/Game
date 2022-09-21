@@ -22,8 +22,14 @@ typedef enum {
 } cardinal_t;
 
 typedef enum {
-    ACTOR_FLAG_REMOVE   = 0x0001,
-    ACTOR_FLAG_SOLID    = 0x0002,
+    ACTOR_FLAG_REMOVE           = 0x0001,
+    ACTOR_FLAG_SOLID            = 0x0002,
+
+    // don't check if tile is walkable
+    ACTOR_FLAG_FLY              = 0x0004,
+
+    // don't do collision checking
+    ACTOR_FLAG_NONINTERACTIVE   = 0x0008,
 } actor_flags_t;
 
 typedef struct actor_state actor_state_t;
@@ -47,6 +53,10 @@ typedef struct actor {
     
     actor_state_t * state;
     int state_timer; // 0 = advance to next state
+
+    union {
+        s16 timer;
+    } info;
 
     // Actors may change the world, so keep an internal reference.
     world_t * world;

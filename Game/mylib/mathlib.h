@@ -113,6 +113,8 @@ void    WrapPosition(vec2_t * position, int w, int h);
 void RandomizeVector(vec2_t * v, float degrees);
 
 vec2_t  RandomDirection(void);
+
+/// Random velocity in a random direction.
 vec2_t  RandomVelocity(float min, float max);
 
 void SeedRandom(u32 newSeed);

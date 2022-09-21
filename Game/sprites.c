@@ -45,5 +45,12 @@ sprite_t sprites[NUM_SPRITES] = {
         .texture_name = "tree.png",
         .location = { 0, 0, 12, 28 },
         .num_frames = 1,
-    }
+    },
+    [SPRITE_BUTTERFLY] = {
+        .texture_name = "wildlife.png",
+        .location = { 0, 0, 3, 3 },
+        .num_frames = 4,
+        .fps = 12,
+        .flags = SPRITE_FLAG_ANIMATED,
+    },
 };

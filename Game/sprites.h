@@ -15,6 +15,7 @@ typedef enum {
     DRAW_ORDER_FOREGROUND,
 } draw_order_t;
 
+// TODO: order this alphabetically?
 typedef enum {
     SPRITE_PLAYER_STAND,
     SPRITE_BEACH,
@@ -24,6 +25,8 @@ typedef enum {
     SPRITE_TINY_YELLOW_FLOWER,
     SPRITE_GRASS_BLADES,
     SPRITE_TREE,
+    SPRITE_BUTTERFLY,
+
     NUM_SPRITES,
 } sprite_id_t;
 

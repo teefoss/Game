@@ -290,7 +290,7 @@ void RenderWorld(world_t * world, bool show_hitboxes)
             SDL_Rect r = GetActorVisibleRect(actor);
             r.x -= visible_rect.x;
             r.y -= visible_rect.y;
-            DrawSprite(sprite, r.x, r.y, 0);
+            DrawSprite(sprite, r.x, r.y, actor->current_frame);
 
             if ( show_hitboxes ) {
                 SDL_FRect hitbox = ActorHitbox(actor);

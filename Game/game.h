@@ -8,6 +8,8 @@
 #ifndef game_h
 #define game_h
 
+#define FPS 60.0f
+
 // The internal resolution of the game.
 // Aspect ratio is 16:9
 // TODO: support non-16:9 ratios?

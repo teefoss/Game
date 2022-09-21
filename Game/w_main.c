@@ -154,26 +154,27 @@ void UpdateWorld(world_t * world, float dt)
         actor_t * actor = active_actors[i];
 
         // Move actors.
-        // Do horizontal and vertical movement separately, resolving
-        // collisions with solid actors at each step.
+        if ( !(actor->flags & ACTOR_FLAG_NONINTERACTIVE) ) {
+            // Do horizontal and vertical movement separately, resolving
+            // collisions with solid actors at each step.
 
-        // horizontal movement:
-        if ( actor->velocity.x ) {
-            actor->position.x += actor->velocity.x * dt;
-            DoCollisions(false, actor, blocks, num_blocks);
-        }
+            // horizontal movement:
+            if ( actor->velocity.x ) {
+                actor->position.x += actor->velocity.x * dt;
+                DoCollisions(false, actor, blocks, num_blocks);
+            }
 
-        // vertical movement:
-        if ( actor->velocity.y ) {
-            actor->position.y += actor->velocity.y * dt;
-            DoCollisions(true, actor, blocks, num_blocks);
+            // vertical movement:
+            if ( actor->velocity.y ) {
+                actor->position.y += actor->velocity.y * dt;
+                DoCollisions(true, actor, blocks, num_blocks);
+            }
+        } else {
+            vec2_t velocity = ScaleVector(actor->velocity, dt);
+            actor->position = AddVectors(actor->position, velocity);
         }
 
         UpdateActor(actor, dt);
-
-        if ( actor->type == ACTOR_PLAYER ) { // TODO: this goes elsewhere
-            LerpVector(&world->camera, &actor->position, 0.1f);
-        }
     }
 
     // Handle any collisions with interactable objects (non-solid things).

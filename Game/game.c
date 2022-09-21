@@ -17,8 +17,6 @@
 #include <SDL.h>
 
 #define DRAW_SCALE  3
-#define FPS 60.0f
-
 
 typedef struct {
     bool (* handle_event)(const SDL_Event * event);
@@ -42,11 +40,23 @@ static int render_ms;
 static int update_ms;
 static float debug_dt;
 
+bool GameHandleEvent(const SDL_Event * event);
+
 game_state_t game_play = {
-    .handle_event = NULL,
+    .handle_event = GameHandleEvent,
     .update = UpdateWorld,
     .render = RenderWorld,
 };
+
+bool GameHandleEvent(const SDL_Event * event)
+{
+    switch ( event->type ) {
+        default:
+            break;
+    }
+
+    return false;
+}
 
 static bool DoFrame(game_t * game, world_t * world, float dt)
 {
@@ -198,8 +208,9 @@ void GameMain(void)
     world_t * world = CreateWorld();
 
     // debug: check things aren't getting too big
-    printf("tile data size: %zu bytes\n", sizeof(world->tiles[0]));
-    printf("world data size: %zu bytes\n", sizeof(*world));
+    printf("- tile data size: %zu bytes\n", sizeof(world->tiles[0]));
+    printf("- world data size: %zu bytes\n", sizeof(*world));
+    printf("- actor size: %zu bytes\n", sizeof(actor_t));
 
     GameLoop(game, world);
     

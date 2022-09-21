@@ -6,6 +6,7 @@
 //
 
 #include "a_actor.h"
+#include "game.h"
 #include "w_world.h"
 #include "sprites.h"
 #include "mylib/input.h"
@@ -50,6 +51,20 @@ void PlayerUpdate(actor_t * player, float dt)
     LerpVector(&player->world->camera, &camera_target, 0.1f);
 }
 
+void ButterflyUpdate(actor_t * actor, float dt)
+{
+    if ( --actor->info.timer <= 0 ) {
+        actor->info.timer = MS2TICKS(Random(100, 1000), FPS);
+
+        if ( actor->velocity.x == 0 && actor->velocity.y == 0 ) {
+            // commence fluttering
+            actor->velocity = (vec2_t){ 0.25f * TILE_SIZE, 0.0f };
+        }
+
+        actor->velocity = RotateVector(actor->velocity, DEG2RAD(Random(0, 359)));
+    }
+}
+
 actor_state_t player_stand = {
     .sprite = &sprites[SPRITE_PLAYER_STAND],
     .handle_input = PlayerHandleInput,
@@ -57,9 +72,13 @@ actor_state_t player_stand = {
     .contact = NULL, // TODO: player stand contact
 };
 
+actor_state_t state_butterfly = {
+    .sprite = &sprites[SPRITE_BUTTERFLY],
+    .update = ButterflyUpdate,
+};
+
 static actor_t actor_definitions[NUM_ACTOR_TYPES] = {
     [ACTOR_PLAYER] = {
-        //.flags = ACTOR_FLAG_SOLID,
         .state = &player_stand,
         .hitbox_width = 6,
         .hitbox_height = 4,
@@ -69,6 +88,10 @@ static actor_t actor_definitions[NUM_ACTOR_TYPES] = {
         .sprite = &sprites[SPRITE_TREE],
         .hitbox_width = 4,
         .hitbox_height = 4,
+    },
+    [ACTOR_BUTTERFLY] = {
+        .flags = ACTOR_FLAG_FLY | ACTOR_FLAG_NONINTERACTIVE,
+        .state = &state_butterfly,
     },
 };
 

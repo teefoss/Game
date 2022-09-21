@@ -148,6 +148,21 @@ void SpawnPlayer(world_t * world)
     world->camera = position;
 }
 
+void SpawnActors(world_t * world)
+{
+    for ( int y = 0; y < WORLD_HEIGHT; y++ ) {
+        for ( int x = 0; x < WORLD_WIDTH; x++ ) {
+            tile_t * tile = GetTile(world->tiles, x, y);
+            if ( tile->terrain == TERRAIN_GRASS ) {
+                if ( Random(0, 50) == 50 ) {
+                    vec2_t p = { x * TILE_SIZE + 0.5f, y * TILE_SIZE + 0.5f };
+                    SpawnActor(ACTOR_BUTTERFLY, p, world);
+                }
+            }
+        }
+    }
+}
+
 world_t * CreateWorld(void)
 {
     world_t * world = calloc(1, sizeof(*world));
@@ -159,6 +174,7 @@ world_t * CreateWorld(void)
 
     GenerateTerrain(world);
     SpawnPlayer(world);
+    SpawnActors(world);
 
     // testing: spawn trees
     for ( int y = 0; y < WORLD_HEIGHT; y++ ) {
