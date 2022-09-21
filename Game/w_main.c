@@ -111,7 +111,7 @@ void DoCollisions(bool vertical, actor_t * actor, actor_t ** blocks, int num_blo
     }
 }
 
-void UpdateWorld(world_t * world, float dt)
+void UpdateActors(world_t * world, float dt)
 {
     actor_t * active_actors[MAX_ACTORS] = { 0 };
     actor_t * blocks[MAX_ACTORS] = { 0 };
@@ -220,4 +220,18 @@ void UpdateWorld(world_t * world, float dt)
             world->actors[i] = world->actors[--world->num_actors];
         }
     }
+}
+
+void UpdateWorld(world_t * world, float dt)
+{
+    if ( ++world->clock > DAY_LENGTH_TICKS ) {
+        world->clock = 0;
+    }
+
+    extern int debug_hours;
+    extern int debug_minutes;
+    debug_hours = world->clock / HOUR_TICKS;
+    debug_minutes = (world->clock - debug_hours * HOUR_TICKS) / (HOUR_TICKS / 60);
+
+    UpdateActors(world, dt);
 }

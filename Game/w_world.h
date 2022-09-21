@@ -17,6 +17,14 @@
 #define CHUNCK_SIZE 32
 #define MAX_ACTORS 5000
 
+#define DAY_LENGTH_TICKS    (int)(1200000.0f / (1000.0f / FPS))
+#define HOUR_TICKS          (DAY_LENGTH_TICKS / 24)
+#define MORNING_START_TICKS (HOUR_TICKS * 6)
+#define MORNING_END_TICKS   (HOUR_TICKS * 7)
+#define NOON_TICKS          (HOUR_TICKS * 12)
+#define DUSK_START_TICKS    (HOUR_TICKS * 8)
+#define DUSK_END_TICKS      (HOUR_TICKS * 9)
+
 typedef enum {
     TERRAIN_DEEP_WATER,
     TERRAIN_SHALLOW_WATER,
@@ -46,10 +54,10 @@ typedef struct world {
 
     actor_t actors[MAX_ACTORS];
     int num_actors;
+    vec2_t camera;
+    int clock;
 
     SDL_Texture * debug_texture; // rendering of entire world, for debuggery
-
-    vec2_t camera;
 } world_t;
 
 /// Allocates and creates the world.

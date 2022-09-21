@@ -39,6 +39,8 @@ static int frame_ms;
 static int render_ms;
 static int update_ms;
 static float debug_dt;
+int debug_hours;
+int debug_minutes;
 
 bool GameHandleEvent(const SDL_Event * event);
 
@@ -89,6 +91,15 @@ static bool DoFrame(game_t * game, world_t * world, float dt)
                         break;
                     case SDLK_F3:
                         show_geometry = !show_geometry;
+                        break;
+                    case SDLK_RIGHT:
+                        world->clock += HOUR_TICKS / 2;
+                        break;
+                    case SDLK_LEFT:
+                        world->clock -= HOUR_TICKS / 2;
+                        if ( world->clock < 0 ) {
+                            world->clock += DAY_LENGTH_TICKS;
+                        }
                         break;
                     default:
                         break;
@@ -152,6 +163,10 @@ static bool DoFrame(game_t * game, world_t * world, float dt)
         Print(0, row++ * h, "- Update time: %2d ms", update_ms);
         Print(0, row++ * h, "- dt: %.3f ms", debug_dt);
         Print(0, row++ * h, "Camera Tile: %.2f, %.2f", world->camera.x, world->camera.y);
+        Print(0, row++ * h, "%2d:%02d %s",
+              debug_hours > 12 ? debug_hours - 12 : debug_hours,
+              debug_minutes,
+              debug_hours < 12 ? "AM" : "PM" );
     }
 
     Present();
