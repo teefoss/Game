@@ -143,7 +143,7 @@ void SpawnPlayer(world_t * world)
     occupied[potentials[i].y][potentials[i].x] = true;
 
     vec2_t position = GetTileCenter(potentials[i].x, potentials[i].y);
-    SpawnActor(ACTOR_PLAYER, position, world->actors, &world->num_actors);
+    SpawnActor(ACTOR_PLAYER, position, world);
 
     world->camera = position;
 }
@@ -175,7 +175,7 @@ world_t * CreateWorld(void)
                 vec2_t v = GetTileCenter(x, y);
                 v.x += RandomFloat(-TILE_SIZE / 2.0f, TILE_SIZE / 2.0f);
                 v.y += RandomFloat(-TILE_SIZE / 2.0f, TILE_SIZE / 2.0f);
-                SpawnActor(ACTOR_TREE, v, world->actors, &world->num_actors);
+                SpawnActor(ACTOR_TREE, v, world);
                 occupied[y][x] = true;
             }
         }

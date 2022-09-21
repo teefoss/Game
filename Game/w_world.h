@@ -15,15 +15,7 @@
 #define WORLD_HEIGHT 512
 #define TILE_SIZE 16
 #define CHUNCK_SIZE 32
-
-typedef enum {
-    NORTH,
-    SOUTH,
-    EAST,
-    WEST,
-    // WEAST,
-    NUM_DIRECTIONS,
-} cardinal_t;
+#define MAX_ACTORS 5000
 
 typedef enum {
     TERRAIN_DEEP_WATER,
@@ -49,7 +41,7 @@ typedef struct {
     u8 variety;
 } tile_t;
 
-typedef struct {
+typedef struct world {
     tile_t tiles[WORLD_WIDTH * WORLD_HEIGHT];
 
     actor_t actors[MAX_ACTORS];

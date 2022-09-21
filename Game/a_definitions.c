@@ -43,6 +43,11 @@ void PlayerUpdate(actor_t * player, float dt)
     if ( !keyboard[SDL_SCANCODE_W] && ! keyboard[SDL_SCANCODE_S] ) {
         player->velocity.y = Lerp(player->velocity.y, 0, PLAYER_ACCEL);
     }
+
+    // Reposition the world camera.
+    vec2_t camera_target = ScaleVector(player->velocity, 3.0f);
+    camera_target = AddVectors(player->position, camera_target);
+    LerpVector(&player->world->camera, &camera_target, 0.1f);
 }
 
 actor_state_t player_stand = {

@@ -254,7 +254,7 @@ bool LerpVector(vec2_t * v, const vec2_t * to, float w)
 {
     float dx = to->x - v->x;
     float dy = to->y - v->y;
-    float threshold = 1.0f;
+    float threshold = 0.001f;
     bool x_arrived;
     bool y_arrived;
 

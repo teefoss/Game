@@ -12,7 +12,14 @@
 #include "mylib/mathlib.h"
 #include "mylib/sprite.h"
 
-#define MAX_ACTORS 5000
+typedef enum {
+    NORTH,
+    SOUTH,
+    EAST,
+    WEST,
+    // WEAST,
+    NUM_DIRECTIONS,
+} cardinal_t;
 
 typedef enum {
     ACTOR_FLAG_REMOVE   = 0x0001,
@@ -20,24 +27,29 @@ typedef enum {
 } actor_flags_t;
 
 typedef struct actor_state actor_state_t;
+typedef struct world world_t;
 
-typedef struct {
+typedef struct actor {
     actor_type_t type;
 
     vec2_t position; // in world pixels, the bottom center of the visible sprite
     vec2_t velocity;
-    vec2_t old_position;
     actor_flags_t flags;
+    cardinal_t direction;
 
     sprite_t * sprite;
     float current_frame;
+
+    // An actor's hitbox is centered on its x position and the hitbox's
+    // bottom aligns with the actor's y position.
     u8 hitbox_width;
     u8 hitbox_height;
     
     actor_state_t * state;
-    int state_timer;
+    int state_timer; // 0 = advance to next state
 
-    SDL_Rect hitbox;
+    // Actors may change the world, so keep an internal reference.
+    world_t * world;
 } actor_t;
 
 struct actor_state {
@@ -53,11 +65,7 @@ struct actor_state {
 // -----------------------------------------------------------------------------
 // a_main.c
 
-void SpawnActor
-(   actor_type_t type,
-    vec2_t position,
-    actor_t * array,
-    int * array_count );
+void SpawnActor(actor_type_t type, vec2_t position, world_t * world);
 sprite_t * GetActorSprite(const actor_t * actor);
 void UpdateActor(actor_t * actor, float dt);
 
@@ -66,11 +74,7 @@ SDL_Rect GetActorVisibleRect(const actor_t * actor);
 
 /// Actor's hitbox in world pixel space.
 SDL_FRect ActorHitbox(const actor_t * actor);
-SDL_Rect HitBox(sprite_t * sprite, vec2_t actor_position);
 vec2_t PositionFromHitbox(const actor_t * actor, SDL_FRect hitbox);
-
-bool ActorCollisionWithRect(actor_t * actor, SDL_Rect rect, vec2_t * point);
-void ClipActor(actor_t * actor, SDL_Rect actor_hitbox, SDL_Rect rect);
 
 // -----------------------------------------------------------------------------
 // a_definitions.c

@@ -6,8 +6,9 @@
 //
 
 #include "a_actor.h"
-#include "mylib/genlib.h"
+#include "m_misc.h"
 #include "w_world.h"
+#include "mylib/genlib.h"
 
 sprite_t * GetActorSprite(const actor_t * actor)
 {
@@ -18,25 +19,21 @@ sprite_t * GetActorSprite(const actor_t * actor)
     }
 }
 
-void SpawnActor
-(   actor_type_t type,
-    vec2_t position,
-    actor_t * array,
-    int * array_count )
+void SpawnActor(actor_type_t type, vec2_t position, world_t * world)
 {
     actor_t actor = GetActorDefinition(type);
     actor.type = type;
     actor.position = position;
+    actor.world = world;
 
-    array[(*array_count)++] = actor;
+    world->actors[world->num_actors++] = actor;
 }
 
 void UpdateActor(actor_t * actor, float dt)
 {
-    // update position
-//    actor->old_position = actor->position;
-//    vec2_t scaled_velocity = ScaleVector(actor->velocity, dt);
-//    actor->position = AddVectors(actor->position, scaled_velocity);
+    if ( actor->velocity.x || actor->velocity.y ) {
+        actor->direction = VelocityToDirection(actor->velocity);
+    }
 
     // update sprite animation
     sprite_t * sprite = GetActorSprite(actor);
