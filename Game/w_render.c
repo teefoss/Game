@@ -8,6 +8,7 @@
 
 #include "w_world.h"
 #include "game.h"
+#include "m_debug.h"
 #include "sprites.h"
 
 #include "mylib/video.h"
@@ -47,7 +48,7 @@ void UpdateDebugMap(tile_t * tiles,  SDL_Texture ** debug_map, vec2_t camera)
 
     SetGray(255);
     SDL_Rect vis_rect = GetVisibleRect(camera);
-    DrawRect(vis_rect);
+    DrawRect(&vis_rect);
 
     SDL_SetRenderTarget(renderer, NULL);
 }
@@ -76,7 +77,11 @@ static void RenderGrassDecoration(sprite_id_t id, u8 sprite_variety)
     DrawSprite(s, Random(1, max.x), Random(1, max.y), sprite_variety);
 }
 
-static void RenderGrassEffectTexture(tile_t * tile, int tile_x, int tile_y)
+static void RenderGrassEffectTexture
+(   tile_t * tile,
+    tile_t ** adjacent_tiles,
+    int tile_x,
+    int tile_y )
 {
     tile->effect = CreateTexture(TILE_SIZE, TILE_SIZE);
     SDL_SetTextureBlendMode(tile->effect, SDL_BLENDMODE_BLEND);
@@ -124,6 +129,20 @@ static void RenderGrassEffectTexture(tile_t * tile, int tile_x, int tile_y)
         }
     }
 
+    // Draw highlights at water edges.
+    SetRGBA(122, 214, 56, 255);
+    if ( adjacent_tiles[NORTH]->terrain <= TERRAIN_SHALLOW_WATER ) {
+        SDL_RenderDrawLine(renderer, 0, 0, TILE_SIZE + 1, 0);
+    }
+
+    if ( adjacent_tiles[WEST]->terrain <= TERRAIN_SHALLOW_WATER ) {
+        SDL_RenderDrawLine(renderer, 0, 0, 0, TILE_SIZE);
+    }
+
+    if ( adjacent_tiles[EAST]->terrain <= TERRAIN_SHALLOW_WATER ) {
+        SDL_RenderDrawLine(renderer, TILE_SIZE - 1, 0, TILE_SIZE - 1, TILE_SIZE - 1);
+    }
+
     SDL_SetRenderTarget(renderer, NULL);
 }
 
@@ -151,38 +170,26 @@ static void RenderGrass
 
     // Generate effect texture for this tile if needed.
     if ( tile->effect == NULL ) {
-        RenderGrassEffectTexture(tile, x, y);
+        RenderGrassEffectTexture(tile, adjacent_tiles, x, y);
     }
+
+    SDL_SetTextureColorMod
+    (   tile->effect,
+        tile->lighting.x,
+        tile->lighting.y,
+        tile->lighting.z );
 
     DrawTexture(tile->effect, NULL, dst);
-
-    // Draw highlights at water edges.
-    SetRGBA(122, 214, 56, 255);
-    if ( adjacent_tiles[NORTH]->terrain <= TERRAIN_SHALLOW_WATER ) {
-        SDL_RenderDrawLine(renderer, dst->x, dst->y, dst->x + TILE_SIZE + 1, dst->y);
-    }
-
-    if ( adjacent_tiles[WEST]->terrain <= TERRAIN_SHALLOW_WATER ) {
-        SDL_RenderDrawLine(renderer, dst->x, dst->y, dst->x, dst->y + TILE_SIZE);
-    }
-
-    if ( adjacent_tiles[EAST]->terrain <= TERRAIN_SHALLOW_WATER ) {
-        SDL_RenderDrawLine
-        (   renderer,
-            dst->x + TILE_SIZE - 1,
-            dst->y,
-            dst->x + TILE_SIZE - 1,
-            dst->y + TILE_SIZE - 1 );
-    }
 }
 
+// TODO: this needs a big cleanup/reorganization
 static void RenderVisibleTerrain(world_t * world)
 {
     SDL_Rect visible_rect = GetVisibleRect(world->camera);
 
     // Find the upper left visible tile.
-    int corner_tile_x = visible_rect.x / TILE_SIZE;
-    int corner_tile_y = visible_rect.y / TILE_SIZE;
+    //int corner_tile_x = visible_rect.x / TILE_SIZE;
+    //int corner_tile_y = visible_rect.y / TILE_SIZE;
     //printf("ul corner tile: %d, %d\n", corner_tile_x, corner_tile_y);
 
     SDL_Texture * grass_texture = GetTexture("grass.png");
@@ -198,17 +205,27 @@ static void RenderVisibleTerrain(world_t * world)
         .h = TILE_SIZE
     };
 
-    for (int tile_y = corner_tile_y;
-         tile_y <= corner_tile_y + VERTICAL_NUM_TILES + 1;
-         tile_y++ ) {
+    SDL_Point min, max;
+    GetVisibleTileRange(world, &min, &max);
 
-        for (int tile_x = corner_tile_x;
-             tile_x <= corner_tile_x + HORIZONTAL_NUM_TILES + 1;
-             tile_x++ ) {
+    for ( int tile_y = min.y; tile_y <= max.y; tile_y++ ) {
+        for ( int tile_x = min.x; tile_x <= max.x; tile_x++ ) {
 
             tile_t * tile = GetTile(world->tiles, tile_x, tile_y);
             tile_t * adjacent_tiles[NUM_DIRECTIONS];
             GetAdjacentTiles(tile_x, tile_y, world->tiles, adjacent_tiles);
+
+            // TODO: switch to using sprite
+            SDL_SetTextureColorMod
+            (   water_texture,
+                tile->lighting.x,
+                tile->lighting.y,
+                tile->lighting.z );
+            SDL_SetTextureColorMod
+            (   grass_texture,
+                tile->lighting.x,
+                tile->lighting.y,
+                tile->lighting.z );
 
             src.x = TILE_SIZE * (tile->variety % 4); // TODO: #define 4
             dst.x = tile_x * TILE_SIZE - visible_rect.x;
@@ -246,18 +263,23 @@ static void RenderVisibleTerrain(world_t * world)
                     break;
             }
 
+            // debug: highlight tile under mouse
+            if (show_debug_info
+                && ((int)mouse_tile.x == tile_x && (int)mouse_tile.y == tile_y) )
+            {
+                SetRGBA(255, 90, 90, 255);
+                DrawRect(&dst);
+            }
+
             dst.x += TILE_SIZE;
         }
 
         dst.y += TILE_SIZE;
     }
-
 }
 
-void RenderWorld(world_t * world, bool show_hitboxes)
+void RenderVisibleActors(world_t * world, bool show_hitboxes)
 {
-    RenderVisibleTerrain(world);
-
     SDL_Rect visible_rect = GetVisibleRect(world->camera);
 
     // Filter the world actor array: only visible actors
@@ -288,8 +310,10 @@ void RenderWorld(world_t * world, bool show_hitboxes)
 
         if ( sprite ) {
             SDL_Rect r = GetActorVisibleRect(actor);
-            r.x -= visible_rect.x;
+            r.x -= visible_rect.x; // adjust for camera
             r.y -= visible_rect.y;
+
+            SetSpriteColorMod(sprite, actor->lighting);
             DrawSprite(sprite, r.x, r.y, actor->current_frame);
 
             if ( show_hitboxes ) {
@@ -298,8 +322,19 @@ void RenderWorld(world_t * world, bool show_hitboxes)
                 hitbox.x -= visible_rect.x;
                 hitbox.y -= visible_rect.y;
                 SDL_Rect hitbox_i = { hitbox.x, hitbox.y, hitbox.w, hitbox.h };
-                DrawRect(hitbox_i);
+                DrawRect(&hitbox_i);
             }
         }
     }
+
+}
+
+void RenderWorld(world_t * world, bool show_hitboxes)
+{
+    int render_start = SDL_GetTicks(); // debug
+
+    RenderVisibleTerrain(world);
+    RenderVisibleActors(world, show_hitboxes);
+
+    render_ms = SDL_GetTicks() - render_start; // debug
 }

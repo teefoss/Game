@@ -46,6 +46,9 @@ typedef struct actor {
     sprite_t * sprite;
     float current_frame;
 
+    // Actors get their lighting from the tile they're standing on.
+    vec3_t lighting;
+
     // An actor's hitbox is centered on its x position and the hitbox's
     // bottom aligns with the actor's y position.
     u8 hitbox_width;
@@ -84,7 +87,8 @@ SDL_Rect GetActorVisibleRect(const actor_t * actor);
 
 /// Actor's hitbox in world pixel space.
 SDL_FRect ActorHitbox(const actor_t * actor);
-vec2_t PositionFromHitbox(const actor_t * actor, SDL_FRect hitbox);
+
+void DoCollisions(bool vertical, actor_t * actor, actor_t ** blocks, int num_blocks);
 
 // -----------------------------------------------------------------------------
 // a_definitions.c

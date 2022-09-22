@@ -57,15 +57,15 @@ inline void Present(void)
 }
 
 /// Draw a rectangle outline with the current draw color.
-inline void DrawRect(SDL_Rect rect)
+inline void DrawRect(SDL_Rect * rect)
 {
-    SDL_RenderDrawRect(renderer, &rect);
+    SDL_RenderDrawRect(renderer, rect);
 }
 
 /// Draw a filled rectangle with the current draw color.
-inline void FillRect(SDL_Rect rect)
+inline void FillRect(SDL_Rect * rect)
 {
-    SDL_RenderFillRect(renderer, &rect);
+    SDL_RenderFillRect(renderer, rect);
 }
 
 /// Draw a point at pixel coordinates x, y.

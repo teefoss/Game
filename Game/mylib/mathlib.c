@@ -1,13 +1,11 @@
 #include "mathlib.h"
 #include <math.h>
 
+// https://thatfrenchgamedev.com/1026/game-programmers-handy-maths-formulas/
+
 float Lerp(float a, float b, float w)
 {
-    if ( fabsf( a - b ) < 1.0f ) {
-        return b;
-    } else {
-        return (1.0f - w) * a + w * b;
-    }
+    return (1.0f - w) * a + w * b;
 }
 
 #pragma mark - GEOMETRY
@@ -244,64 +242,6 @@ float RandomFloat(float min, float max)
     return _RandomFloat() * (max - min) + min;
 }
 
-#pragma mark - VECTOR
-
-extern inline vec2_t AddVectors(vec2_t a, vec2_t b);
-extern inline vec2_t ScaleVector(vec2_t v, float s);
-extern inline vec2_t SubtractVectors(vec2_t a, vec2_t b);
-
-bool LerpVector(vec2_t * v, const vec2_t * to, float w)
-{
-    float dx = to->x - v->x;
-    float dy = to->y - v->y;
-    float threshold = 0.001f;
-    bool x_arrived;
-    bool y_arrived;
-
-    if ( fabsf( dx ) > threshold ) {
-        v->x += dx * w;
-        x_arrived = false;
-    } else {
-        v->x = to->x;
-        x_arrived = true;
-    }
-
-    if ( fabsf( dy ) > threshold ) {
-        v->y += dy * w;
-        y_arrived = false;
-    } else {
-        v->y = to->y;
-        y_arrived = true;
-    }
-
-    return x_arrived && y_arrived;
-}
-
-vec2_t NormalizeVector(vec2_t v)
-{
-    vec2_t result = { 0, 0 };
-
-    float length = sqrtf(v.x * v.x + v.y * v.y);
-    if ( length == 0.0f ) {
-        return result;
-    }
-
-    float ilength = 1.0 / length;
-    result.x = v.x * ilength;
-    result.y = v.y * ilength;
-
-    return result;
-}
-
-vec2_t RotateVector(vec2_t v, float radians)
-{
-    vec2_t result;
-    result.x = cos(radians) * v.x - sin(radians) * v.y;
-    result.y = sin(radians) * v.x + cos(radians) * v.y;
-
-    return result;
-}
-
 void WrapPosition(vec2_t * position, int w, int h)
 {
     position->x = fmod(position->x + w, w);
@@ -310,19 +250,19 @@ void WrapPosition(vec2_t * position, int w, int h)
 
 vec2_t RandomDirection(void)
 {
-    return RotateVector((vec2_t){ 1, 0 }, DEG2RAD(Random(0, 359)));
+    return Vec2Rotate((vec2_t){ 1, 0 }, DEG2RAD(Random(0, 359)));
 }
 
 vec2_t RandomVelocity(float min, float max)
 {
     vec2_t v = RandomDirection();
-    VSCALE(v, RandomFloat(min, max));
+    v = Vec2Scale(v, RandomFloat(min, max));
 
     return v;
 }
 
 void RandomizeVector(vec2_t * v, float radians) {
-    *v =  RotateVector(*v, RandomFloat(-radians, +radians));
+    *v =  Vec2Rotate(*v, RandomFloat(-radians, +radians));
 }
 
 #pragma mark - NOISE

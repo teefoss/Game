@@ -16,6 +16,7 @@
 
 void PlayerHandleInput(actor_t * player)
 {
+    // TODO: stop lerping
     if ( keyboard[SDL_SCANCODE_A] ) {
         player->velocity.x = Lerp(player->velocity.x, -PLAYER_VELOCITY, PLAYER_ACCEL);
     }
@@ -46,9 +47,8 @@ void PlayerUpdate(actor_t * player, float dt)
     }
 
     // Reposition the world camera.
-    vec2_t camera_target = ScaleVector(player->velocity, 3.0f);
-    camera_target = AddVectors(player->position, camera_target);
-    LerpVector(&player->world->camera, &camera_target, 0.1f);
+    vec2_t camera_target = Vec2Add(player->position, player->velocity);
+    VectorLerpEpsilon(&player->world->camera, &camera_target, 0.08f, 1.0f);
 }
 
 void ButterflyUpdate(actor_t * actor, float dt)
@@ -61,7 +61,7 @@ void ButterflyUpdate(actor_t * actor, float dt)
             actor->velocity = (vec2_t){ 0.25f * TILE_SIZE, 0.0f };
         }
 
-        actor->velocity = RotateVector(actor->velocity, DEG2RAD(Random(0, 359)));
+        actor->velocity = Vec2Rotate(actor->velocity, DEG2RAD(Random(0, 359)));
     }
 }
 

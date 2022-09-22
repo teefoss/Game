@@ -2,6 +2,7 @@
 #define SPRITE_H
 
 #include "genlib.h"
+#include "vector.h"
 #include <stdbool.h>
 
 typedef enum {
@@ -28,5 +29,7 @@ typedef struct {
 /// - Parameter frame: The current animation frame is sprite is animated, or
 ///   a number to randomly select which sprite varient is drawn.
 void DrawSprite(sprite_t * sprite, int x, int y, u8 frame);
+
+void SetSpriteColorMod(sprite_t * sprite, vec3_t color_mod);
 
 #endif /* SPRITE_H */

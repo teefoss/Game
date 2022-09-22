@@ -7,6 +7,7 @@
 //  World generation code
 
 #include "w_world.h"
+#include "game.h"
 #include "mylib/video.h"
 
 static vec2_t GetTileCenter(int x, int y)
@@ -86,9 +87,6 @@ static void GenerateTerrain(world_t * world)
             SetUpTile(x, y, GetTile(world->tiles, x, y), world->tiles, noise);
         }
     }
-
-    world->camera.x = half_width + 40.5f;
-    world->camera.y = half_height - 30.5f;
 }
 
 // track occupied tiles during generation
@@ -170,6 +168,8 @@ world_t * CreateWorld(void)
         Error("could not allocate world");
     }
 
+    world->clock = MORNING_END_TICKS;
+
     memset(occupied, 0, sizeof(occupied));
 
     GenerateTerrain(world);
@@ -188,9 +188,11 @@ world_t * CreateWorld(void)
                 && !occupied[y][x]
                 && Random(0, 10) == 10 )
             {
+                // Randomly offset from center of tile.
                 vec2_t v = GetTileCenter(x, y);
-                v.x += RandomFloat(-TILE_SIZE / 2.0f, TILE_SIZE / 2.0f);
-                v.y += RandomFloat(-TILE_SIZE / 2.0f, TILE_SIZE / 2.0f);
+                v.x += RandomFloat(-TILE_SIZE / 3.0f, TILE_SIZE / 3.0f);
+                v.y += RandomFloat(-TILE_SIZE / 3.0f, TILE_SIZE / 3.0f);
+
                 SpawnActor(ACTOR_TREE, v, world);
                 occupied[y][x] = true;
             }

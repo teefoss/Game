@@ -17,6 +17,7 @@
 // 4x this resolution = 1920x1080
 #define GAME_WIDTH  480
 #define GAME_HEIGHT 270
+#define DRAW_SCALE  3
 
 void GameMain(void);
 

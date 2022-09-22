@@ -100,3 +100,14 @@ void InitInput(void)
 
 extern bool IsKeyDown(SDL_Scancode scancode);
 extern bool IsButtonDown(SDL_GameControllerButton button);
+
+vec2_t GetMousePosition(float draw_scale)
+{
+    int x, y;
+    SDL_GetMouseState(&x, &y);
+
+    vec2_t position = { x, y };
+    position = Vec2Scale(position, 1.0f / draw_scale);
+
+    return position;
+}

@@ -9,6 +9,7 @@
 #define world_h
 
 #include "a_actor.h"
+#include "game.h"
 #include "mylib/mathlib.h"
 
 #define WORLD_WIDTH  512
@@ -22,8 +23,8 @@
 #define MORNING_START_TICKS (HOUR_TICKS * 6)
 #define MORNING_END_TICKS   (HOUR_TICKS * 7)
 #define NOON_TICKS          (HOUR_TICKS * 12)
-#define DUSK_START_TICKS    (HOUR_TICKS * 8)
-#define DUSK_END_TICKS      (HOUR_TICKS * 9)
+#define DUSK_START_TICKS    (HOUR_TICKS * 20) // 8 PM
+#define DUSK_END_TICKS      (HOUR_TICKS * 21) // 9 PM
 
 typedef enum {
     TERRAIN_DEEP_WATER,
@@ -47,6 +48,9 @@ typedef struct {
     // A value that can be used to
     // randomize various tile properties.
     u8 variety;
+
+    // Determined by world lighting and any nearby light-casting actors.
+    vec3_t lighting;
 } tile_t;
 
 typedef struct world {
@@ -54,10 +58,19 @@ typedef struct world {
 
     actor_t actors[MAX_ACTORS];
     int num_actors;
+
+    // The world pixel coordinate that's centered on screen.
     vec2_t camera;
+
     int clock;
 
-    SDL_Texture * debug_texture; // rendering of entire world, for debuggery
+    // Lighting is a color mod value that's applied to textures.
+    // Tiles get their lighting from the world, then from any actors
+    // that cast light. Actors in turn get their lighting from the tile
+    // they stand on.
+    vec3_t lighting;
+
+    SDL_Texture * debug_map; // rendering of entire world, for debuggery
 } world_t;
 
 /// Allocates and creates the world.
@@ -66,6 +79,8 @@ typedef struct world {
 world_t * CreateWorld(void);
 
 tile_t * GetTile(tile_t * tiles, int x, int y);
+void GetVisibleTileRange(world_t * world, SDL_Point * min, SDL_Point * max);
+SDL_Rect GetVisibleRect(vec2_t camera);
 
 void GetAdjacentTiles
 (   int x,
@@ -76,7 +91,7 @@ void GetAdjacentTiles
 void RenderWorld(world_t * world, bool show_hitboxes);
 void DestroyWorld(world_t * world); // maybe FreeWorld would be more positive?
 void UpdateWorld(world_t * world, float dt);
-SDL_Rect GetVisibleRect(vec2_t camera);
+
 void UpdateDebugMap(tile_t * tiles,  SDL_Texture ** debug_map, vec2_t camera);
 
 #endif /* world_h */

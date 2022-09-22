@@ -157,8 +157,8 @@ SDL_Texture * CreateTexture(int w, int h)
 
 extern inline void Clear(void);
 extern inline void Present(void);
-extern inline void DrawRect(SDL_Rect rect);
-extern inline void FillRect(SDL_Rect rect);
+extern inline void DrawRect(SDL_Rect * rect);
+extern inline void FillRect(SDL_Rect * rect);
 extern inline void DrawPoint(int x, int y);
 extern inline void SetRGBA(u8 r, u8 g, u8 b, u8 a);
 extern inline void SetColor(SDL_Color color);

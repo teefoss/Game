@@ -29,3 +29,9 @@ void DrawSprite(sprite_t * sprite, int x, int y, u8 frame)
         DrawTextureFlip(texture, &src, &dst, flip);
     }
 }
+
+void SetSpriteColorMod(sprite_t * sprite, vec3_t color_mod)
+{
+    SDL_Texture * texture = GetTexture(sprite->texture_name);
+    SDL_SetTextureColorMod(texture, color_mod.x, color_mod.y, color_mod.z);
+}

@@ -7,6 +7,10 @@
 
 #include "game.h"
 
+/*
+ https://www.gamedeveloper.com/programming/dynamic-2d-character-lighting
+ */
+
 int main(void)
 {
     GameMain();

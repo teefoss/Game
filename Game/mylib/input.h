@@ -61,4 +61,6 @@ vec2_t ControllerStickDirection(controllerSide_t stick);
 /// the trigger is depressed.
 float ControllerTriggerState(controllerSide_t trigger);
 
+vec2_t GetMousePosition(float draw_scale);
+
 #endif /* __INPUT_H__ */

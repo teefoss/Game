@@ -7,6 +7,7 @@
 #define __MATHLIB_H__
 
 #include "genlib.h"
+#include "vector.h"
 #include <stdbool.h>
 
 #define RANDOM_MAX          0xFFFFFFFF
@@ -39,22 +40,6 @@ typedef enum {
     RECT_SIDE_NONE,
 } rect_side_t;
 
-typedef struct {
-    float x;
-    float y;
-} vec2_t;
-
-// create a new vector from +, - operations, etc.
-// e.g. vec2_t sum = VEC(vecA, +, vecB)
-#define VEC(a, op, b)   (vec2_t){ a.x op b.x, a.y op b.y }
-
-// modify vector a with +=, -= operations, etc.
-// e.g. VOP(vecA, +=, vecB)
-#define VOP(a, op, b)   { a.x op b.x; a.y op b.y }
-
-// scale vector v by s
-#define VSCALE(v, s)    { v.x *= s; v.y *= s; }
-
 /// Linearly interpolate from a to b with factor w.
 float Lerp(float a, float b, float w);
 
@@ -83,27 +68,7 @@ bool LinesIntersect
     vec2_t b1, vec2_t b2,
     vec2_t * intersection);
 
-inline vec2_t AddVectors(vec2_t a, vec2_t b)
-{
-    return (vec2_t){ a.x + b.x, a.y + b.y };
-}
 
-inline vec2_t SubtractVectors(vec2_t a, vec2_t b)
-{
-    return (vec2_t){ a.x - b.x, a.y - b.y };
-}
-
-inline vec2_t ScaleVector(vec2_t v, float s)
-{
-    return (vec2_t){ v.x * s, v.y * s };
-}
-
-/// Linearly interpolate factor v to vector `to` with factor `w`.
-/// - Returns: true if vector `v` is within 1 of vector `to`.
-bool LerpVector(vec2_t * v, const vec2_t * to, float w);
-
-vec2_t  NormalizeVector(vec2_t v);
-vec2_t  RotateVector(vec2_t v, float radians);
 void    WrapPosition(vec2_t * position, int w, int h);
 
 /// Rotate a vector by a random amount.
