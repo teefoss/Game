@@ -13,6 +13,17 @@ sprite_t sprites[NUM_SPRITES] = {
         .location = { 0, 0, 6, 24 },
         .num_frames = 1,
     },
+    [SPRITE_SHALLOW_WATER] = {
+        .texture_name = "shallow-water.png",
+        .location = { 0, 0, 16, 16 },
+        .num_frames = 1,
+    },
+    [SPRITE_SHALLOW_WATER_EDGE] = {
+        .texture_name = "shallow-water.png",
+        .location = { 0, 16, 16, 16 },
+        .num_frames = 4,
+        .flags = SPRITE_FLAG_HORIZONTAL_FLIPPABLE|SPRITE_FLAG_VARIETY,
+    },
     [SPRITE_GRASS] = {
         .texture_name = "grass.png",
         .location = { 0, 0, 16, 16 },

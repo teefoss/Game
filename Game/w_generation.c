@@ -21,8 +21,8 @@ static vec2_t GetTileCenter(int x, int y)
 static const float terrain_elevations[NUM_TERRAIN_TYPES] = {
     -1.00, // deep ocean
     -0.45, // shallow ocean
-    -0.20, // beach
-    -0.15, // grass
+    //-0.20, // beach
+    -0.20, // grass -0.15
      0.05, // forest
      0.30, // dark forest
      1.00,

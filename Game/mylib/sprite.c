@@ -20,10 +20,10 @@ void DrawSprite(sprite_t * sprite, int x, int y, u8 frame)
         }
 
         SDL_RendererFlip flip = 0;
-        if ( sprite->flags & SPRITE_FLAG_HORIZONTAL_FLIPPABLE && Random(0, 1) ) {
+        if ( sprite->flags & SPRITE_FLAG_HORIZONTAL_FLIPPABLE && frame < 128 ) {
             flip |= SDL_FLIP_HORIZONTAL;
         }
-        if ( sprite->flags & SPRITE_FLAG_VERTICAL_FLIPPABLE && Random(0, 1) ) {
+        if ( sprite->flags & SPRITE_FLAG_VERTICAL_FLIPPABLE && frame < 128 ) {
             flip |= SDL_FLIP_VERTICAL;
         }
         DrawTextureFlip(texture, &src, &dst, flip);

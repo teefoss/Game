@@ -92,32 +92,40 @@ static void RenderGrassEffectTexture
 
     // Render moss.
 
+    float noise_map[TILE_SIZE][TILE_SIZE];
+
 //    SetRGBA(93, 163, 42, 255); // darker shade of same grass color
 //    SetRGBA(114, 201, 52, 255); // faintly lighter shade of same grass color
     for ( int py = 0; py < TILE_SIZE; py++ ) {
         for ( int px = 0; px < TILE_SIZE; px++ ) {
             int wx = tile_x * 16 + px; // world pixel coord
             int wy = tile_y * 16 + py;
-            float noise = Noise2(wx, wy, 1.0f, 0.01f, 8, 1.0f, 0.5f, 2.5f);
+            noise_map[py][px] = Noise2(wx, wy, 1.0f, 0.01f, 8, 1.0f, 0.5f, 2.5f);
             SeedRandom(wx * wy); // TODO: more than one prng
 
-            if ( noise > 0.2f ) { //}|| (noise > 0.05f && Random(0, 3) == 0) ) {
+            if ( noise_map[py][px] > 0.2f ) { //}|| (noise > 0.05f && Random(0, 3) == 0) ) {
                 SetRGBA(78, 138, 36, 255); // darker green
                 DrawPoint(px, py);
-            } else if ( noise > 0.1 ) {
+            } else if ( noise_map[py][px] > 0.1 ) {
                 SetRGBA(114, 201, 52, 255); // faintly lighter shade of same grass color
                 DrawPoint(px, py);
             }
+        }
+    }
 
-            if ( noise > 0.7f ) {
+    // tiny moss flowers
+    for ( int py = 0; py < TILE_SIZE; py++ ) {
+        for ( int px = 0; px < TILE_SIZE; px++ ) {
+            if ( noise_map[py][px] > 0.7f ) {
                 if ( Random(0, 15) == 15 ) {
                     DrawSprite(&sprites[SPRITE_TINY_YELLOW_FLOWER], px, py, 0);
                 }
-            } else if ( noise > 0.45f && Random(0, 20) == 20 ) {
+            } else if ( noise_map[py][px] > 0.45f && Random(0, 20) == 20 ) {
                 DrawSprite(&sprites[SPRITE_TINY_BLUE_FLOWER], px, py, 0);
             }
         }
     }
+
 
     // Sprinkle some foliage.
     // Most tiles have grass, occasionally a flower.
@@ -149,36 +157,24 @@ static void RenderGrassEffectTexture
 static void RenderGrass
 (   tile_t * tile,
     tile_t ** adjacent_tiles,
-    int x,
-    int y,
-    SDL_Texture * grass_texture,
+    int tile_x,
+    int tile_y,
     SDL_Rect * dst )
 {
-    SDL_Rect src = {
-        .y = 0,
-        .w = TILE_SIZE,
-        .h = TILE_SIZE
-    };
-
-    if ( tile->variety % 12 == 0 ) {
-        src.x = TILE_SIZE * (tile->variety < 128 ? 1 : 2);
-    } else {
-        src.x = 0;
-    }
-
-    DrawTexture(GetTexture("grass.png"), &src, dst);
+    SetSpriteColorMod(&sprites[SPRITE_GRASS], tile->lighting);
+    DrawSprite(&sprites[SPRITE_GRASS], dst->x, dst->y, tile->variety);
 
     // Generate effect texture for this tile if needed.
     if ( tile->effect == NULL ) {
-        RenderGrassEffectTexture(tile, adjacent_tiles, x, y);
+        RenderGrassEffectTexture(tile, adjacent_tiles, tile_x, tile_y);
     }
 
+    // overlay the effect texture
     SDL_SetTextureColorMod
     (   tile->effect,
         tile->lighting.x,
         tile->lighting.y,
         tile->lighting.z );
-
     DrawTexture(tile->effect, NULL, dst);
 }
 
@@ -187,45 +183,31 @@ static void RenderVisibleTerrain(world_t * world)
 {
     SDL_Rect visible_rect = GetVisibleRect(world->camera);
 
-    // Find the upper left visible tile.
-    //int corner_tile_x = visible_rect.x / TILE_SIZE;
-    //int corner_tile_y = visible_rect.y / TILE_SIZE;
-    //printf("ul corner tile: %d, %d\n", corner_tile_x, corner_tile_y);
-
-    SDL_Texture * grass_texture = GetTexture("grass.png");
-    SDL_Texture * water_texture = GetTexture("shallow-water.png");
-
-    SDL_Rect dst = {
-        .w = TILE_SIZE,
-        .h = TILE_SIZE,
-    };
-
-    SDL_Rect src = {
-        .w = TILE_SIZE,
-        .h = TILE_SIZE
-    };
+    SDL_Rect dst = { .w = TILE_SIZE, .h = TILE_SIZE, };
+    SDL_Rect src = { .w = TILE_SIZE, .h = TILE_SIZE };
 
     SDL_Point min, max;
     GetVisibleTileRange(world, &min, &max);
 
     for ( int tile_y = min.y; tile_y <= max.y; tile_y++ ) {
         for ( int tile_x = min.x; tile_x <= max.x; tile_x++ ) {
-
             tile_t * tile = GetTile(world->tiles, tile_x, tile_y);
+
             tile_t * adjacent_tiles[NUM_DIRECTIONS];
             GetAdjacentTiles(tile_x, tile_y, world->tiles, adjacent_tiles);
 
             // TODO: switch to using sprite
-            SDL_SetTextureColorMod
-            (   water_texture,
-                tile->lighting.x,
-                tile->lighting.y,
-                tile->lighting.z );
-            SDL_SetTextureColorMod
-            (   grass_texture,
-                tile->lighting.x,
-                tile->lighting.y,
-                tile->lighting.z );
+
+//            SDL_SetTextureColorMod
+//            (   water_texture,
+//                tile->lighting.x,
+//                tile->lighting.y,
+//                tile->lighting.z );
+//            SDL_SetTextureColorMod
+//            (   grass_texture,
+//                tile->lighting.x,
+//                tile->lighting.y,
+//                tile->lighting.z );
 
             src.x = TILE_SIZE * (tile->variety % 4); // TODO: #define 4
             dst.x = tile_x * TILE_SIZE - visible_rect.x;
@@ -235,19 +217,21 @@ static void RenderVisibleTerrain(world_t * world)
                 case TERRAIN_DEEP_WATER:
                     // TODO: render deep water
                 case TERRAIN_SHALLOW_WATER: {
+                    sprite_t * sprite;
+
                     if ( adjacent_tiles[NORTH]
                         && adjacent_tiles[NORTH]->terrain != TERRAIN_SHALLOW_WATER
                         && adjacent_tiles[NORTH]->terrain != TERRAIN_DEEP_WATER )
                     {
-                        src.y = TILE_SIZE * 1;
+                        sprite = &sprites[SPRITE_SHALLOW_WATER_EDGE];
                     } else {
-                        src.y = 0;
+                        sprite = &sprites[SPRITE_SHALLOW_WATER];
                     }
 
-                    DrawTexture(water_texture, &src, &dst);
+                    SetSpriteColorMod(sprite, tile->lighting);
+                    DrawSprite(sprite, dst.x, dst.y, tile->variety);
                     break;
                 }
-                case TERRAIN_BEACH:
                 case TERRAIN_GRASS:
                 case TERRAIN_FOREST:
                 case TERRAIN_DARK_FOREST:
@@ -256,7 +240,6 @@ static void RenderVisibleTerrain(world_t * world)
                         adjacent_tiles,
                         tile_x,
                         tile_y,
-                        grass_texture,
                         &dst );
                     break;
                 default:
@@ -310,7 +293,7 @@ void RenderVisibleActors(world_t * world, bool show_hitboxes)
 
         if ( sprite ) {
             SDL_Rect r = GetActorVisibleRect(actor);
-            r.x -= visible_rect.x; // adjust for camera
+            r.x -= visible_rect.x; // convert to window space
             r.y -= visible_rect.y;
 
             SetSpriteColorMod(sprite, actor->lighting);
