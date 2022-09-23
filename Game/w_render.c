@@ -178,7 +178,6 @@ static void RenderGrass
     DrawTexture(tile->effect, NULL, dst);
 }
 
-// TODO: this needs a big cleanup/reorganization
 static void RenderVisibleTerrain(world_t * world)
 {
     SDL_Rect visible_rect = GetVisibleRect(world->camera);
@@ -195,19 +194,6 @@ static void RenderVisibleTerrain(world_t * world)
 
             tile_t * adjacent_tiles[NUM_DIRECTIONS];
             GetAdjacentTiles(tile_x, tile_y, world->tiles, adjacent_tiles);
-
-            // TODO: switch to using sprite
-
-//            SDL_SetTextureColorMod
-//            (   water_texture,
-//                tile->lighting.x,
-//                tile->lighting.y,
-//                tile->lighting.z );
-//            SDL_SetTextureColorMod
-//            (   grass_texture,
-//                tile->lighting.x,
-//                tile->lighting.y,
-//                tile->lighting.z );
 
             src.x = TILE_SIZE * (tile->variety % 4); // TODO: #define 4
             dst.x = tile_x * TILE_SIZE - visible_rect.x;
@@ -287,6 +273,25 @@ void RenderVisibleActors(world_t * world, bool show_hitboxes)
         }
     }
 
+    // draw actor show
+    // TODO: make a actor shadow flag
+    for ( int i = 0; i < num_visible; i++ ) {
+        actor_t * actor = visible_actors[i];
+
+        if ( GetActorSprite(actor) ) {
+            SDL_Rect shadow = {
+                .w = actor->hitbox_width + 4,
+                .h = actor->hitbox_height + 2
+            };
+            shadow.x = actor->position.x - shadow.w / 2 - visible_rect.x;
+            shadow.y = actor->position.y - shadow.h / 2 - visible_rect.y;
+
+            SetRGBA(0, 0, 0, 64);
+            FillRect(&shadow);
+        }
+    }
+
+    // draw actors
     for ( int i = 0; i < num_visible; i++ ) {
         actor_t * actor = visible_actors[i];
         sprite_t * sprite = GetActorSprite(actor);
@@ -294,7 +299,7 @@ void RenderVisibleActors(world_t * world, bool show_hitboxes)
         if ( sprite ) {
             SDL_Rect r = GetActorVisibleRect(actor);
             r.x -= visible_rect.x; // convert to window space
-            r.y -= visible_rect.y;
+            r.y -= visible_rect.y + actor->z;
 
             SetSpriteColorMod(sprite, actor->lighting);
             DrawSprite(sprite, r.x, r.y, actor->current_frame);

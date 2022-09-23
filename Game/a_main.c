@@ -19,7 +19,7 @@ sprite_t * GetActorSprite(const actor_t * actor)
     }
 }
 
-void SpawnActor(actor_type_t type, vec2_t position, world_t * world)
+actor_t * SpawnActor(actor_type_t type, vec2_t position, world_t * world)
 {
     actor_t actor = GetActorDefinition(type);
     actor.type = type;
@@ -27,6 +27,7 @@ void SpawnActor(actor_type_t type, vec2_t position, world_t * world)
     actor.world = world;
 
     world->actors[world->num_actors++] = actor;
+    return &world->actors[world->num_actors - 1];
 }
 
 void UpdateActor(actor_t * actor, float dt)

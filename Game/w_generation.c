@@ -154,7 +154,8 @@ void SpawnActors(world_t * world)
             if ( tile->terrain == TERRAIN_GRASS ) {
                 if ( Random(0, 50) == 50 ) {
                     vec2_t p = { x * TILE_SIZE + 0.5f, y * TILE_SIZE + 0.5f };
-                    SpawnActor(ACTOR_BUTTERFLY, p, world);
+                    actor_t * actor = SpawnActor(ACTOR_BUTTERFLY, p, world);
+                    actor->z = 16;
                 }
             }
         }

@@ -39,6 +39,11 @@ typedef struct actor {
     actor_type_t type;
 
     vec2_t position; // in world pixels, the bottom center of the visible sprite
+
+    // 0 if actor is on the ground. This doesn't affect anything except
+    // where an actor's sprite is rendered.
+    int z;
+
     vec2_t velocity;
     actor_flags_t flags;
     cardinal_t direction;
@@ -78,7 +83,7 @@ struct actor_state {
 // -----------------------------------------------------------------------------
 // a_main.c
 
-void SpawnActor(actor_type_t type, vec2_t position, world_t * world);
+actor_t * SpawnActor(actor_type_t type, vec2_t position, world_t * world);
 sprite_t * GetActorSprite(const actor_t * actor);
 void UpdateActor(actor_t * actor, float dt);
 
