@@ -57,8 +57,8 @@ void DestroyWorld(world_t * world)
 SDL_Rect GetVisibleRect(vec2_t camera)
 {
     SDL_Rect r = {
-        .x = camera.x - GAME_WIDTH / 2,
-        .y = camera.y - GAME_HEIGHT / 2,
+        .x = floorf(camera.x) - (float)GAME_WIDTH / 2.0f,
+        .y = floorf(camera.y) - (float)GAME_HEIGHT / 2.0f,
         .w = GAME_WIDTH,
         .h = GAME_HEIGHT
     };

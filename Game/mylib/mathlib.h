@@ -40,8 +40,9 @@ typedef enum {
     RECT_SIDE_NONE,
 } rect_side_t;
 
-/// Linearly interpolate from a to b with factor w.
+/// Linearly interpolate from a to b with interpolation point w.
 float Lerp(float a, float b, float w);
+float LerpEpsilon(float a, float b, float w, float epsilon);
 
 /// Test for line-circle interaction.
 /// - Parameter p1: Start of line.

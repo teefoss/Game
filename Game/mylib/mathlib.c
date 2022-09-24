@@ -8,6 +8,16 @@ float Lerp(float a, float b, float w)
     return (1.0f - w) * a + w * b;
 }
 
+float LerpEpsilon(float a, float b, float w, float epsilon)
+{
+    float result = (1.0f - w) * a + w * b;
+    if ( fabsf(result) < epsilon ) {
+        result = b;
+    }
+
+    return result;
+}
+
 #pragma mark - GEOMETRY
 
 //

@@ -75,24 +75,23 @@ static void UpdateActors(world_t * world, float dt)
         actor_t * actor = active_actors[i];
 
         // Move actors.
-        if ( !(actor->flags & ACTOR_FLAG_NONINTERACTIVE) ) {
-            // Do horizontal and vertical movement separately, resolving
-            // collisions with solid actors at each step.
+        // Do horizontal and vertical movement separately, resolving
+        // collisions with solid actors at each step.
 
-            // horizontal movement:
-            if ( actor->velocity.x ) {
-                actor->position.x += actor->velocity.x * dt;
+        // horizontal movement:
+        if ( actor->velocity.x ) {
+            actor->position.x += actor->velocity.x * dt;
+            if ( !(actor->flags & ACTOR_FLAG_NONINTERACTIVE) ) {
                 DoCollisions(false, actor, blocks, num_blocks);
             }
+        }
 
-            // vertical movement:
-            if ( actor->velocity.y ) {
-                actor->position.y += actor->velocity.y * dt;
+        // vertical movement:
+        if ( actor->velocity.y ) {
+            actor->position.y += actor->velocity.y * dt;
+            if ( !(actor->flags & ACTOR_FLAG_NONINTERACTIVE) ) {
                 DoCollisions(true, actor, blocks, num_blocks);
             }
-        } else {
-            vec2_t velocity = Vec2Scale(actor->velocity, dt);
-            actor->position = Vec2Add(actor->position, velocity);
         }
 
         UpdateActor(actor, dt);

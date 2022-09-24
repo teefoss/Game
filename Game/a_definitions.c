@@ -11,43 +11,71 @@
 #include "sprites.h"
 #include "mylib/input.h"
 
-#define PLAYER_VELOCITY (1.5f * TILE_SIZE) // tiles / second
-#define PLAYER_ACCEL 0.1f
+//#define PLAYER_VELOCITY (1.5f * TILE_SIZE) // tiles / second
+#define PLAYER_VELOCITY (2.5f * TILE_SIZE)
+//#define PLAYER_ACCEL 0.1f
+#define PLAYER_ACCEL 2.0f
 
 void PlayerHandleInput(actor_t * player)
 {
-    // TODO: stop lerping
     if ( keyboard[SDL_SCANCODE_A] ) {
-        player->velocity.x = Lerp(player->velocity.x, -PLAYER_VELOCITY, PLAYER_ACCEL);
+        player->velocity.x -= PLAYER_ACCEL;
     }
 
     if ( keyboard[SDL_SCANCODE_D] ) {
-        player->velocity.x = Lerp(player->velocity.x, PLAYER_VELOCITY, PLAYER_ACCEL);
+        player->velocity.x += PLAYER_ACCEL;
     }
 
     if ( keyboard[SDL_SCANCODE_W] ) {
-        player->velocity.y = Lerp(player->velocity.y, -PLAYER_VELOCITY, PLAYER_ACCEL);
+        player->velocity.y -= PLAYER_ACCEL;
     }
 
     if ( keyboard[SDL_SCANCODE_S] ) {
-        player->velocity.y = Lerp(player->velocity.y, PLAYER_VELOCITY, PLAYER_ACCEL);
+        player->velocity.y += PLAYER_ACCEL;
     }
+
+    CLAMP(player->velocity.x, -PLAYER_VELOCITY, PLAYER_VELOCITY);
+    CLAMP(player->velocity.y, -PLAYER_VELOCITY, PLAYER_VELOCITY);
 }
 
 void PlayerUpdate(actor_t * player, float dt)
 {
+    world_t * world = player->world;
+
+    const float damping_lerp_point = 0.2f;
+    const float decel_epsilon = 0.2f;
+
     // apply horizontal friction
-    if ( !keyboard[SDL_SCANCODE_A] && ! keyboard[SDL_SCANCODE_D] ) {
-        player->velocity.x = Lerp(player->velocity.x, 0, PLAYER_ACCEL);
+    //if ( player->velocity.x )
+    {
+        if ( !keyboard[SDL_SCANCODE_A] && ! keyboard[SDL_SCANCODE_D] ) {
+            player->velocity.x = LerpEpsilon
+            (   player->velocity.x,
+                0.0f,
+                damping_lerp_point,
+                decel_epsilon );
+        }
     }
 
     // apply vertical friction
-    if ( !keyboard[SDL_SCANCODE_W] && ! keyboard[SDL_SCANCODE_S] ) {
-        player->velocity.y = Lerp(player->velocity.y, 0, PLAYER_ACCEL);
+    //if ( player->velocity.y )
+    {
+        if ( !keyboard[SDL_SCANCODE_W] && ! keyboard[SDL_SCANCODE_S] ) {
+            player->velocity.y = LerpEpsilon
+            (   player->velocity.y,
+                0.0f,
+                damping_lerp_point,
+                decel_epsilon );
+        }
     }
 
-    // TODO: this needs some major tweaking
-    player->world->camera = Vec2Add(player->position, player->velocity);
+    // update world camera
+
+//    vec2_t position = { floorf(player->position.x), floorf(player->position.y) };
+    vec2_t position = player->position;
+    vec2_t target = Vec2Add(position, Vec2Scale(player->velocity, 0.75f));
+//    VectorLerpEpsilon(&world->camera, &target, 0.1f, 1.0f);
+    world->camera = target;
 }
 
 void ButterflyUpdate(actor_t * actor, float dt)
