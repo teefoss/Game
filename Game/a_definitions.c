@@ -12,7 +12,7 @@
 #include "mylib/input.h"
 
 //#define PLAYER_VELOCITY (1.5f * TILE_SIZE) // tiles / second
-#define PLAYER_VELOCITY (2.5f * TILE_SIZE)
+#define PLAYER_VELOCITY (2.5f * SCALED_TILE_SIZE)
 //#define PLAYER_ACCEL 0.1f
 #define PLAYER_ACCEL 2.0f
 
@@ -46,36 +46,33 @@ void PlayerUpdate(actor_t * player, float dt)
     const float decel_epsilon = 0.2f;
 
     // apply horizontal friction
-    //if ( player->velocity.x )
-    {
-        if ( !keyboard[SDL_SCANCODE_A] && ! keyboard[SDL_SCANCODE_D] ) {
-            player->velocity.x = LerpEpsilon
-            (   player->velocity.x,
-                0.0f,
-                damping_lerp_point,
-                decel_epsilon );
-        }
+    if ( !keyboard[SDL_SCANCODE_A] && ! keyboard[SDL_SCANCODE_D] ) {
+        player->velocity.x = LerpEpsilon
+        (   player->velocity.x,
+         0.0f,
+         damping_lerp_point,
+         decel_epsilon );
     }
 
     // apply vertical friction
-    //if ( player->velocity.y )
-    {
-        if ( !keyboard[SDL_SCANCODE_W] && ! keyboard[SDL_SCANCODE_S] ) {
-            player->velocity.y = LerpEpsilon
-            (   player->velocity.y,
-                0.0f,
-                damping_lerp_point,
-                decel_epsilon );
-        }
+    if ( !keyboard[SDL_SCANCODE_W] && ! keyboard[SDL_SCANCODE_S] ) {
+        player->velocity.y = LerpEpsilon
+        (   player->velocity.y,
+         0.0f,
+         damping_lerp_point,
+         decel_epsilon );
     }
 
     // update world camera
 
-//    vec2_t position = { floorf(player->position.x), floorf(player->position.y) };
-    vec2_t position = player->position;
-    vec2_t target = Vec2Add(position, Vec2Scale(player->velocity, 0.75f));
-//    VectorLerpEpsilon(&world->camera, &target, 0.1f, 1.0f);
-    world->camera = target;
+    if ( player->velocity.x || player->velocity.y ) {
+        vec2_t position = player->position;
+        world->camera_target = Vec2Normalize(player->velocity);
+        world->camera_target = Vec2Scale(world->camera_target, SCALED_TILE_SIZE * 3.0f);
+        world->camera_target = Vec2Add(position, world->camera_target);
+    }
+
+    VectorLerpEpsilon(&world->camera, &world->camera_target, 0.03f, 1.0f);
 }
 
 void ButterflyUpdate(actor_t * actor, float dt)
@@ -85,7 +82,7 @@ void ButterflyUpdate(actor_t * actor, float dt)
 
         if ( actor->velocity.x == 0 && actor->velocity.y == 0 ) {
             // commence fluttering
-            actor->velocity = (vec2_t){ 0.25f * TILE_SIZE, 0.0f };
+            actor->velocity = (vec2_t){ 0.25f * SCALED_TILE_SIZE, 0.0f };
         }
 
         actor->velocity = Vec2Rotate(actor->velocity, DEG2RAD(Random(0, 359)));

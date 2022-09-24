@@ -28,7 +28,7 @@ typedef struct {
 ///
 /// - Parameter frame: The current animation frame is sprite is animated, or
 ///   a number to randomly select which sprite varient is drawn.
-void DrawSprite(sprite_t * sprite, int x, int y, u8 frame);
+void DrawSprite(sprite_t * sprite, int x, int y, u8 frame, int scale);
 
 void SetSpriteColorMod(sprite_t * sprite, vec3_t color_mod);
 

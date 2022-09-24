@@ -57,8 +57,8 @@ void DestroyWorld(world_t * world)
 SDL_Rect GetVisibleRect(vec2_t camera)
 {
     SDL_Rect r = {
-        .x = floorf(camera.x) - (float)GAME_WIDTH / 2.0f,
-        .y = floorf(camera.y) - (float)GAME_HEIGHT / 2.0f,
+        .x = camera.x - GAME_WIDTH / 2.0f,
+        .y = camera.y - GAME_HEIGHT / 2.0f,
         .w = GAME_WIDTH,
         .h = GAME_HEIGHT
     };
@@ -71,8 +71,8 @@ void GetVisibleTileRange(world_t * world, SDL_Point * min, SDL_Point * max)
     SDL_Rect visible_rect = GetVisibleRect(world->camera);
 
     // Tile coordinate of tile visible in upper left corner.
-    int min_x = visible_rect.x / TILE_SIZE;
-    int min_y = visible_rect.y / TILE_SIZE;
+    int min_x = visible_rect.x / SCALED_TILE_SIZE;
+    int min_y = visible_rect.y / SCALED_TILE_SIZE;
 
     if ( min ) {
         min->x = min_x;
@@ -83,8 +83,8 @@ void GetVisibleTileRange(world_t * world, SDL_Point * min, SDL_Point * max)
         // Number of tiles across and down the screen.
         // + 1 accounts for any screen sizes that result in a fractional
         // number of tiles.
-        max->x = min_x + GAME_WIDTH / TILE_SIZE + 1;
-        max->y = min_y + GAME_HEIGHT / TILE_SIZE + 1;
+        max->x = min_x + GAME_WIDTH / SCALED_TILE_SIZE + 1;
+        max->y = min_y + GAME_HEIGHT / SCALED_TILE_SIZE + 1;
     }
 }
 

@@ -3,11 +3,10 @@
 #include "texture.h"
 #include "video.h"
 
-// NB: this does not handle sprite scaling, maybe it should
-void DrawSprite(sprite_t * sprite, int x, int y, u8 frame)
+void DrawSprite(sprite_t * sprite, int x, int y, u8 frame, int scale)
 {
     SDL_Rect src = sprite->location;
-    SDL_Rect dst = { x, y, sprite->location.w, sprite->location.h };
+    SDL_Rect dst = { x, y, sprite->location.w * scale, sprite->location.h * scale };
     SDL_Texture * texture = GetTexture(sprite->texture_name);
 
     if ( sprite->flags & SPRITE_FLAG_ANIMATED ) {

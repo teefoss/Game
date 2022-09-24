@@ -28,7 +28,6 @@ typedef struct {
     int ticks;
 } game_t;
 
-
 bool GameHandleEvent(const SDL_Event * event);
 
 game_state_t game_play = {
@@ -142,11 +141,10 @@ void GameMain(void)
     // system init
 
     window_info_t info = {
-        .width = GAME_WIDTH * DRAW_SCALE,
-        .height = GAME_HEIGHT * DRAW_SCALE
+        .width = GAME_WIDTH,
+        .height = GAME_HEIGHT
     };
     InitWindow(&info);
-    SDL_RenderSetLogicalSize(renderer, GAME_WIDTH, GAME_HEIGHT);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     LoadTextures("Assets", "png");
     InitInput();

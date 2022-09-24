@@ -15,6 +15,7 @@
 #define WORLD_WIDTH  512
 #define WORLD_HEIGHT 512
 #define TILE_SIZE 16
+#define SCALED_TILE_SIZE (TILE_SIZE * DRAW_SCALE)
 #define CHUNCK_SIZE 32
 #define MAX_ACTORS 5000
 
@@ -60,6 +61,7 @@ typedef struct world {
 
     // The world pixel coordinate that's centered on screen.
     vec2_t camera;
+    vec2_t camera_target; // camera lerps to target each frame
 
     int clock;
 

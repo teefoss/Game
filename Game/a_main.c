@@ -52,8 +52,8 @@ void UpdateActor(actor_t * actor, float dt)
         // Get which tile the actor is on and apply lighting color mod.
         tile_t * tile = GetTile
         (   actor->world->tiles,
-            actor->position.x / TILE_SIZE,
-            actor->position.y / TILE_SIZE );
+            actor->position.x / SCALED_TILE_SIZE,
+            actor->position.y / SCALED_TILE_SIZE );
 
         // TODO: lerp this
         actor->lighting = tile->lighting;
@@ -72,8 +72,8 @@ SDL_Rect GetActorVisibleRect(const actor_t * actor)
     SDL_Rect rect = {
         .x = actor->position.x,
         .y = actor->position.y,
-        .w = sprite ? sprite->location.w : 0,
-        .h = sprite ? sprite->location.h + actor->z : 0
+        .w = sprite ? sprite->location.w * DRAW_SCALE : 0,
+        .h = sprite ? (sprite->location.h + actor->z) * DRAW_SCALE : 0
     };
 
     rect.x -= rect.w / 2;
@@ -92,11 +92,14 @@ static vec2_t PositionFromHitbox(const actor_t * actor, SDL_FRect hitbox)
 
 SDL_FRect ActorHitbox(const actor_t * actor)
 {
+    float w = actor->hitbox_width * (float)DRAW_SCALE;
+    float h = actor->hitbox_height * (float)DRAW_SCALE;
+
     SDL_FRect hitbox = {
-        .x = actor->position.x - actor->hitbox_width / 2.0f,
-        .y = actor->position.y - actor->hitbox_height,
-        .w = actor->hitbox_width,
-        .h = actor->hitbox_height
+        .x = actor->position.x - w / 2.0f,
+        .y = actor->position.y - h,
+        .w = w,
+        .h = h
     };
 
     return hitbox;

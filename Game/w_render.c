@@ -79,7 +79,7 @@ static void RenderGrassDecoration(sprite_id_t id, u8 sprite_variety)
     sprite_t * s = &sprites[id];
     SDL_Rect area = { .w = TILE_SIZE, .h = TILE_SIZE };
     SDL_Point max = RectInRectMaxPoint(&s->location, &area, 1);
-    DrawSprite(s, Random(1, max.x), Random(1, max.y), sprite_variety);
+    DrawSprite(s, Random(1, max.x), Random(1, max.y), sprite_variety, 1);
 }
 
 static void RenderGrassEffectTexture
@@ -123,10 +123,10 @@ static void RenderGrassEffectTexture
         for ( int px = 0; px < TILE_SIZE; px++ ) {
             if ( noise_map[py][px] > 0.7f ) {
                 if ( Random(0, 15) == 15 ) {
-                    DrawSprite(&sprites[SPRITE_TINY_YELLOW_FLOWER], px, py, 0);
+                    DrawSprite(&sprites[SPRITE_TINY_YELLOW_FLOWER], px, py, 0, 1);
                 }
             } else if ( noise_map[py][px] > 0.45f && Random(0, 20) == 20 ) {
-                DrawSprite(&sprites[SPRITE_TINY_BLUE_FLOWER], px, py, 0);
+                DrawSprite(&sprites[SPRITE_TINY_BLUE_FLOWER], px, py, 0, 1);
             }
         }
     }
@@ -167,7 +167,7 @@ static void RenderGrass
     SDL_Rect * dst )
 {
     SetSpriteColorMod(&sprites[SPRITE_GRASS], tile->lighting);
-    DrawSprite(&sprites[SPRITE_GRASS], dst->x, dst->y, tile->variety);
+    DrawSprite(&sprites[SPRITE_GRASS], dst->x, dst->y, tile->variety, DRAW_SCALE);
 
     // Generate effect texture for this tile if needed.
     if ( tile->effect == NULL ) {
@@ -187,7 +187,7 @@ static void RenderVisibleTerrain(world_t * world)
 {
     SDL_Rect visible_rect = GetVisibleRect(world->camera);
 
-    SDL_Rect dst = { .w = TILE_SIZE, .h = TILE_SIZE, };
+    SDL_Rect dst = { .w = SCALED_TILE_SIZE, .h = SCALED_TILE_SIZE, };
     SDL_Rect src = { .w = TILE_SIZE, .h = TILE_SIZE };
 
     SDL_Point min, max;
@@ -201,8 +201,10 @@ static void RenderVisibleTerrain(world_t * world)
             GetAdjacentTiles(tile_x, tile_y, world->tiles, adjacent_tiles);
 
             src.x = TILE_SIZE * (tile->variety % 4); // TODO: #define 4
-            dst.x = tile_x * TILE_SIZE - visible_rect.x;
-            dst.y = tile_y * TILE_SIZE - visible_rect.y;
+            dst.x = tile_x * SCALED_TILE_SIZE - visible_rect.x;
+            dst.y = tile_y * SCALED_TILE_SIZE - visible_rect.y;
+//            dst.x /= DRAW_SCALE; dst.x *= DRAW_SCALE;
+//            dst.y /= DRAW_SCALE; dst.y *= DRAW_SCALE;
 
             switch ( tile->terrain ) {
                 case TERRAIN_DEEP_WATER:
@@ -220,7 +222,7 @@ static void RenderVisibleTerrain(world_t * world)
                     }
 
                     SetSpriteColorMod(sprite, tile->lighting);
-                    DrawSprite(sprite, dst.x, dst.y, tile->variety);
+                    DrawSprite(sprite, dst.x, dst.y, tile->variety, DRAW_SCALE);
                     break;
                 }
                 case TERRAIN_GRASS:
@@ -278,15 +280,15 @@ void RenderVisibleActors(world_t * world, bool show_hitboxes)
         }
     }
 
-    // draw actor show
+    // draw actor shadow
     // TODO: make a actor shadow flag
     for ( int i = 0; i < num_visible; i++ ) {
         actor_t * actor = visible_actors[i];
 
         if ( GetActorSprite(actor) ) {
             SDL_Rect shadow = {
-                .w = actor->hitbox_width + 4,
-                .h = actor->hitbox_height + 2
+                .w = (actor->hitbox_width + 4) * DRAW_SCALE,
+                .h = (actor->hitbox_height + 2) * DRAW_SCALE
             };
             shadow.x = actor->position.x - shadow.w / 2 - visible_rect.x;
             shadow.y = actor->position.y - shadow.h / 2 - visible_rect.y;
@@ -307,7 +309,7 @@ void RenderVisibleActors(world_t * world, bool show_hitboxes)
             r.y -= visible_rect.y;
 
             SetSpriteColorMod(sprite, actor->lighting);
-            DrawSprite(sprite, r.x, r.y, actor->current_frame);
+            DrawSprite(sprite, r.x, r.y, actor->current_frame, DRAW_SCALE);
 
             if ( show_hitboxes ) {
                 SDL_FRect hitbox = ActorHitbox(actor);
