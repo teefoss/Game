@@ -43,6 +43,8 @@ void GetAdjacentTiles
 
 void DestroyWorld(world_t * world)
 {
+    SDL_DestroyTexture(world->debug_map);
+    
     for ( int i = 0; i < WORLD_WIDTH * WORLD_HEIGHT; i++ ) {
         if ( world->tiles[i].effect ) {
             SDL_DestroyTexture(world->tiles[i].effect);

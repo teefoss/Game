@@ -70,6 +70,8 @@ typedef struct world {
     vec3_t lighting;
 
     SDL_Texture * debug_map; // rendering of entire world, for debuggery
+
+    void (* draw)(tile_t * tile);
 } world_t;
 
 /// Allocates and creates the world.

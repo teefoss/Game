@@ -73,7 +73,7 @@ SDL_Rect GetActorVisibleRect(const actor_t * actor)
         .x = actor->position.x,
         .y = actor->position.y,
         .w = sprite ? sprite->location.w : 0,
-        .h = sprite ? sprite->location.h : 0
+        .h = sprite ? sprite->location.h + actor->z : 0
     };
 
     rect.x -= rect.w / 2;

@@ -46,9 +46,8 @@ void PlayerUpdate(actor_t * player, float dt)
         player->velocity.y = Lerp(player->velocity.y, 0, PLAYER_ACCEL);
     }
 
-    // Reposition the world camera.
-    vec2_t camera_target = Vec2Add(player->position, player->velocity);
-    VectorLerpEpsilon(&player->world->camera, &camera_target, 0.08f, 1.0f);
+    // TODO: this needs some major tweaking
+    player->world->camera = Vec2Add(player->position, player->velocity);
 }
 
 void ButterflyUpdate(actor_t * actor, float dt)

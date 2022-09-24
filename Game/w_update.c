@@ -152,8 +152,7 @@ void UpdateWorld(world_t * world, float dt)
         world->clock = 0;
     }
 
-    extern int debug_hours;
-    extern int debug_minutes;
+    // update debug info
     debug_hours = world->clock / HOUR_TICKS;
     debug_minutes = (world->clock - debug_hours * HOUR_TICKS) / (HOUR_TICKS / 60);
 
