@@ -10,6 +10,7 @@
 #include "game.h"
 #include "m_debug.h"
 #include "sprites.h"
+#include "w_tile.h"
 
 #include "mylib/video.h"
 #include "mylib/sprite.h"
@@ -82,13 +83,16 @@ static void RenderGrassDecoration(sprite_id_t id, u8 sprite_variety)
     DrawSprite(s, Random(1, max.x), Random(1, max.y), sprite_variety, 1);
 }
 
-static void RenderGrassEffectTexture
+void RenderGrassEffectTexture
 (   tile_t * tile,
     tile_t ** adjacent_tiles,
     int tile_x,
     int tile_y )
 {
+    // < 0.1 ms
+//    PROFILE_START(create_texture);
     tile->effect = CreateTexture(TILE_SIZE, TILE_SIZE);
+//    PROFILE_END(create_texture);
     SDL_SetTextureBlendMode(tile->effect, SDL_BLENDMODE_BLEND);
     SDL_SetRenderTarget(renderer, tile->effect);
 
@@ -98,15 +102,27 @@ static void RenderGrassEffectTexture
     // Render moss.
 
     float noise_map[TILE_SIZE][TILE_SIZE];
+    GetTileNoise(tile_x, tile_y, noise_map);
 
+    // Set a unique seed for this tile ?
+    //SeedRandom(tile_y * WORLD_WIDTH + tile_x);
+
+    struct {
+        int x;
+        int y;
+        bool blue; // if false, yellow
+    } moss_flowers[TILE_SIZE * TILE_SIZE];
+    int num_moss_flowers = 0;
+
+    // ~0.4 ms:
 //    SetRGBA(93, 163, 42, 255); // darker shade of same grass color
 //    SetRGBA(114, 201, 52, 255); // faintly lighter shade of same grass color
     for ( int py = 0; py < TILE_SIZE; py++ ) {
         for ( int px = 0; px < TILE_SIZE; px++ ) {
-            int wx = tile_x * 16 + px; // world pixel coord
-            int wy = tile_y * 16 + py;
-            noise_map[py][px] = Noise2(wx, wy, 1.0f, 0.01f, 8, 1.0f, 0.5f, 2.5f);
-            SeedRandom(wx * wy); // TODO: more than one prng
+//            int wx = tile_x * 16 + px; // world pixel coord
+//            int wy = tile_y * 16 + py;
+//            noise_map[py][px] = Noise2(wx, wy, 1.0f, 0.01f, 8, 1.0f, 0.5f, 2.5f);
+//            SeedRandom(wx * wy); // TODO: more than one prng
 
             if ( noise_map[py][px] > 0.2f ) { //}|| (noise > 0.05f && Random(0, 3) == 0) ) {
                 SetRGBA(78, 138, 36, 255); // darker green
@@ -115,10 +131,26 @@ static void RenderGrassEffectTexture
                 SetRGBA(114, 201, 52, 255); // faintly lighter shade of same grass color
                 DrawPoint(px, py);
             }
+
+            if ( noise_map[py][px] > 0.7f ) {
+                if ( Random(0, 15) == 15 ) {
+                    moss_flowers[num_moss_flowers].x = px;
+                    moss_flowers[num_moss_flowers].y = py;
+                    moss_flowers[num_moss_flowers].blue = false;
+                    num_moss_flowers++;
+                }
+            } else if ( noise_map[py][px] > 0.45f && Random(0, 20) == 20 ) {
+                moss_flowers[num_moss_flowers].x = px;
+                moss_flowers[num_moss_flowers].y = py;
+                moss_flowers[num_moss_flowers].blue = true;
+                num_moss_flowers++;
+            }
+
         }
     }
 
-    // tiny moss flowers
+    // Render tiny moss flowers.
+#if 0
     for ( int py = 0; py < TILE_SIZE; py++ ) {
         for ( int px = 0; px < TILE_SIZE; px++ ) {
             if ( noise_map[py][px] > 0.7f ) {
@@ -129,6 +161,12 @@ static void RenderGrassEffectTexture
                 DrawSprite(&sprites[SPRITE_TINY_BLUE_FLOWER], px, py, 0, 1);
             }
         }
+    }
+#endif
+    for ( int i = 0; i < num_moss_flowers; i++ ) {
+        sprite_id_t id =
+        moss_flowers[i].blue ? SPRITE_TINY_BLUE_FLOWER : SPRITE_TINY_YELLOW_FLOWER;
+        DrawSprite(&sprites[id], moss_flowers[i].x, moss_flowers[i].y, 0, 1);
     }
 
 
@@ -247,10 +285,12 @@ static void RenderVisibleTerrain(world_t * world)
                 DrawRect(&dst);
             }
 
-            SetRGBA(255, 255, 90, 255);
-            SDL_Rect corner_dot = dst;
-            corner_dot.w = corner_dot.h = DRAW_SCALE;
-            FillRect(&corner_dot);
+            if ( show_geometry ) {
+                SetRGBA(255, 255, 90, 255);
+                SDL_Rect corner_dot = dst;
+                corner_dot.w = corner_dot.h = DRAW_SCALE;
+                FillRect(&corner_dot);
+            }
 
             dst.x += TILE_SIZE;
         }
@@ -279,7 +319,7 @@ void RenderVisibleActors(world_t * world, bool show_hitboxes)
     // Sort the visible list by y position.
     for ( int i = 0; i < num_visible; i++ ) {
         for ( int j = i + 1; j < num_visible; j++ ) {
-            if ( visible_actors[i]->position.y > visible_actors[j]->position.y ) {
+            if ( visible_actors[i]->pos.y > visible_actors[j]->pos.y ) {
                 SWAP(visible_actors[i], visible_actors[j]);
             }
         }
@@ -295,8 +335,8 @@ void RenderVisibleActors(world_t * world, bool show_hitboxes)
                 .w = (actor->hitbox_width + 4) * DRAW_SCALE,
                 .h = (actor->hitbox_height + 2) * DRAW_SCALE
             };
-            shadow.x = actor->position.x - shadow.w / 2 - visible_rect.x;
-            shadow.y = actor->position.y - shadow.h / 2 - visible_rect.y;
+            shadow.x = actor->pos.x - shadow.w / 2 - visible_rect.x;
+            shadow.y = actor->pos.y - shadow.h / 2 - visible_rect.y;
 
             SetRGBA(0, 0, 0, 64);
             FillRect(&shadow);

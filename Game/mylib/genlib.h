@@ -41,10 +41,14 @@ extern "C" {
         SDL_Rect: print_sdl_rect    \
     )(#var, var)
 
+#define CAT_(a, b) a ## b
+#define CAT(a, b) CAT_(a, b)
+#define VARLINE(var) CAT(var, __LINE__)
+
 // Check how many ms a bit of code takes.
-// Don't use this more than once per function...
-#define PROFILE_START int __start_ms__ = SDL_GetTicks();
-#define PROFILE_END(str) printf(str" took %d ms\n", SDL_GetTicks()-__start_ms__);
+#define PROFILE_START(var) float var = ProgramTime();
+#define PROFILE_END(var) printf(#var" took %f ms\n", \
+                                (ProgramTime() - var) * 1000.0f);
 
 #define Error(...) { fprintf(stderr, "%s: ", __func__); \
                      fprintf(stderr, __VA_ARGS__);      \

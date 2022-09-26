@@ -66,7 +66,7 @@ static void UpdateActors(world_t * world, float dt)
     // Let any actors that respond to input do so.
     for ( actor_t ** actor = active_actors; *actor; actor++ ) {
         if ( (*actor)->state && (*actor)->state->handle_input ) {
-            (*actor)->state->handle_input(*actor);
+            (*actor)->state->handle_input(*actor, dt);
         }
     }
 
@@ -79,16 +79,16 @@ static void UpdateActors(world_t * world, float dt)
         // collisions with solid actors at each step.
 
         // horizontal movement:
-        if ( actor->velocity.x ) {
-            actor->position.x += actor->velocity.x * dt;
+        if ( actor->vel.x ) {
+            actor->pos.x += actor->vel.x * dt;
             if ( !(actor->flags & ACTOR_FLAG_NONINTERACTIVE) ) {
                 DoCollisions(false, actor, blocks, num_blocks);
             }
         }
 
         // vertical movement:
-        if ( actor->velocity.y ) {
-            actor->position.y += actor->velocity.y * dt;
+        if ( actor->vel.y ) {
+            actor->pos.y += actor->vel.y * dt;
             if ( !(actor->flags & ACTOR_FLAG_NONINTERACTIVE) ) {
                 DoCollisions(true, actor, blocks, num_blocks);
             }

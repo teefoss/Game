@@ -30,17 +30,8 @@ static const float terrain_elevations[NUM_TERRAIN_TYPES] = {
 
 // Used by GenerateTerrain() to initialize and set up a world tile at x, y, and
 // assign its properties according a noise value for the tile.
-static void
-SetUpTile
-(   int x,
-    int y,
-    tile_t * tile,
-    tile_t * world_tiles,
-    float tile_noise )
+static void SetUpTile(tile_t * tile, float tile_noise)
 {
-    tile_t * adjacent_tiles[NUM_DIRECTIONS];
-    GetAdjacentTiles(x, y, world_tiles, adjacent_tiles);
-
     // select terrain per noise (elevation)
     for ( int i = 0; i < NUM_TERRAIN_TYPES - 1; i++ ) {
         if ( tile_noise < terrain_elevations[i + 1] ) {
@@ -53,6 +44,14 @@ SetUpTile
     tile->effect = NULL;
 }
 
+// This is filled by GenerateTerrain during world generation
+// and is used in later stages of generation.
+struct {
+    int x, y;
+    tile_t * tile;
+} grass_tiles[WORLD_WIDTH * WORLD_HEIGHT];
+int num_grass_tiles = 0;
+
 // Used by CreateWorld() to generate all terrain.
 static void GenerateTerrain(world_t * world)
 {
@@ -61,6 +60,7 @@ static void GenerateTerrain(world_t * world)
     float half_width = WORLD_WIDTH / 2.0f;
     float half_height = WORLD_HEIGHT / 2.0f;
 
+    num_grass_tiles = 0;
     for ( int y = 0; y < WORLD_HEIGHT; y++ ) {
         for ( int x = 0; x < WORLD_WIDTH; x++ ) {
 
@@ -84,7 +84,15 @@ static void GenerateTerrain(world_t * world)
                 noise = -1.0f;
             }
 
-            SetUpTile(x, y, GetTile(world->tiles, x, y), world->tiles, noise);
+            tile_t * tile = GetTile(world->tiles, x, y);
+            SetUpTile(tile, noise);
+
+            if ( tile->terrain >= TERRAIN_GRASS ) {
+                grass_tiles[num_grass_tiles].tile = tile;
+                grass_tiles[num_grass_tiles].x = x;
+                grass_tiles[num_grass_tiles].y = y;
+                num_grass_tiles++;
+            }
         }
     }
 }
@@ -135,7 +143,7 @@ void SpawnPlayer(world_t * world)
         Error("Somehow there are < %d grass tiles in the world!", spawn_tile_count);
     }
 
-    // select one of the 50 grass tiles closest to the center of world.
+    // Select one of the 50 grass tiles closest to the center of world.
     Randomize();
     int i = Random(0, spawn_tile_count - 1);
     occupied[potentials[i].y][potentials[i].x] = true;
@@ -163,6 +171,35 @@ void SpawnActors(world_t * world)
     }
 }
 
+//static int GenerateAllTileNoise(void * data)
+//{
+//    world_t * world = (world_t *)data;
+//
+//    for ( int y = 0; y < WORLD_HEIGHT; y++ ) {
+//        for ( int x = 0; x < WORLD_WIDTH; x++ ) {
+//            tile_t * tile = GetTile(world->tiles, x, y);
+//            if ( !tile->did_generate_noise && tile->terrain == TERRAIN_GRASS ) {
+//                GenerateTileNoise(tile, x, y);
+//                printf("generated tile noise at %d, %d\n", x, y);
+//            }
+//        }
+//    }
+//
+//    return 0;
+//}
+
+void RenderAllGrassTextures(tile_t * world_tiles)
+{
+    for ( int i = 0; i < num_grass_tiles; i++ ) {
+        int x = grass_tiles[i].x;
+        int y = grass_tiles[i].y;
+
+        tile_t * adjacents[NUM_DIRECTIONS];
+        GetAdjacentTiles(x, y, world_tiles, adjacents);
+        RenderGrassEffectTexture(grass_tiles[i].tile, adjacents, x, y);
+    }
+}
+
 world_t * CreateWorld(void)
 {
     world_t * world = calloc(1, sizeof(*world));
@@ -174,7 +211,14 @@ world_t * CreateWorld(void)
 
     memset(occupied, 0, sizeof(occupied));
 
+    PROFILE_START(generate_terrain);
     GenerateTerrain(world);
+    PROFILE_END(generate_terrain);
+
+    PROFILE_START(render_all_grass);
+//    RenderAllGrassTextures(world->tiles); // TODO: Justin
+    PROFILE_END(render_all_grass);
+
     SpawnPlayer(world);
     SpawnActors(world);
 

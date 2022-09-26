@@ -10,8 +10,10 @@
 
 #include "mylib/sprite.h"
 #include "mylib/vector.h"
+#include "inventory.h"
 
-#define FPS 60.0f
+#define FPS 30.0f
+#define FRAME_TIME_SEC (1.0f / FPS)
 
 // The internal resolution of the game.
 // Aspect ratio is 16:9
@@ -21,6 +23,20 @@
 #define DRAW_SCALE  3
 #define GAME_WIDTH  (480 * DRAW_SCALE)
 #define GAME_HEIGHT (270 * DRAW_SCALE)
+
+typedef struct world world_t;
+
+typedef struct {
+    bool (* handle_event)(const SDL_Event * event);
+    void (* update)(world_t *, float);
+    void (* render)();
+} game_state_t;
+
+typedef struct {
+    game_state_t state;
+    int ticks;
+    inventory_t inventory;
+} game_t;
 
 void GameMain(void);
 

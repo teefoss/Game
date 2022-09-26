@@ -8,13 +8,13 @@
 #ifndef world_h
 #define world_h
 
+#include "w_tile.h"
 #include "a_actor.h"
 #include "game.h"
 #include "mylib/mathlib.h"
 
 #define WORLD_WIDTH  512
 #define WORLD_HEIGHT 512
-#define TILE_SIZE 16
 #define SCALED_TILE_SIZE (TILE_SIZE * DRAW_SCALE)
 #define CHUNCK_SIZE 32
 #define MAX_ACTORS 5000
@@ -26,32 +26,6 @@
 #define NOON_TICKS          (HOUR_TICKS * 12)
 #define DUSK_START_TICKS    (HOUR_TICKS * 20) // 8 PM
 #define DUSK_END_TICKS      (HOUR_TICKS * 21) // 9 PM
-
-typedef enum {
-    TERRAIN_DEEP_WATER,
-    TERRAIN_SHALLOW_WATER,
-    TERRAIN_GRASS,
-    TERRAIN_FOREST,
-    TERRAIN_DARK_FOREST,
-    TERRAIN_END,
-    NUM_TERRAIN_TYPES,
-} terrain_t;
-
-typedef struct {
-    terrain_t terrain;
-
-    // Some tiles have extra, per-tile decoration/
-    // visual effects that are laid over the regular texture
-    // This can be generated dynamically as needed.
-    SDL_Texture * effect;
-
-    // A value that can be used to
-    // randomize various tile properties.
-    u8 variety;
-
-    // Determined by world lighting and any nearby light-casting actors.
-    vec3_t lighting;
-} tile_t;
 
 typedef struct world {
     tile_t tiles[WORLD_WIDTH * WORLD_HEIGHT];
@@ -92,6 +66,12 @@ void GetAdjacentTiles
     tile_t * out[NUM_DIRECTIONS] );
 
 void RenderWorld(world_t * world, bool show_hitboxes);
+void RenderGrassEffectTexture
+(   tile_t * tile,
+    tile_t ** adjacent_tiles,
+    int tile_x,
+    int tile_y );
+
 void DestroyWorld(world_t * world); // maybe FreeWorld would be more positive?
 void UpdateWorld(world_t * world, float dt);
 

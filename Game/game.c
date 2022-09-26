@@ -17,17 +17,6 @@
 
 #include <SDL.h>
 
-typedef struct {
-    bool (* handle_event)(const SDL_Event * event);
-    void (* update)(world_t *, float);
-    void (* render)();
-} game_state_t;
-
-typedef struct {
-    game_state_t state;
-    int ticks;
-} game_t;
-
 bool GameHandleEvent(const SDL_Event * event);
 
 game_state_t game_play = {
@@ -104,6 +93,16 @@ static bool DoFrame(game_t * game, world_t * world, float dt)
     DisplayDebugInfo(world);
     Present();
 
+    static int max_render = 0;
+    if ( frame > FPS * 2 && render_ms > max_render ) {
+        max_render = render_ms;
+        printf("max render time: %d\n", max_render);
+    }
+
+    if ( render_ms > 1000 / FPS ) {
+        printf("frame %d: rending took %d ms!\n", frame, render_ms);
+    }
+
     frame++;
 
     return true;
@@ -120,10 +119,11 @@ static void GameLoop(game_t * game, world_t * world)
             SDL_Delay(1);
             continue;
         }
-        if ( dt > 0.05f ) {
-            dt = 0.05;
-        }
-        //dt = 1.0f / FPS;
+        //dt = 1.0f / 60.0f;
+//        if ( dt > 0.05f ) {
+//            dt = 0.05;
+//        }
+        dt = FRAME_TIME_SEC;
         debug_dt = dt;
 
         int frame_start = SDL_GetTicks();
@@ -131,6 +131,9 @@ static void GameLoop(game_t * game, world_t * world)
             return;
         }
         frame_ms = SDL_GetTicks() - frame_start;
+        if ( frame_ms > 1000 / FPS ) {
+            printf("frame took %d ms!\n", frame_ms);
+        }
 
         old_time = new_time;
     }
@@ -142,7 +145,8 @@ void GameMain(void)
 
     window_info_t info = {
         .width = GAME_WIDTH,
-        .height = GAME_HEIGHT
+        .height = GAME_HEIGHT,
+        .render_flags = SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC
     };
     InitWindow(&info);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);

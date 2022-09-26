@@ -38,13 +38,13 @@ typedef struct world world_t;
 typedef struct actor {
     actor_type_t type;
 
-    vec2_t position; // in world pixels, the bottom center of the visible sprite
+    vec2_t pos; // in world pixels, the bottom center of the visible sprite
+    vec2_t vel;
 
     // 0 if actor is on the ground. This doesn't affect anything except
     // where an actor's sprite is rendered.
     int z;
 
-    vec2_t velocity;
     actor_flags_t flags;
     cardinal_t direction;
 
@@ -75,7 +75,7 @@ struct actor_state {
     actor_state_t * next_state;
     sprite_t * sprite; // &sprites[id]
 
-    void (* handle_input)(actor_t * self);
+    void (* handle_input)(actor_t * self, float dt);
     void (* update)(actor_t * self, float dt);
     void (* contact)(actor_t * self, actor_t * other);
 };
