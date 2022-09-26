@@ -29,17 +29,22 @@ float debug_dt;
 
 void DisplayScreenGeometry(void)
 {
-    int hw = GAME_WIDTH / 2;
-    int hh = GAME_HEIGHT / 2;
+    SDL_RenderSetScale(renderer, DRAW_SCALE, DRAW_SCALE);
+    int hw = (GAME_WIDTH / 2) / DRAW_SCALE;
+    int hh = (GAME_HEIGHT / 2) / DRAW_SCALE;
     SetRGBA(255, 0, 0, 128);
-    SDL_RenderDrawLine(renderer, hw, 0, hw, hh);
-    SDL_RenderDrawLine(renderer, 0, hh, GAME_WIDTH, hh);
+    SDL_RenderDrawLine(renderer, hw, 0, hw, GAME_HEIGHT / DRAW_SCALE);
+    SDL_RenderDrawLine(renderer, 0, hh, GAME_WIDTH / DRAW_SCALE, hh);
 
-    for ( int y = 0; y <= GAME_HEIGHT / TILE_SIZE; y++ ) {
-        for ( int x = 0; x <= GAME_WIDTH / TILE_SIZE; x++ ) {
+#if 0
+    for ( int y = 0; y <= GAME_HEIGHT / SCALED_TILE_SIZE; y++ ) {
+        for ( int x = 0; x <= GAME_WIDTH / SCALED_TILE_SIZE; x++ ) {
             DrawPoint(x * TILE_SIZE, y * TILE_SIZE);
         }
     }
+#endif
+    
+    SDL_RenderSetScale(renderer, 1, 1);
 }
 
 void DisplayGeneralInfo(world_t * world)
@@ -66,9 +71,9 @@ void DisplayTileInfo(world_t * world)
     SDL_Rect visible_rect = GetVisibleRect(world->camera);
     vec2_t upper_left = { visible_rect.x, visible_rect.y };
 
-    vec2_t mouse_pixel = GetMousePosition(DRAW_SCALE); // window space
+    vec2_t mouse_pixel = GetMousePosition(1); // window space
     vec2_t mouse_coord = Vec2Add(mouse_pixel, upper_left); // world space
-    mouse_tile = Vec2Scale(mouse_coord, 1.0f / TILE_SIZE);
+    mouse_tile = Vec2Scale(mouse_coord, 1.0f / SCALED_TILE_SIZE);
     tile_t * tile = GetTile(world->tiles, mouse_tile.x, mouse_tile.y);
 
     Print(GAME_WIDTH * 0.5 * DRAW_SCALE, 0,

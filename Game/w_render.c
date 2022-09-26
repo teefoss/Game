@@ -247,6 +247,11 @@ static void RenderVisibleTerrain(world_t * world)
                 DrawRect(&dst);
             }
 
+            SetRGBA(255, 255, 90, 255);
+            SDL_Rect corner_dot = dst;
+            corner_dot.w = corner_dot.h = DRAW_SCALE;
+            FillRect(&corner_dot);
+
             dst.x += TILE_SIZE;
         }
 

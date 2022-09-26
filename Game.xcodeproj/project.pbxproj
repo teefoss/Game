@@ -26,6 +26,7 @@
 		60E498A828DB45E000F4A322 /* w_update.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E498A728DB45E000F4A322 /* w_update.c */; };
 		60E498AC28DC976100F4A322 /* m_debug.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E498AB28DC976100F4A322 /* m_debug.c */; };
 		60E498AF28DCB27600F4A322 /* vector.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E498AE28DCB27600F4A322 /* vector.c */; };
+		60E498B128DFA31E00F4A322 /* g_inventory.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E498B028DFA31E00F4A322 /* g_inventory.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -82,6 +83,7 @@
 		60E498AB28DC976100F4A322 /* m_debug.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = m_debug.c; sourceTree = "<group>"; };
 		60E498AD28DCB27600F4A322 /* vector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vector.h; sourceTree = "<group>"; };
 		60E498AE28DCB27600F4A322 /* vector.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = vector.c; sourceTree = "<group>"; };
+		60E498B028DFA31E00F4A322 /* g_inventory.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = g_inventory.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,6 +125,7 @@
 				60E0BDC328D021EA00413F7B /* a_main.c */,
 				56CA3EB628C69FFD00AE2DD5 /* game.h */,
 				56CA3EB728C69FFD00AE2DD5 /* game.c */,
+				60E498B028DFA31E00F4A322 /* g_inventory.c */,
 				6076642A28C68F8400CD99E5 /* main.c */,
 				60E498AA28DC976100F4A322 /* m_debug.h */,
 				60E498AB28DC976100F4A322 /* m_debug.c */,
@@ -237,6 +240,7 @@
 				60E0BDC728D0244200413F7B /* sprite.c in Sources */,
 				56CA3EBB28C6AA7E00AE2DD5 /* mathlib.c in Sources */,
 				60E0BDCA28D0264A00413F7B /* sprites.c in Sources */,
+				60E498B128DFA31E00F4A322 /* g_inventory.c in Sources */,
 				56CA3EBC28C6AA7E00AE2DD5 /* text.c in Sources */,
 				60E0BDC428D021EA00413F7B /* a_main.c in Sources */,
 				60E497D128D12D9800F4A322 /* w_generation.c in Sources */,

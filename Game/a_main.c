@@ -84,9 +84,12 @@ SDL_Rect GetActorVisibleRect(const actor_t * actor)
 
 static vec2_t PositionFromHitbox(const actor_t * actor, SDL_FRect hitbox)
 {
+    float w = actor->hitbox_width * (float)DRAW_SCALE;
+    float h = actor->hitbox_height * (float)DRAW_SCALE;
+
     return (vec2_t){
-        .x = hitbox.x + actor->hitbox_width / 2.0f,
-        .y = hitbox.y + actor->hitbox_height
+        .x = hitbox.x + w / 2.0f,
+        .y = hitbox.y + h
     };
 }
 
