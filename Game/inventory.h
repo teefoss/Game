@@ -14,6 +14,10 @@
 #define MAX_ITEMS 100
 #define MAX_GRID_SIZE 10
 
+typedef enum {
+    ITEM_LOG,
+} item_type_t;
+
 typedef struct {
     actor_type_t type;
 

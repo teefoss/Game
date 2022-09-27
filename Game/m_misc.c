@@ -9,9 +9,9 @@
 
 cardinal_t VelocityToDirection(vec2_t velocity)
 {
-    if ( fabsf(velocity.x) > fabsf(velocity.y) ) {
-        return velocity.x < 0 ? WEST : EAST;
-    } else {
+    if ( velocity.y && !velocity.x ) {
         return velocity.y < 0 ? NORTH : SOUTH;
+    } else {
+        return velocity.x < 0 ? WEST : EAST;
     }
 }

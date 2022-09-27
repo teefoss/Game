@@ -87,7 +87,7 @@ void PlayerStandUpdate(actor_t * player, float dt)
 
 void PlayerWalkUpdate(actor_t * player, float dt)
 {
-    const float damping = 0.4f;
+    const float damping = 0.5f;
     const float decel_ep = 0.2f;
 
     // apply horizontal friction
