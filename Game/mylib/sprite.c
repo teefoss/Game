@@ -3,30 +3,24 @@
 #include "texture.h"
 #include "video.h"
 
-void DrawSprite(sprite_t * sprite, int x, int y, u8 frame, int scale)
+void DrawSprite
+(   sprite_t * sprite,
+    int cell_x,
+    int cell_y,
+    int dst_x,
+    int dst_y,
+    int scale,
+    SDL_RendererFlip flip )
 {
+    int w = sprite->location.w;
+    int h = sprite->location.h;
+
     SDL_Rect src = sprite->location;
-    SDL_Rect dst = { x, y, sprite->location.w * scale, sprite->location.h * scale };
-    SDL_Texture * texture = GetTexture(sprite->texture_name);
+    src.x += cell_x * w;
+    src.y += cell_y * h;
+    SDL_Rect dst = { dst_x, dst_y, w * scale, h * scale };
 
-    if ( sprite->flags & SPRITE_FLAG_ANIMATED ) {
-        src.x += sprite->location.w * frame;
-        DrawTexture(texture, &src, &dst);
-    } else {
-        if ( sprite->flags & SPRITE_FLAG_VARIETY ) {
-            // select a random varient
-            src.x += sprite->location.w * frame % sprite->num_frames;
-        }
-
-        SDL_RendererFlip flip = 0;
-        if ( sprite->flags & SPRITE_FLAG_HORIZONTAL_FLIPPABLE && frame < 128 ) {
-            flip |= SDL_FLIP_HORIZONTAL;
-        }
-        if ( sprite->flags & SPRITE_FLAG_VERTICAL_FLIPPABLE && frame < 128 ) {
-            flip |= SDL_FLIP_VERTICAL;
-        }
-        DrawTextureFlip(texture, &src, &dst, flip);
-    }
+    DrawTextureFlip(GetTexture(sprite->texture_name), &src, &dst, flip);
 }
 
 void SetSpriteColorMod(sprite_t * sprite, vec3_t color_mod)

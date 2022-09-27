@@ -5,13 +5,6 @@
 #include "vector.h"
 #include <stdbool.h>
 
-typedef enum {
-    SPRITE_FLAG_ANIMATED = 0x1,
-    SPRITE_FLAG_VARIETY = 0x2, // draw one of the sprite varient frames
-    SPRITE_FLAG_HORIZONTAL_FLIPPABLE = 0x4,
-    SPRITE_FLAG_VERTICAL_FLIPPABLE = 0x8,
-} sprite_flags_t;
-
 // A Sprite / Sprite Sheet and relavent data
 // In a sprite sheet, animations or tile varients should be
 // laid out horizontally
@@ -21,14 +14,21 @@ typedef struct {
     SDL_Rect location; // source rect in sprite sheet
     u8 num_frames; // If not animated, refers to the number of varients.
     u8 fps;
-    sprite_flags_t flags;
+
+    /// Which axes this sprite can be flipped along (SDL_).
+    SDL_RendererFlip flip;
 } sprite_t;
 
-/// Draw sprite at pixel coordinate (x, y).
-///
-/// - Parameter frame: The current animation frame is sprite is animated, or
-///   a number to randomly select which sprite varient is drawn.
-void DrawSprite(sprite_t * sprite, int x, int y, u8 frame, int scale);
+/// Draw sprite at pixel coordinate `dst_x`, `dst_y` using spritesheet
+/// cell cell_x, cell_y.
+void DrawSprite
+(   sprite_t * sprite,
+    int cell_x,
+    int cell_y,
+    int dst_x,
+    int dst_y,
+    int scale,
+    SDL_RendererFlip flip );
 
 void SetSpriteColorMod(sprite_t * sprite, vec3_t color_mod);
 

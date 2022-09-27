@@ -18,6 +18,7 @@ typedef enum {
 // TODO: order this alphabetically?
 typedef enum {
     SPRITE_PLAYER_STAND,
+    SPRITE_PLAYER_WALK,
     SPRITE_SHALLOW_WATER,
     SPRITE_SHALLOW_WATER_EDGE,
     SPRITE_GRASS,
@@ -25,8 +26,11 @@ typedef enum {
     SPRITE_TINY_BLUE_FLOWER,
     SPRITE_TINY_YELLOW_FLOWER,
     SPRITE_GRASS_BLADES,
+    SPRITE_GRASS_BUMPS,
+    SPRITE_WHITE_FLOWERS,
     SPRITE_TREE,
     SPRITE_BUTTERFLY,
+    SPRITE_LOG,
 
     NUM_SPRITES,
 } sprite_id_t;

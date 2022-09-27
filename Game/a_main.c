@@ -39,9 +39,8 @@ void UpdateActor(actor_t * actor, float dt)
 
     sprite_t * sprite = GetActorSprite(actor);
     if ( sprite ) {
-
         // Update sprite animation.
-        if ( sprite->flags & SPRITE_FLAG_ANIMATED ) {
+        if ( actor->flags & ACTOR_FLAG_ANIMATED ) {
             actor->current_frame += (float)sprite->fps * dt;
             while ( actor->current_frame >= sprite->num_frames ) {
                 actor->current_frame -= sprite->num_frames; // wrap frame if needed

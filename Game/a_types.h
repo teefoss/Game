@@ -12,6 +12,7 @@ typedef enum {
     ACTOR_PLAYER,
     ACTOR_TREE,
     ACTOR_BUTTERFLY,
+    ACTOR_LOG,
     NUM_ACTOR_TYPES,
 } actor_type_t;
 

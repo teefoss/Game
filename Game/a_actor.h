@@ -25,11 +25,20 @@ typedef enum {
     ACTOR_FLAG_REMOVE           = 0x0001,
     ACTOR_FLAG_SOLID            = 0x0002,
 
+    // sprite cell y according to actor's direction
+    ACTOR_FLAG_DIRECTIONAL      = 0x0004,
+
+    // sprite cell x according to actor's current_frame, otherwise its variety
+    ACTOR_FLAG_ANIMATED         = 0x0008,
+
     // don't check if tile is walkable
-    ACTOR_FLAG_FLY              = 0x0004,
+    ACTOR_FLAG_FLY              = 0x0010,
 
     // don't do collision checking
-    ACTOR_FLAG_NONINTERACTIVE   = 0x0008,
+    ACTOR_FLAG_NONINTERACTIVE   = 0x0020,
+
+    // player can pick it up
+    ACTOR_FLAG_COLLETIBLE       = 0x0040,
 } actor_flags_t;
 
 typedef struct actor_state actor_state_t;

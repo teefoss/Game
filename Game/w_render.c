@@ -80,7 +80,24 @@ static void RenderGrassDecoration(sprite_id_t id, u8 sprite_variety)
     sprite_t * s = &sprites[id];
     SDL_Rect area = { .w = TILE_SIZE, .h = TILE_SIZE };
     SDL_Point max = RectInRectMaxPoint(&s->location, &area, 1);
-    DrawSprite(s, Random(1, max.x), Random(1, max.y), sprite_variety, 1);
+
+    SDL_RendererFlip flip = SDL_FLIP_NONE;
+    if ( s->flip & SDL_FLIP_HORIZONTAL && Random(0, 1) == 1 ) {
+        flip |= SDL_FLIP_HORIZONTAL;
+    }
+
+    if ( s->flip & SDL_FLIP_VERTICAL && Random(0, 1) == 1 ) {
+        flip |= SDL_FLIP_VERTICAL;
+    }
+
+    DrawSprite
+    (   s,
+        sprite_variety % s->num_frames,
+        0,
+        Random(1, max.x),
+        Random(1, max.y),
+        1,
+        flip );
 }
 
 void RenderGrassEffectTexture
@@ -166,7 +183,8 @@ void RenderGrassEffectTexture
     for ( int i = 0; i < num_moss_flowers; i++ ) {
         sprite_id_t id =
         moss_flowers[i].blue ? SPRITE_TINY_BLUE_FLOWER : SPRITE_TINY_YELLOW_FLOWER;
-        DrawSprite(&sprites[id], moss_flowers[i].x, moss_flowers[i].y, 0, 1);
+        //DrawSprite(&sprites[id], moss_flowers[i].x, moss_flowers[i].y, 0, 1);
+        DrawSprite(&sprites[id], 0, 0, moss_flowers[i].x, moss_flowers[i].y, 1, 0);
     }
 
 
@@ -174,7 +192,11 @@ void RenderGrassEffectTexture
     // Most tiles have grass, occasionally a flower.
     if ( Random(0, 1) == 1 ) {
         if ( Random(0, 12) == 12 ) {
-            RenderGrassDecoration(SPRITE_PLUS_FLOWER, tile->variety);
+            if ( Random(0, 1) == 1 ) {
+                RenderGrassDecoration(SPRITE_PLUS_FLOWER, tile->variety);
+            } else {
+                RenderGrassDecoration(SPRITE_WHITE_FLOWERS, tile->variety);
+            }
         } else {
             RenderGrassDecoration(SPRITE_GRASS_BLADES, tile->variety);
         }
@@ -205,7 +227,17 @@ static void RenderGrass
     SDL_Rect * dst )
 {
     SetSpriteColorMod(&sprites[SPRITE_GRASS], tile->lighting);
-    DrawSprite(&sprites[SPRITE_GRASS], dst->x, dst->y, tile->variety, DRAW_SCALE);
+    //DrawSprite(&sprites[SPRITE_GRASS], dst->x, dst->y, tile->variety, DRAW_SCALE);
+    sprite_t * sprite = &sprites[SPRITE_GRASS];
+
+    DrawSprite
+    (   sprite,
+        tile->variety % sprite->num_frames,
+        0,
+        dst->x,
+        dst->y,
+        DRAW_SCALE,
+        0 );
 
     // Generate effect texture for this tile if needed.
     if ( tile->effect == NULL ) {
@@ -218,6 +250,7 @@ static void RenderGrass
         tile->lighting.x,
         tile->lighting.y,
         tile->lighting.z );
+
     DrawTexture(tile->effect, NULL, dst);
 }
 
@@ -260,7 +293,7 @@ static void RenderVisibleTerrain(world_t * world)
                     }
 
                     SetSpriteColorMod(sprite, tile->lighting);
-                    DrawSprite(sprite, dst.x, dst.y, tile->variety, DRAW_SCALE);
+                    DrawSprite(sprite, 0, 0, dst.x, dst.y, DRAW_SCALE, 0);
                     break;
                 }
                 case TERRAIN_GRASS:
@@ -354,7 +387,15 @@ void RenderVisibleActors(world_t * world, bool show_hitboxes)
             r.y -= visible_rect.y;
 
             SetSpriteColorMod(sprite, actor->lighting);
-            DrawSprite(sprite, r.x, r.y, actor->current_frame, DRAW_SCALE);
+
+            DrawSprite
+            (   sprite,
+                actor->current_frame,
+                actor->flags & ACTOR_FLAG_DIRECTIONAL ? actor->direction : 0,
+                r.x,
+                r.y,
+                DRAW_SCALE,
+                0 ); // TODO: actor flippable?
 
             if ( show_hitboxes ) {
                 SDL_FRect hitbox = ActorHitbox(actor);
