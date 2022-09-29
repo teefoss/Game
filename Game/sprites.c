@@ -17,7 +17,7 @@ sprite_t sprites[NUM_SPRITES] = {
         .texture_name = "player.png",
         .location = { 8, 0, 8, 24 },
         .num_frames = 2,
-        .fps = 10,
+        .fps = 6,
     },
     [SPRITE_SHALLOW_WATER] = {
         .texture_name = "shallow-water.png",

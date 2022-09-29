@@ -26,6 +26,15 @@ actor_t * SpawnActor(actor_type_t type, vec2_t position, world_t * world)
     actor.pos = position;
     actor.world = world;
 
+    if ( world->num_actors + 1 > world->actor_array_capacity ) {
+        world->actor_array_capacity += 1024;
+        world->actors = realloc
+        (   world->actors,
+            world->actor_array_capacity * sizeof(world->actors[0]) );
+
+        printf("resized actor array to %d actors\n", world->actor_array_capacity);
+    }
+
     world->actors[world->num_actors++] = actor;
     return &world->actors[world->num_actors - 1];
 }

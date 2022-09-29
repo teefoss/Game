@@ -11,6 +11,7 @@
 #include "a_types.h"
 #include "mylib/mathlib.h"
 #include "mylib/sprite.h"
+#include "mylib/input.h"
 
 typedef enum {
     NORTH,
@@ -40,6 +41,11 @@ typedef enum {
     // player can pick it up
     ACTOR_FLAG_COLLETIBLE       = 0x0040,
 } actor_flags_t;
+
+typedef struct {
+    bool stopping_x;
+    bool stopping_y;
+} player_info_t;
 
 typedef struct actor_state actor_state_t;
 typedef struct world world_t;
@@ -73,6 +79,7 @@ typedef struct actor {
 
     union {
         s16 timer;
+        player_info_t player;
     } info;
 
     // Actors may change the world, so keep an internal reference.
@@ -84,7 +91,7 @@ struct actor_state {
     actor_state_t * next_state;
     sprite_t * sprite; // &sprites[id]
 
-    void (* handle_input)(actor_t * self, float dt);
+    void (* handle_input)(actor_t * self, input_state_t *, float dt);
     void (* update)(actor_t * self, float dt);
     void (* contact)(actor_t * self, actor_t * other);
 };

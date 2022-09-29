@@ -32,10 +32,11 @@ static void UpdateTiles(world_t * world)
     }
 }
 
-static void UpdateActors(world_t * world, float dt)
+static void UpdateActors(world_t * world, input_state_t * input_state, float dt)
 {
-    actor_t * active_actors[MAX_ACTORS] = { 0 };
-    actor_t * blocks[MAX_ACTORS] = { 0 };
+    const int max_active = 1000;
+    actor_t * active_actors[max_active] = { 0 };
+    actor_t * blocks[max_active] = { 0 };
     int num_active = 0;
     int num_blocks = 0;
 
@@ -54,7 +55,7 @@ static void UpdateActors(world_t * world, float dt)
         actor_t * actor = &world->actors[i];
 
         if ( RectsIntersect(GetActorVisibleRect(actor), active_rect) ) {
-            if ( num_active < MAX_ACTORS ) {
+            if ( num_active < max_active ) {
                 active_actors[num_active++] = actor;
                 if ( actor->flags & ACTOR_FLAG_SOLID ) {
                     blocks[num_blocks++] = actor;
@@ -66,7 +67,7 @@ static void UpdateActors(world_t * world, float dt)
     // Let any actors that respond to input do so.
     for ( actor_t ** actor = active_actors; *actor; actor++ ) {
         if ( (*actor)->state && (*actor)->state->handle_input ) {
-            (*actor)->state->handle_input(*actor, dt);
+            (*actor)->state->handle_input(*actor, input_state, dt);
         }
     }
 
@@ -143,7 +144,7 @@ static void UpdateActors(world_t * world, float dt)
 }
 
 
-void UpdateWorld(world_t * world, float dt)
+void UpdateWorld(world_t * world, input_state_t * input_state, float dt)
 {
     int update_start = SDL_GetTicks(); // debug
 
@@ -178,7 +179,7 @@ void UpdateWorld(world_t * world, float dt)
     }
 
     UpdateTiles(world);
-    UpdateActors(world, dt);
+    UpdateActors(world, input_state, dt);
 
     update_ms = SDL_GetTicks() - update_start; // debug
 }

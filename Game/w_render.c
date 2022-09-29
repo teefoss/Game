@@ -337,7 +337,7 @@ void RenderVisibleActors(world_t * world, bool show_hitboxes)
     SDL_Rect visible_rect = GetVisibleRect(world->camera);
 
     // Filter the world actor array: only visible actors
-    actor_t * visible_actors[MAX_ACTORS] = { 0 };
+    actor_t * visible_actors[500] = { 0 }; // TODO: think about size
     int num_visible = 0;
     for ( int i = 0; i < world->num_actors; i++ ) {
         actor_t * actor = &world->actors[i];

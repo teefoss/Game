@@ -17,7 +17,7 @@
 #define WORLD_HEIGHT 512
 #define SCALED_TILE_SIZE (TILE_SIZE * DRAW_SCALE)
 #define CHUNCK_SIZE 32
-#define MAX_ACTORS 5000
+//#define MAX_ACTORS 5000
 
 #define DAY_LENGTH_TICKS    (int)(1200000.0f / (1000.0f / FPS))
 #define HOUR_TICKS          (DAY_LENGTH_TICKS / 24)
@@ -30,8 +30,9 @@
 typedef struct world {
     tile_t tiles[WORLD_WIDTH * WORLD_HEIGHT];
 
-    actor_t actors[MAX_ACTORS];
-    int num_actors;
+    actor_t * actors;
+    int actor_array_capacity; // Total number of actors
+    int num_actors; // Current array count
 
     // The world pixel coordinate that's centered on screen.
     vec2_t camera;
@@ -73,7 +74,7 @@ void RenderGrassEffectTexture
     int tile_y );
 
 void DestroyWorld(world_t * world); // maybe FreeWorld would be more positive?
-void UpdateWorld(world_t * world, float dt);
+void UpdateWorld(world_t * world, input_state_t * input_state, float dt);
 
 void UpdateDebugMap(tile_t * tiles,  SDL_Texture ** debug_map, vec2_t camera);
 

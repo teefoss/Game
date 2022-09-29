@@ -9,6 +9,7 @@
 #define vector_h
 
 #include <stdbool.h>
+#include <math.h>
 
 typedef struct {
     float x;
@@ -51,6 +52,16 @@ inline vec2_t Vec2Subtract(vec2_t a, vec2_t b)
 inline vec2_t Vec2Scale(vec2_t v, float s)
 {
     return (vec2_t){ v.x * s, v.y * s };
+}
+
+inline float Vec2LengthSqr(vec2_t v)
+{
+    return v.x * v.x + v.y * v.y;
+}
+
+inline float Vec2Length(vec2_t v)
+{
+    return sqrtf(Vec2LengthSqr(v));
 }
 
 #endif /* vector_h */

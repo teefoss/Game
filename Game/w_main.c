@@ -50,6 +50,11 @@ void DestroyWorld(world_t * world)
             SDL_DestroyTexture(world->tiles[i].effect);
         }
     }
+
+    if ( world->actors ) {
+        free(world->actors);
+        world->actors = NULL;
+    }
     
     free(world);
 }

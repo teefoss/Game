@@ -159,12 +159,23 @@ void SpawnActors(world_t * world)
 {
     for ( int y = 0; y < WORLD_HEIGHT; y++ ) {
         for ( int x = 0; x < WORLD_WIDTH; x++ ) {
+            if ( occupied[y][x] ) {
+                continue;
+            }
+
             tile_t * tile = GetTile(world->tiles, x, y);
             if ( tile->terrain == TERRAIN_GRASS ) {
                 if ( Random(0, 50) == 50 ) {
                     vec2_t p = GetTileCenter(x, y);
                     actor_t * actor = SpawnActor(ACTOR_BUTTERFLY, p, world);
                     actor->z = 16;
+                    continue;
+                }
+
+                if ( Random(0, 12) == 12 ) {
+                    vec2_t v = GetTileCenter(x, y);
+                    SpawnActor(ACTOR_TREE, v, world);
+                    occupied[y][x] = true;
                 }
             }
         }
@@ -221,29 +232,7 @@ world_t * CreateWorld(void)
 
     SpawnPlayer(world);
     SpawnActors(world);
-
-    // testing: spawn trees
-    for ( int y = 0; y < WORLD_HEIGHT; y++ ) {
-        for ( int x = 0; x < WORLD_WIDTH; x++ ) {
-            if ( occupied[y][x] ) {
-                continue;
-            }
-
-            tile_t * tile = GetTile(world->tiles, x, y);
-            if ( tile->terrain == TERRAIN_GRASS
-                && !occupied[y][x]
-                && Random(0, 10) == 10 )
-            {
-                // Randomly offset from center of tile.
-                vec2_t v = GetTileCenter(x, y);
-                v.x += RandomFloat(-SCALED_TILE_SIZE / 3.0f, SCALED_TILE_SIZE / 3.0f);
-                v.y += RandomFloat(-SCALED_TILE_SIZE / 3.0f, SCALED_TILE_SIZE / 3.0f);
-
-                SpawnActor(ACTOR_TREE, v, world);
-                occupied[y][x] = true;
-            }
-        }
-    }
+    printf("num actors: %d\n", world->num_actors);
 
     return world;
 }

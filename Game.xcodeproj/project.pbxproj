@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		56CA3EB828C69FFD00AE2DD5 /* game.c in Sources */ = {isa = PBXBuildFile; fileRef = 56CA3EB728C69FFD00AE2DD5 /* game.c */; };
 		56CA3EB928C6AA7E00AE2DD5 /* genlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076643328C68FB200CD99E5 /* genlib.c */; };
-		56CA3EBA28C6AA7E00AE2DD5 /* input.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076643A28C68FB200CD99E5 /* input.c */; };
 		56CA3EBB28C6AA7E00AE2DD5 /* mathlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076643E28C68FB200CD99E5 /* mathlib.c */; };
 		56CA3EBC28C6AA7E00AE2DD5 /* text.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076643C28C68FB200CD99E5 /* text.c */; };
 		56CA3EBD28C6AA7E00AE2DD5 /* texture.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076643828C68FB200CD99E5 /* texture.c */; };
@@ -18,6 +17,7 @@
 		604ABB5728E226DD007A9DD4 /* w_tile.c in Sources */ = {isa = PBXBuildFile; fileRef = 604ABB5628E226DD007A9DD4 /* w_tile.c */; };
 		6076642B28C68F8400CD99E5 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076642A28C68F8400CD99E5 /* main.c */; };
 		60E06B2328E256AD0077F607 /* inventory.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E06B2228E256AD0077F607 /* inventory.c */; };
+		60E06B2628E373FE0077F607 /* input.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E06B2528E373FE0077F607 /* input.c */; };
 		60E0BDC428D021EA00413F7B /* a_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E0BDC328D021EA00413F7B /* a_main.c */; };
 		60E0BDC728D0244200413F7B /* sprite.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E0BDC628D0244200413F7B /* sprite.c */; };
 		60E0BDCA28D0264A00413F7B /* sprites.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E0BDC928D0264A00413F7B /* sprites.c */; };
@@ -53,13 +53,11 @@
 		6076642A28C68F8400CD99E5 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		6076643128C68F9900CD99E5 /* Game.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Game.entitlements; sourceTree = "<group>"; };
 		6076643328C68FB200CD99E5 /* genlib.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = genlib.c; sourceTree = "<group>"; };
-		6076643428C68FB200CD99E5 /* input.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = input.h; sourceTree = "<group>"; };
 		6076643528C68FB200CD99E5 /* text.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = text.h; sourceTree = "<group>"; };
 		6076643628C68FB200CD99E5 /* video.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = video.c; sourceTree = "<group>"; };
 		6076643728C68FB200CD99E5 /* mathlib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mathlib.h; sourceTree = "<group>"; };
 		6076643828C68FB200CD99E5 /* texture.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = texture.c; sourceTree = "<group>"; };
 		6076643928C68FB200CD99E5 /* genlib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = genlib.h; sourceTree = "<group>"; };
-		6076643A28C68FB200CD99E5 /* input.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = input.c; sourceTree = "<group>"; };
 		6076643B28C68FB200CD99E5 /* video.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = video.h; sourceTree = "<group>"; };
 		6076643C28C68FB200CD99E5 /* text.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = text.c; sourceTree = "<group>"; };
 		6076643D28C68FB200CD99E5 /* texture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = texture.h; sourceTree = "<group>"; };
@@ -70,6 +68,8 @@
 		6076644328C68FB200CD99E5 /* cp437_8x16.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cp437_8x16.h; sourceTree = "<group>"; };
 		60E06B2128E256AD0077F607 /* inventory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = inventory.h; sourceTree = "<group>"; };
 		60E06B2228E256AD0077F607 /* inventory.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = inventory.c; sourceTree = "<group>"; };
+		60E06B2428E373FE0077F607 /* input.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = input.h; sourceTree = "<group>"; };
+		60E06B2528E373FE0077F607 /* input.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = input.c; sourceTree = "<group>"; };
 		60E0BDC128CEEF1A00413F7B /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Assets; sourceTree = "<group>"; };
 		60E0BDC228D021EA00413F7B /* a_actor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = a_actor.h; sourceTree = "<group>"; };
 		60E0BDC328D021EA00413F7B /* a_main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = a_main.c; sourceTree = "<group>"; };
@@ -155,8 +155,8 @@
 				6076643F28C68FB200CD99E5 /* fonts */,
 				6076643928C68FB200CD99E5 /* genlib.h */,
 				6076643328C68FB200CD99E5 /* genlib.c */,
-				6076643428C68FB200CD99E5 /* input.h */,
-				6076643A28C68FB200CD99E5 /* input.c */,
+				60E06B2428E373FE0077F607 /* input.h */,
+				60E06B2528E373FE0077F607 /* input.c */,
 				6076643728C68FB200CD99E5 /* mathlib.h */,
 				6076643E28C68FB200CD99E5 /* mathlib.c */,
 				60E0BDC528D0244200413F7B /* sprite.h */,
@@ -243,7 +243,6 @@
 			files = (
 				56CA3EB928C6AA7E00AE2DD5 /* genlib.c in Sources */,
 				60E498A528DA81DE00F4A322 /* m_misc.c in Sources */,
-				56CA3EBA28C6AA7E00AE2DD5 /* input.c in Sources */,
 				60E0BDC728D0244200413F7B /* sprite.c in Sources */,
 				56CA3EBB28C6AA7E00AE2DD5 /* mathlib.c in Sources */,
 				60E0BDCA28D0264A00413F7B /* sprites.c in Sources */,
@@ -256,6 +255,7 @@
 				60E498AC28DC976100F4A322 /* m_debug.c in Sources */,
 				60E498A828DB45E000F4A322 /* w_update.c in Sources */,
 				60E497CF28D12B3C00F4A322 /* w_render.c in Sources */,
+				60E06B2628E373FE0077F607 /* input.c in Sources */,
 				56CA3EBD28C6AA7E00AE2DD5 /* texture.c in Sources */,
 				56CA3EBE28C6AA7E00AE2DD5 /* video.c in Sources */,
 				603B178128CEC94C00CF0E8A /* w_main.c in Sources */,

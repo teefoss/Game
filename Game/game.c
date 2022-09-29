@@ -14,6 +14,7 @@
 #include "mylib/text.h"
 #include "mylib/texture.h"
 #include "mylib/input.h"
+#include "mylib/input.h"
 
 #include <SDL.h>
 
@@ -35,10 +36,19 @@ bool GameHandleEvent(const SDL_Event * event)
     return false;
 }
 
-static bool DoFrame(game_t * game, world_t * world, float dt)
+static bool DoFrame
+(   game_t * game,
+    world_t * world,
+    input_state_t * input_state,
+    float dt )
 {
+    I_StartFrame(input_state);
+
     SDL_Event event;
     while ( SDL_PollEvent(&event) ) {
+
+        I_ProcessEvent(input_state, event);
+
         if ( game->state.handle_event ) {
             if ( game->state.handle_event(&event) ) {
                 continue;
@@ -51,7 +61,13 @@ static bool DoFrame(game_t * game, world_t * world, float dt)
             case SDL_QUIT:
                 return false;
             case SDL_KEYDOWN:
+                if ( event.key.repeat != 0 ) {
+                    break;
+                }
+
                 switch ( event.key.keysym.sym ) {
+                    case SDLK_ESCAPE:
+                        return false;
                     case SDLK_F1:
                         show_debug_info = !show_debug_info;
                         break;
@@ -76,6 +92,9 @@ static bool DoFrame(game_t * game, world_t * world, float dt)
                             world->clock += DAY_LENGTH_TICKS;
                         }
                         break;
+                    case SDLK_BACKSLASH:
+                        ToggleFullscreen(DESKTOP);
+                        break;
                     default:
                         break;
                 }
@@ -85,12 +104,14 @@ static bool DoFrame(game_t * game, world_t * world, float dt)
         }
     }
 
-    game->state.update(world, dt);
+    I_Update(input_state);
+
+    game->state.update(world, input_state, dt);
 
     SetGray(0);
     Clear();
     game->state.render(world, show_geometry);
-    DisplayDebugInfo(world);
+    DisplayDebugInfo(world, I_GetMousePosition(input_state));
     Present();
 
     static int max_render = 0;
@@ -108,7 +129,7 @@ static bool DoFrame(game_t * game, world_t * world, float dt)
     return true;
 }
 
-static void GameLoop(game_t * game, world_t * world)
+static void GameLoop(game_t * game, world_t * world, input_state_t * input_state)
 {
     float old_time = ProgramTime();
     while ( true ) {
@@ -127,7 +148,7 @@ static void GameLoop(game_t * game, world_t * world)
         debug_dt = dt;
 
         int frame_start = SDL_GetTicks();
-        if ( !DoFrame(game, world, dt) ) {
+        if ( !DoFrame(game, world, input_state, dt) ) {
             return;
         }
         frame_ms = SDL_GetTicks() - frame_start;
@@ -149,24 +170,27 @@ void GameMain(void)
         .render_flags = SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC
     };
     InitWindow(&info);
+    SDL_RenderSetLogicalSize(renderer, GAME_WIDTH, GAME_HEIGHT);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     LoadTextures("Assets", "png");
-    InitInput();
+    //InitInput();
     SetTextRenderer(renderer);
     SetTextScale(2.0f, 2.0f);
 
     game_t * game = calloc(1, sizeof(*game));
     game->state = game_play;
     world_t * world = CreateWorld();
+    input_state_t * input_state = I_Initialize();
 
     // debug: check things aren't getting too big
     printf("- tile data size: %zu bytes\n", sizeof(world->tiles[0]));
     printf("- world data size: %zu bytes\n", sizeof(*world));
     printf("- actor size: %zu bytes\n", sizeof(actor_t));
 
-    GameLoop(game, world);
+    GameLoop(game, world, input_state);
     
     // clean up
     DestroyWorld(world);
+    free(input_state);
     free(game);
 }

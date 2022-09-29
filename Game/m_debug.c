@@ -66,13 +66,12 @@ void DisplayGeneralInfo(world_t * world)
           debug_hours < 12 ? "AM" : "PM" );
 }
 
-void DisplayTileInfo(world_t * world)
+void DisplayTileInfo(world_t * world, vec2_t mouse_position)
 {
     SDL_Rect visible_rect = GetVisibleRect(world->camera);
     vec2_t upper_left = { visible_rect.x, visible_rect.y };
 
-    vec2_t mouse_pixel = GetMousePosition(1); // window space
-    vec2_t mouse_coord = Vec2Add(mouse_pixel, upper_left); // world space
+    vec2_t mouse_coord = Vec2Add(mouse_position, upper_left); // world space
     mouse_tile = Vec2Scale(mouse_coord, 1.0f / SCALED_TILE_SIZE);
     tile_t * tile = GetTile(world->tiles, mouse_tile.x, mouse_tile.y);
 
@@ -85,7 +84,7 @@ void DisplayTileInfo(world_t * world)
           tile->lighting.z);
 }
 
-void DisplayDebugInfo(world_t * world)
+void DisplayDebugInfo(world_t * world, vec2_t mouse_position)
 {
     if ( show_geometry ) {
         DisplayScreenGeometry();
@@ -102,6 +101,6 @@ void DisplayDebugInfo(world_t * world)
     }
 
     if ( show_debug_info ) {
-        DisplayTileInfo(world);
+        DisplayTileInfo(world, mouse_position);
     }
 }

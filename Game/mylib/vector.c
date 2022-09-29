@@ -7,11 +7,12 @@
 
 #include "vector.h"
 #include "mathlib.h"
-#include "math.h"
 
 extern inline vec2_t Vec2Add(vec2_t a, vec2_t b);
 extern inline vec2_t Vec2Scale(vec2_t v, float s);
 extern inline vec2_t Vec2Subtract(vec2_t a, vec2_t b);
+extern inline float Vec2LengthSqr(vec2_t v);
+extern inline float Vec2Length(vec2_t);
 
 void Vec2Lerp(vec2_t * v, const vec2_t * target, float w)
 {

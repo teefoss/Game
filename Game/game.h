@@ -25,10 +25,11 @@
 #define GAME_HEIGHT (270 * DRAW_SCALE)
 
 typedef struct world world_t;
+typedef struct input_state input_state_t;
 
 typedef struct {
     bool (* handle_event)(const SDL_Event * event);
-    void (* update)(world_t *, float);
+    void (* update)(world_t *, input_state_t *, float dt);
     void (* render)();
 } game_state_t;
 

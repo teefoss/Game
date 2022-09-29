@@ -10,7 +10,7 @@
 
 #include "w_world.h"
 
-void DisplayDebugInfo(world_t * world);
+void DisplayDebugInfo(world_t * world, vec2_t mouse_position);
 
 extern bool show_geometry;
 extern bool show_world;

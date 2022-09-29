@@ -11,10 +11,10 @@
 #include "sprites.h"
 #include "mylib/input.h"
 
-#define PLAYER_ACCEL (0.2f * SCALED_TILE_SIZE)
-#define PLAYER_MAX_VELOCITY (2.5f * SCALED_TILE_SIZE)
+#define PLAYER_VELOCITY (2.5f * SCALED_TILE_SIZE)
 
-void PlayerHandleInput(actor_t * player, float dt);
+void PlayerHandleInput(actor_t * player, input_state_t * input_state, float dt);
+
 void PlayerStandUpdate(actor_t * player, float dt);
 void PlayerWalkUpdate(actor_t * player, float dt);
 void ButterflyUpdate(actor_t * actor, float dt);
@@ -37,27 +37,76 @@ static actor_state_t state_butterfly = {
     .update = ButterflyUpdate,
 };
 
+/*
+ I personally moved from a force/mass/acceleration model to a simpler, less realistic but more controllable/reliable dampening method for most of my entities.
+ I did this because my force/acceleration model wasn't working for humanoids (and nor should it, it's an inappropriate model, legged creatures aren't billiard balls).
+ Basically:
+ New Velocity = old_velocity * (1 - delta_time * transition_speed) + desired_velocity * (delta_time * transition_speed)
+ (we're just lerping here)
+ transition_speed is one of a few constants (based on terrain type) largely simulated friction, water/ground has a transition speed of 4.0, and to have a smidge of air control, the air transition speed is 0.7.
+ desired_velocity is a unit length "running force" (whatever the entity is trying to do) multiplied by the characters max speed for what they're standing on, e.g. higher for land than water.
+ Implementing this immediately made my FPS experience immediately feel much tighter, and all issues I had applying f = ma to humanoids disappeared.
+ Projectiles are still doing f = ma (with drag etc.), but I only apply it to new entities if the simple model fails me.
+ Edit:
+ If at some point you feel as if physics really is important in your game, check out:
+ http://gafferongames.com/game-physics/integration-basics/
+ With respect to integration and timesteps, just something to look at if you decide "my physics isn't working well enough". If you're going to go with an approach that's not "correct" or based purely in the physical world, you may as well know why and how it's incorrect.
+ */
 
-void PlayerHandleInput(actor_t * player, float dt)
+void PlayerHandleInput(actor_t * player, input_state_t * input_state, float dt)
 {
-    if ( keyboard[SDL_SCANCODE_A] ) {
-        player->vel.x -= PLAYER_ACCEL;
-    }
+    player_info_t * info = &player->info.player;
+    info->stopping_x = true;
+    info->stopping_y = true;
 
-    if ( keyboard[SDL_SCANCODE_D] ) {
-        player->vel.x += PLAYER_ACCEL;
-    }
+#if 1
+    if ( I_IsControllerConnected(input_state) ) {
+        vec2_t move_dir = I_GetStickDirection(input_state, SIDE_LEFT);
 
-    if ( keyboard[SDL_SCANCODE_W] ) {
-        player->vel.y -= PLAYER_ACCEL;
-    }
+        // Make it easier to go exactly east/west and north/south
+        const float minimum = 0.2f;
+        if ( fabsf(move_dir.x) < minimum ) {
+            move_dir.x = 0.0f;
+        }
 
-    if ( keyboard[SDL_SCANCODE_S] ) {
-        player->vel.y += PLAYER_ACCEL;
-    }
+        if ( fabsf(move_dir.y) < minimum ) {
+            move_dir.y = 0.0f;
+        }
 
-    CLAMP(player->vel.x, -PLAYER_MAX_VELOCITY, PLAYER_MAX_VELOCITY);
-    CLAMP(player->vel.y, -PLAYER_MAX_VELOCITY, PLAYER_MAX_VELOCITY);
+        if ( move_dir.x ) {
+            info->stopping_x = false;
+        }
+
+        if ( move_dir.y ) {
+            info->stopping_y = false;
+        }
+
+        vec2_t vel = Vec2Scale(move_dir, PLAYER_VELOCITY);
+        Vec2Lerp(&player->vel, &vel, dt * 10);
+    } else
+#endif
+    {
+        float factor = 4.0f;
+        if ( I_IsKeyDown(input_state, SDL_SCANCODE_A) ) {
+            player->vel.x = Lerp(player->vel.x, -PLAYER_VELOCITY, dt * factor);
+            info->stopping_x = false;
+        }
+
+        if ( I_IsKeyDown(input_state, SDL_SCANCODE_D) ) {
+            player->vel.x = Lerp(player->vel.x, PLAYER_VELOCITY, dt * factor);
+            info->stopping_x = false;
+        }
+
+        if ( I_IsKeyDown(input_state, SDL_SCANCODE_W) ) {
+            player->vel.y = Lerp(player->vel.y, -PLAYER_VELOCITY, dt * factor);
+            info->stopping_y = false;
+        }
+
+        if ( I_IsKeyDown(input_state, SDL_SCANCODE_S) ) {
+            player->vel.y = Lerp(player->vel.y, PLAYER_VELOCITY, dt * factor);
+            info->stopping_y = false;
+        }
+    }
 }
 
 void PlayerUpdateCamera(actor_t * player, float dt)
@@ -91,12 +140,12 @@ void PlayerWalkUpdate(actor_t * player, float dt)
     const float decel_ep = 0.2f;
 
     // apply horizontal friction
-    if ( !keyboard[SDL_SCANCODE_A] && ! keyboard[SDL_SCANCODE_D] ) {
+    if ( player->info.player.stopping_x ) {
         player->vel.x = LerpEpsilon(player->vel.x, 0.0f, damping, decel_ep);
     }
 
     // apply vertical friction
-    if ( !keyboard[SDL_SCANCODE_W] && ! keyboard[SDL_SCANCODE_S] ) {
+    if ( player->info.player.stopping_y ) {
         player->vel.y = LerpEpsilon(player->vel.y, 0.0f, damping, decel_ep);
     }
 

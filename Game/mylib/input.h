@@ -1,66 +1,54 @@
-// -----------------------------------------------------------------------------
-// SDL Input Library
 //
-// Handle controller connect/disconnect, and controller, keyboard, and mouse
-// state.
-// -----------------------------------------------------------------------------
-#ifndef __INPUT_H__
-#define __INPUT_H__
+//  input.h
+//  Game
+//
+//  Created by Thomas Foster on 9/27/22.
+//
+
+#ifndef input2_h
+#define input2_h
 
 #include "genlib.h"
-#include "mathlib.h"
+#include "vector.h"
 
-// these are really just way shorter renames of SDL defines
-#define BUTTON_UP      SDL_BUTTON_BUTTON_DPAD_UP
-#define BUTTON_DOWN    SDL_BUTTON_BUTTON_DPAD_DOWN
-#define BUTTON_LEFT    SDL_BUTTON_BUTTON_DPAD_LEFT
-#define BUTTON_RIGHT   SDL_BUTTON_BUTTON_DPAD_RIGHT
-#define BUTTON_A       SDL_BUTTON_BUTTON_A
-#define BUTTON_B       SDL_BUTTON_BUTTON_B
-#define BUTTON_X       SDL_BUTTON_BUTTON_X
-#define BUTTON_Y       SDL_BUTTON_BUTTON_Y
+typedef enum {
+    BUTTON_STATE_UNDEFINED = -1,
+    BUTTON_STATE_NONE,
+    BUTTON_STATE_PRESSED,
+    BUTTON_STATE_HELD,
+    BUTTON_STATE_RELEASED
+} button_state_t; // also for keys
 
-/// Side for controller buttons that are found on either side
 typedef enum {
     SIDE_LEFT,
-    SIDE_RIGHT
-} controllerSide_t;
+    SIDE_RIGHT,
+} controller_side_t;
 
-extern const u8 * keyboard;
-extern SDL_GameController * controller;
+typedef struct input_state input_state_t;
 
-inline bool IsKeyDown(SDL_Scancode scancode)
-{
-    return keyboard[scancode];
-}
+input_state_t * I_Initialize(void);
+void I_StartFrame(input_state_t *);
+void I_ProcessEvent(input_state_t *, SDL_Event event);
+void I_Update(input_state_t *);
 
-inline bool IsButtonDown(SDL_GameControllerButton button)
-{
-    return SDL_GameControllerGetButton(controller, button);
-}
+// Keyboard
 
-/// Initialize the the SDL game controller subsystem, the `keyboard` state
-/// array, and connect any controllers.
-void InitInput(void);
+bool I_IsKeyDown(input_state_t *, SDL_Scancode code);
+button_state_t I_GetKeyState(input_state_t *, SDL_Scancode code);
 
- /// Handle connecting a controller. This should be called in response
- /// to the SDL event `SDL_CONTROLLERDEVICEADDED`.
-void ConnectController(void);
+// Controller
 
- /// Handle disconnecting a controller. This should be called in response
- /// to the SDL event `SDL_CONTROLLERDEVICEREMOVED`.
-void DisconnectController(void);
+void I_ConnectController(input_state_t *);
+void I_DisconnectController(input_state_t *);
+bool I_IsControllerConnected(input_state_t *);
+bool I_IsControllerButtonDown(input_state_t *, SDL_GameControllerButton button);
+button_state_t I_GetControllerButtonState(input_state_t *, SDL_GameControllerButton button);
+vec2_t I_GetStickDirection(input_state_t *, controller_side_t side);
 
-/// Get the direction of the right or left controller stick
-/// - Returns: a vector, of length between 0.0 and 1.0, representing
-/// the stick direction and distance from center.
-vec2_t ControllerStickDirection(controllerSide_t stick);
+// Mouse
 
-/// Get the amount the right or left trigger is despressed.
-/// - Returns: a value between 0.0 and 1.0 represent how far down
-/// the trigger is depressed.
-float ControllerTriggerState(controllerSide_t trigger);
+bool I_IsMouseButtonDown(input_state_t *, int button);
+button_state_t I_GetMouseButtonState(input_state_t * state, int button);
+vec2_t I_GetMousePosition(input_state_t *);
 
-vec2_t GetMousePosition(float draw_scale);
-
-#endif /* __INPUT_H__ */
+#endif /* input2_h */

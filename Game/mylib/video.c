@@ -74,31 +74,15 @@ void GoWindowed(void)
     SDL_SetWindowFullscreen(window, 0);
 }
 
-static float scaleX;
-static float scaleY;
-
 void ToggleFullscreen(fullscreen_t mode)
 {
-    if ( SDL_GetWindowFlags(window)
-        & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP) ) {
-        if ( mode == DESKTOP ) {
-            // restore saved scale
-            SDL_RenderSetScale(renderer, scaleX, scaleY);
-        }
+    u32 flags = SDL_GetWindowFlags(window);
+
+    if (   flags & SDL_WINDOW_FULLSCREEN
+        || flags & SDL_WINDOW_FULLSCREEN_DESKTOP )
+    {
         GoWindowed();
     } else {
-        if ( mode == DESKTOP ) {
-//            SDL_GetWindowSize(window, &windowWidth, &windowHeight);
-//            SDL_RenderGetScale(renderer, &scaleX, &scaleY);
-//
-//            int displayIndex = SDL_GetWindowDisplayIndex(window);
-//            SDL_DisplayMode displayMode;
-//            SDL_GetDesktopDisplayMode(displayIndex, &displayMode);
-//            float scale = (float)displayMode.h / (float)windowHeight;
-//            print(scale);
-//            SDL_RenderSetScale(renderer, scale, scale);
-        }
-
         GoFullscreen(mode);
     }
 }
