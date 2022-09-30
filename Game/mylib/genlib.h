@@ -119,6 +119,8 @@ FILE * OpenFile( const char * file_name, const char * mode );
 /// The time since program start in fractional seconds.
 float ProgramTime(void);
 
+unsigned StringHash(const char * key);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

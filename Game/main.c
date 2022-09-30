@@ -11,6 +11,11 @@
  https://www.gamedeveloper.com/programming/dynamic-2d-character-lighting
  */
 
+/*
+ BUGS
+ TODO: water edge not randomizing
+ */
+
 int main(void)
 {
     GameMain();

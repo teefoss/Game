@@ -172,8 +172,6 @@ void GameMain(void)
     InitWindow(&info);
     SDL_RenderSetLogicalSize(renderer, GAME_WIDTH, GAME_HEIGHT);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-    LoadTextures("Assets", "png");
-    //InitInput();
     SetTextRenderer(renderer);
     SetTextScale(2.0f, 2.0f);
 
@@ -188,8 +186,9 @@ void GameMain(void)
     printf("- actor size: %zu bytes\n", sizeof(actor_t));
 
     GameLoop(game, world, input_state);
-    
+
     // clean up
+    FreeAllTextures();
     DestroyWorld(world);
     free(input_state);
     free(game);

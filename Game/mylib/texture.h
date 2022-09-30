@@ -22,4 +22,7 @@ void LoadTextures(const char * directory_name, const char * file_extension);
 ///   the program is terminated via a cell of `Error()`.
 SDL_Texture * GetTexture(const char * key);
 
+void FreeAllTextures(void);
+void PrintTextureHashTable(void);
+
 #endif /* __TEXTURE_H__ */

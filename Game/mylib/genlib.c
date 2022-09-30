@@ -1,4 +1,5 @@
 #include "genlib.h"
+#include <dirent.h> // TODO: check if this is portable
 
 #define PRINT_DEF(func, T, format) \
     PRINT_DECL(func, T) { printf("%s: "format"\n", name, value); }
@@ -54,4 +55,61 @@ float ProgramTime(void)
     }
 
     return (timeval.tv_sec - seconds) + timeval.tv_usec / 1000000.0f;
+}
+
+unsigned StringHash(const char * key)
+{
+    /*
+     Good hash table prime numbers from
+     https://planetmath.org/goodhashtableprimes
+
+     Use table size = num table entries * 1.3
+
+     193, 389, 769, 1543, 3079, 6151, 12289, 24593, 49157, 98317,
+     196613, 393241, 786433, 1572869, 3145739, 6291469,
+     12582917, 25165843, 50331653, 100663319, 201326611,
+     402653189, 805306457, 1610612741,
+     */
+
+    // djb2 string hash function:
+    unsigned result = 5381;
+    const char * p = key;
+
+    while ( *p != '\0' ) {
+        result = (result << 5) + result + *p;
+        ++p;
+    }
+
+    return result;
+}
+
+// TODO: test this
+int GetAllFilesInDirectory(const char * path, const char * file_ext, char ** out)
+{
+    DIR * dir = opendir(path);
+    if ( dir == NULL ) {
+        Error("could not open directory '%s'", path);
+    }
+
+    int num_files = 0;
+    struct dirent * entry;
+    while (( entry = readdir(dir) )) {
+        const char * file = entry->d_name;
+
+        // skip the '.' and '..'
+        if ( strcmp(".", file) == 0 || strcmp("..", file) == 0 ) {
+            continue;
+        }
+
+        // skip files with non-matching extension
+        const char * this_ext = GetExtension(file);
+        if ( file_ext != NULL && strcmp(this_ext, file_ext) != 0 ) {
+            continue;
+        }
+
+        num_files++;
+        out[num_files++] = SDL_strdup(file);
+    }
+
+    return num_files;
 }
