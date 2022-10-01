@@ -58,8 +58,8 @@ void DisplayGeneralInfo(world_t * world)
     Print(0, row++ * h, "- Update time: %2d ms", update_ms);
     Print(0, row++ * h, "- dt: %.3f ms", debug_dt);
     Print(0, row++ * h, "Camera Tile: %.2f, %.2f",
-          world->camera.x / TILE_SIZE,
-          world->camera.y / TILE_SIZE);
+          world->camera.x / SCALED_TILE_SIZE,
+          world->camera.y / SCALED_TILE_SIZE);
     Print(0, row++ * h, "%2d:%02d %s",
           debug_hours > 12 ? debug_hours - 12 : debug_hours,
           debug_minutes,
@@ -75,7 +75,7 @@ void DisplayTileInfo(world_t * world, vec2_t mouse_position)
     mouse_tile = Vec2Scale(mouse_coord, 1.0f / SCALED_TILE_SIZE);
     tile_t * tile = GetTile(world->tiles, mouse_tile.x, mouse_tile.y);
 
-    Print(GAME_WIDTH * 0.5 * DRAW_SCALE, 0,
+    Print(GAME_WIDTH * 0.5, 0,
           "Mouse Tile: %d, %d\n"
           "- Tile light: %.1f, %.1f, %.1f",
           (int)mouse_tile.x, (int)mouse_tile.y,

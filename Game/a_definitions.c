@@ -52,9 +52,8 @@ static actor_t actor_definitions[NUM_ACTOR_TYPES] = {
         .health = { .amount = 100, .minimum_damage_level = 0 },
     },
     [ACTOR_HAND_STRIKE] = {
-//        .flags = 0,
         .flags = ACTOR_FLAG_REMOVE,
-        .sprite = &sprites[SPRITE_ICON_NO_ITEM],
+        //.sprite = &sprites[SPRITE_ICON_NO_ITEM],
         .hitbox_width = TILE_SIZE,
         .hitbox_height = TILE_SIZE,
         .damage = { .level = 0, .amount = 10 },
