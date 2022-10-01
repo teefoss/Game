@@ -72,7 +72,12 @@ sprite_t sprites[NUM_SPRITES] = {
     },
     [SPRITE_TREE] = {
         .texture_name = ""SPRITE_DIR"tree.png",
-        .location = { 0, 0, 12, 28 },
+        .location = { 0, 0, 16, 43 },
+        .num_frames = 1,
+    },
+    [SPRITE_BUSH] = {
+        .texture_name = ""SPRITE_DIR"tree.png",
+        .location = { 16, 0, 12, 16 },
         .num_frames = 1,
     },
     [SPRITE_BUTTERFLY] = {

@@ -94,6 +94,9 @@ u32 Random(u32 min, u32 max);
 /// Generator a random float between min and max, inclusive
 float RandomFloat(float min, float max);
 
+/// `percent` between 0 and 1
+bool Chance(float percent);
+
 #pragma mark - NOISE
 
 void RandomizeNoise(u32 seed);

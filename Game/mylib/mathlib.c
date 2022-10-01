@@ -275,6 +275,11 @@ void RandomizeVector(vec2_t * v, float radians) {
     *v =  Vec2Rotate(*v, RandomFloat(-radians, +radians));
 }
 
+bool Chance(float percent)
+{
+    return _RandomFloat() < percent;
+}
+
 #pragma mark - NOISE
 
 #define P_SIZE 512

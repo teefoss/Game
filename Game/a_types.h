@@ -12,6 +12,7 @@ typedef enum {
     ACTOR_PLAYER,
     ACTOR_HAND_STRIKE,
     ACTOR_TREE,
+    ACTOR_BUSH,
     ACTOR_BUTTERFLY,
     ACTOR_LOG,
     NUM_ACTOR_TYPES,

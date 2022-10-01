@@ -156,19 +156,44 @@ void SpawnActors(world_t * world)
             }
 
             tile_t * tile = GetTile(world->tiles, x, y);
-            if ( tile->terrain == TERRAIN_GRASS ) {
-                if ( Random(0, 50) == 50 ) {
-                    vec2_t p = GetTileCenter(x, y);
-                    actor_t * actor = SpawnActor(ACTOR_BUTTERFLY, p, world);
-                    actor->z = 16;
-                    continue;
-                }
+            vec2_t v = GetTileCenter(x, y);
+            float r = SCALED_TILE_SIZE / 3;
+            v.x += RandomFloat(-r, r);
+            v.y += RandomFloat(-r, r);
 
-                if ( Random(0, 12) == 12 ) {
-                    vec2_t v = GetTileCenter(x, y);
-                    SpawnActor(ACTOR_TREE, v, world);
-                    occupied[y][x] = true;
-                }
+            switch ( tile->terrain ) {
+                case TERRAIN_GRASS:
+                    // butterflies
+                    if ( Chance(1.0f / 80.0f) ) {
+                        vec2_t p = GetTileCenter(x, y);
+                        actor_t * actor = SpawnActor(ACTOR_BUTTERFLY, p, world);
+                        actor->z = 16;
+                        continue;
+                    }
+
+                    // trees
+                    if ( Chance(1.0f / 100.0f) ) {
+                        SpawnActor(ACTOR_TREE, v, world);
+                        occupied[y][x] = true;
+                        continue;
+                    }
+
+                    // bushes
+                    if ( Chance(1.0f / 50.0f) ) {
+                        SpawnActor(ACTOR_BUSH, v, world);
+                        occupied[y][x] = true;
+                        continue;
+                    }
+                    break;
+                case TERRAIN_FOREST:
+                    if ( Chance(1.0f / 3.0f) ) {
+                        SpawnActor(ACTOR_TREE, v, world);
+                        occupied[y][x] = true;
+                        continue;
+                    }
+                    break;
+                default:
+                    break;
             }
         }
     }

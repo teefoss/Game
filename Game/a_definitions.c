@@ -66,6 +66,13 @@ static actor_t actor_definitions[NUM_ACTOR_TYPES] = {
         .hitbox_height = 4,
         .health = { .amount = 30, .minimum_damage_level = 3 },
     },
+    [ACTOR_BUSH] = {
+        .flags = ACTOR_FLAG_SOLID,
+        .sprite = &sprites[SPRITE_BUSH],
+        .hitbox_width = 4,
+        .hitbox_height = 4,
+        .health = { .amount = 30, .minimum_damage_level = 0 },
+    },
     [ACTOR_BUTTERFLY] = {
         .flags = ACTOR_FLAG_ANIMATED | ACTOR_FLAG_FLY | ACTOR_FLAG_NONINTERACTIVE,
         .state = &state_butterfly,
@@ -129,6 +136,7 @@ void PlayerHandleInput(actor_t * player, input_state_t * input_state, float dt)
         vec2_t vel = Vec2Scale(move_dir, PLAYER_VELOCITY);
         Vec2Lerp(&player->vel, &vel, dt * 10);
 
+        // Set player facing according to right controller stick
         vec2_t facing = I_GetStickDirection(input_state, SIDE_RIGHT);
         player->facing = VectorToCardinal(facing);
 
@@ -137,7 +145,14 @@ void PlayerHandleInput(actor_t * player, input_state_t * input_state, float dt)
         if ( !info->strike_button_down && left_trigger > 0.0f ) {
             info->strike_button_down = true;
 
-            vec2_t tile = GetAdjacentTile(player->pos, player->facing);
+            cardinal_t facing;
+            if ( player->facing == NO_DIRECTION ) {
+                facing = player->direction;
+            } else {
+                facing = player->facing;
+            }
+
+            vec2_t tile = GetAdjacentTile(player->pos, facing);
 
             // upper left corner
             vec2_t coord = GetTileCenter(tile.x, tile.y);
