@@ -8,12 +8,13 @@
 #include "game.h"
 
 /*
+ RESOURCES
  https://www.gamedeveloper.com/programming/dynamic-2d-character-lighting
- */
 
-/*
+ TODO: keyboard: facing direction
+
  BUGS
- TODO: water edge not randomizing
+ TODO: TF water edge not randomizing
  */
 
 int main(void)

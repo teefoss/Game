@@ -145,11 +145,13 @@ void I_Update(input_state_t * state)
     v = SDL_GameControllerGetAxis(state->controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
     cs->triggers[SIDE_RIGHT] = Filter1D(v);
 
-    // Controller sticks
+    // Controller left stick
 
     s16 x = SDL_GameControllerGetAxis(state->controller, SDL_CONTROLLER_AXIS_LEFTX);
     s16 y = SDL_GameControllerGetAxis(state->controller, SDL_CONTROLLER_AXIS_LEFTY);
     cs->sticks[SIDE_LEFT] = Filter2D(x, y);
+
+    // Controller right stick
 
     x = SDL_GameControllerGetAxis(state->controller, SDL_CONTROLLER_AXIS_RIGHTX);
     y = SDL_GameControllerGetAxis(state->controller, SDL_CONTROLLER_AXIS_RIGHTY);
@@ -208,6 +210,24 @@ button_state_t I_GetControllerButtonState(input_state_t * state, SDL_GameControl
     }
 }
 
+vec2_t I_GetStickDirection(input_state_t * state, controller_side_t side)
+{
+    if ( I_IsControllerConnected(state) ) {
+        return state->controller_state.sticks[side];
+    } else {
+        return (vec2_t){ 0 };
+    }
+}
+
+float I_GetTriggerState(input_state_t * state, controller_side_t side)
+{
+    if ( I_IsControllerConnected(state) ) {
+        return state->controller_state.triggers[side];
+    } else {
+        return 0.0f;
+    }
+}
+
 #pragma mark - MOUSE
 
 button_state_t I_GetMouseButtonState(input_state_t * state, int button)
@@ -226,15 +246,6 @@ button_state_t I_GetMouseButtonState(input_state_t * state, int button)
 bool I_IsMouseButtonDown(input_state_t * state, int button)
 {
     return state->mouse_state.curr_buttons & button;
-}
-
-vec2_t I_GetStickDirection(input_state_t * state, controller_side_t side)
-{
-    if ( I_IsControllerConnected(state) ) {
-        return state->controller_state.sticks[side];
-    } else {
-        return (vec2_t){ 0 };
-    }
 }
 
 vec2_t I_GetMousePosition(input_state_t * state)

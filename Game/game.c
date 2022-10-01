@@ -108,11 +108,11 @@ static bool DoFrame
 
     game->state.update(world, input_state, dt);
 
-    SetGray(0);
-    Clear();
+    V_SetGray(0);
+    V_Clear();
     game->state.render(world, show_geometry);
     DisplayDebugInfo(world, I_GetMousePosition(input_state));
-    Present();
+    V_Present();
 
     static int max_render = 0;
     if ( frame > FPS * 2 && render_ms > max_render ) {

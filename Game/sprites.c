@@ -8,6 +8,7 @@
 #include "sprites.h"
 
 #define SPRITE_DIR "Assets/"
+#define HELD_ITEM_ICON_ALPHA 128
 
 sprite_t sprites[NUM_SPRITES] = {
     [SPRITE_PLAYER_STAND] = {
@@ -84,5 +85,23 @@ sprite_t sprites[NUM_SPRITES] = {
     [SPRITE_LOG] = {
         .texture_name = ""SPRITE_DIR"items.png",
         .location = { 0, 0, 12, 12 }
-    }
+    },
+    [SPRITE_ICON_NO_ITEM] = {
+        .texture_name = ""SPRITE_DIR"icons.png",
+        .location = { 0, 0, 16, 16 },
+        .transparent = true,
+        .alpha = HELD_ITEM_ICON_ALPHA,
+    },
+    [SPRITE_ICON_SWORD] = {
+        .texture_name = ""SPRITE_DIR"icons.png",
+        .location = { 12, 0, 12, 12 },
+        .transparent = true,
+        .alpha = HELD_ITEM_ICON_ALPHA,
+    },
+    [SPRITE_ICON_AXE] = {
+        .texture_name = ""SPRITE_DIR"icons.png",
+        .location = { 0, 24, 12, 12 },
+        .transparent = true,
+        .alpha = HELD_ITEM_ICON_ALPHA,
+    },
 };

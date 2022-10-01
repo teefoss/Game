@@ -11,6 +11,7 @@
 #include "w_tile.h"
 #include "a_actor.h"
 #include "game.h"
+#include "mylib/array.h"
 #include "mylib/mathlib.h"
 
 #define WORLD_WIDTH  512
@@ -27,12 +28,20 @@
 #define DUSK_START_TICKS    (HOUR_TICKS * 20) // 8 PM
 #define DUSK_END_TICKS      (HOUR_TICKS * 21) // 9 PM
 
+#define PENDING_ACTORS_MAX 200
+
 typedef struct world {
     tile_t tiles[WORLD_WIDTH * WORLD_HEIGHT];
 
-    actor_t * actors;
-    int actor_array_capacity; // Total number of actors
-    int num_actors; // Current array count
+//    actor_t * actors;
+//    int actor_array_capacity; // Total number of actors
+//    int num_actors; // Current array count
+    array_t * actors;
+    array_t * pending_actors;
+
+//    actor_t pending_actors[PENDING_ACTORS_MAX];
+//    int num_pending_actors;
+    bool updating_actors;
 
     // The world pixel coordinate that's centered on screen.
     vec2_t camera;
@@ -46,7 +55,9 @@ typedef struct world {
     // they stand on.
     vec3_t lighting;
 
+    // debug:
     SDL_Texture * debug_map; // rendering of entire world, for debuggery
+    actor_t * player;
 
     void (* draw)(tile_t * tile);
 } world_t;
@@ -57,6 +68,7 @@ typedef struct world {
 world_t * CreateWorld(void);
 
 tile_t * GetTile(tile_t * tiles, int x, int y);
+vec2_t GetTileCenter(int x, int y);
 void GetVisibleTileRange(world_t * world, SDL_Point * min, SDL_Point * max);
 SDL_Rect GetVisibleRect(vec2_t camera);
 

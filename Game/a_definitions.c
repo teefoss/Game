@@ -7,6 +7,7 @@
 
 #include "a_actor.h"
 #include "game.h"
+#include "m_misc.h"
 #include "w_world.h"
 #include "sprites.h"
 #include "mylib/input.h"
@@ -18,6 +19,10 @@ void PlayerHandleInput(actor_t * player, input_state_t * input_state, float dt);
 void PlayerStandUpdate(actor_t * player, float dt);
 void PlayerWalkUpdate(actor_t * player, float dt);
 void ButterflyUpdate(actor_t * actor, float dt);
+
+void PlayerStrikeContact(actor_t *, actor_t *);
+
+void DrawPlayer(actor_t * player, int x, int y);
 
 static actor_state_t player_stand = {
     .sprite = &sprites[SPRITE_PLAYER_STAND],
@@ -36,6 +41,47 @@ static actor_state_t state_butterfly = {
     .sprite = &sprites[SPRITE_BUTTERFLY],
     .update = ButterflyUpdate,
 };
+
+static actor_t actor_definitions[NUM_ACTOR_TYPES] = {
+    [ACTOR_PLAYER] = {
+        .flags = ACTOR_FLAG_DIRECTIONAL | ACTOR_FLAG_ANIMATED,
+        .state = &player_stand,
+        .hitbox_width = 5,
+        .hitbox_height = 4,
+        .draw = DrawPlayer,
+        .health = { .amount = 100, .minimum_damage_level = 0 },
+    },
+    [ACTOR_HAND_STRIKE] = {
+//        .flags = 0,
+        .flags = ACTOR_FLAG_REMOVE,
+        .sprite = &sprites[SPRITE_ICON_NO_ITEM],
+        .hitbox_width = TILE_SIZE,
+        .hitbox_height = TILE_SIZE,
+        .damage = { .level = 0, .amount = 10 },
+        .contact = PlayerStrikeContact,
+    },
+    [ACTOR_TREE] = {
+        .flags = ACTOR_FLAG_SOLID,
+        .sprite = &sprites[SPRITE_TREE],
+        .hitbox_width = 4,
+        .hitbox_height = 4,
+        .health = { .amount = 30, .minimum_damage_level = 3 },
+    },
+    [ACTOR_BUTTERFLY] = {
+        .flags = ACTOR_FLAG_ANIMATED | ACTOR_FLAG_FLY | ACTOR_FLAG_NONINTERACTIVE,
+        .state = &state_butterfly,
+    },
+    [ACTOR_LOG] = { .flags = ACTOR_FLAG_COLLETIBLE },
+};
+
+#pragma mark -
+
+actor_t GetActorDefinition(actor_type_t type)
+{
+    return actor_definitions[type];
+}
+
+#pragma mark - INPUT FUNCTIONS
 
 /*
  I personally moved from a force/mass/acceleration model to a simpler, less realistic but more controllable/reliable dampening method for most of my entities.
@@ -83,7 +129,30 @@ void PlayerHandleInput(actor_t * player, input_state_t * input_state, float dt)
 
         vec2_t vel = Vec2Scale(move_dir, PLAYER_VELOCITY);
         Vec2Lerp(&player->vel, &vel, dt * 10);
-    } else
+
+        vec2_t facing = I_GetStickDirection(input_state, SIDE_RIGHT);
+        player->facing = VectorToCardinal(facing);
+
+        float left_trigger = I_GetTriggerState(input_state, SIDE_RIGHT);
+
+        if ( !info->strike_button_down && left_trigger > 0.0f ) {
+            info->strike_button_down = true;
+
+            vec2_t tile = GetAdjacentTile(player->pos, player->facing);
+
+            // upper left corner
+            vec2_t coord = GetTileCenter(tile.x, tile.y);
+            coord.y += SCALED_TILE_SIZE / 2; // actor position is at the bottom
+
+            SpawnActor(ACTOR_HAND_STRIKE, coord, player->world);
+            puts("left trigger");
+        }
+
+        if ( left_trigger == 0.0f ) {
+            info->strike_button_down = false;
+        }
+    }
+    else
 #endif
     {
         float factor = 4.0f;
@@ -108,6 +177,8 @@ void PlayerHandleInput(actor_t * player, input_state_t * input_state, float dt)
         }
     }
 }
+
+#pragma mark - UPDATE FUNCTIONS
 
 void PlayerUpdateCamera(actor_t * player, float dt)
 {
@@ -170,27 +241,38 @@ void ButterflyUpdate(actor_t * actor, float dt)
     }
 }
 
-static actor_t actor_definitions[NUM_ACTOR_TYPES] = {
-    [ACTOR_PLAYER] = {
-        .flags = ACTOR_FLAG_DIRECTIONAL | ACTOR_FLAG_ANIMATED,
-        .state = &player_stand,
-        .hitbox_width = 5,
-        .hitbox_height = 4,
-    },
-    [ACTOR_TREE] = {
-        .flags = ACTOR_FLAG_SOLID,
-        .sprite = &sprites[SPRITE_TREE],
-        .hitbox_width = 4,
-        .hitbox_height = 4,
-    },
-    [ACTOR_BUTTERFLY] = {
-        .flags = ACTOR_FLAG_ANIMATED | ACTOR_FLAG_FLY | ACTOR_FLAG_NONINTERACTIVE,
-        .state = &state_butterfly,
-    },
-    [ACTOR_LOG] = { .flags = ACTOR_FLAG_COLLETIBLE },
-};
+#pragma mark - CONTACT FUNCTIONS
 
-actor_t GetActorDefinition(actor_type_t type)
+void PlayerStrikeContact(actor_t * strike, actor_t * hit)
 {
-    return actor_definitions[type];
+    printf("hit a %d\n", hit->type);
+    DamageActor(strike, hit);
+}
+
+#pragma mark - DRAW FUNCTIONS
+
+void DrawPlayer(actor_t * player, int x, int y)
+{
+    // Draw the reticle if a direction is being held.
+    if ( player->facing != NO_DIRECTION ) {
+        sprite_t * spr = &sprites[SPRITE_ICON_NO_ITEM];
+        SDL_Rect visible_rect = GetVisibleRect(player->world->camera);
+
+        // Center the reticle on the center of tile adjacent to the player
+        vec2_t tile = GetAdjacentTile(player->pos, player->facing);
+        vec2_t ret_pos = GetTileCenter(tile.x, tile.y);
+        ret_pos.x -= (spr->location.w * DRAW_SCALE) / 2.0f;
+        ret_pos.y -= (spr->location.h * DRAW_SCALE) / 2.0f;
+
+        DrawSprite
+        (   spr,
+            0,
+            0,
+            ret_pos.x - visible_rect.x,
+            ret_pos.y - visible_rect.y,
+            DRAW_SCALE,
+            0 );
+    }
+
+    DrawActorSprite(player, GetActorSprite(player), x, y);
 }

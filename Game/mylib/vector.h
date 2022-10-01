@@ -64,4 +64,9 @@ inline float Vec2Length(vec2_t v)
     return sqrtf(Vec2LengthSqr(v));
 }
 
+inline float Vec2Angle(vec2_t v)
+{
+    return atan2f(-v.y, v.x);
+}
+
 #endif /* vector_h */

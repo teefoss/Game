@@ -20,7 +20,13 @@ void DrawSprite
     src.y += cell_y * h;
     SDL_Rect dst = { dst_x, dst_y, w * scale, h * scale };
 
-    DrawTextureFlip(GetTexture(sprite->texture_name), &src, &dst, flip);
+    SDL_Texture * texture = GetTexture(sprite->texture_name);
+
+    if ( sprite->transparent ) {
+        SDL_SetTextureAlphaMod(texture, sprite->alpha);
+    }
+
+    V_DrawTextureFlip(texture, &src, &dst, flip);
 }
 
 void SetSpriteColorMod(sprite_t * sprite, vec3_t color_mod)

@@ -31,7 +31,9 @@ typedef enum {
     SPRITE_TREE,
     SPRITE_BUTTERFLY,
     SPRITE_LOG,
-
+    SPRITE_ICON_NO_ITEM,
+    SPRITE_ICON_SWORD,
+    SPRITE_ICON_AXE,
     NUM_SPRITES,
 } sprite_id_t;
 

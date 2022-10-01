@@ -51,8 +51,12 @@ static void UpdateActors(world_t * world, input_state_t * input_state, float dt)
 
     // Add all actors within the active rect, they will be processed.
     // Add solid actors to a separate list of blocks.
-    for ( int i = 0; i < world->num_actors; i++ ) {
-        actor_t * actor = &world->actors[i];
+    for ( int i = 0; i < world->actors->count; i++ ) {
+        actor_t * actor = GetElement(world->actors, i);
+
+        if ( actor->type == ACTOR_HAND_STRIKE ) {
+
+        }
 
         if ( RectsIntersect(GetActorVisibleRect(actor), active_rect) ) {
             if ( num_active < max_active ) {
@@ -64,6 +68,8 @@ static void UpdateActors(world_t * world, input_state_t * input_state, float dt)
         }
     }
 
+    world->updating_actors = true;
+
     // Let any actors that respond to input do so.
     for ( actor_t ** actor = active_actors; *actor; actor++ ) {
         if ( (*actor)->state && (*actor)->state->handle_input ) {
@@ -74,6 +80,10 @@ static void UpdateActors(world_t * world, input_state_t * input_state, float dt)
     // Update actors.
     for ( int i = 0; i < num_active; i++ ) {
         actor_t * actor = active_actors[i];
+
+        if ( actor->type == ACTOR_HAND_STRIKE ) {
+
+        }
 
         // Move actors.
         // Do horizontal and vertical movement separately, resolving
@@ -102,44 +112,62 @@ static void UpdateActors(world_t * world, input_state_t * input_state, float dt)
     for ( int i = 0; i < num_active; i++ ) {
         actor_t * ai = active_actors[i];
 
-        if ( ai->flags & ACTOR_FLAG_REMOVE ) {
-            continue;
+        if ( ai->type == ACTOR_HAND_STRIKE ) {
+
         }
+
+
+//        if ( ai->flags & ACTOR_FLAG_REMOVE ) {
+//            continue;
+//        }
 
         SDL_FRect hitbox_i = ActorHitbox(ai);
 
         for ( int j = i + 1; j < num_active; j++ ) {
             actor_t * aj = active_actors[j];
 
-            if ( aj->flags & ACTOR_FLAG_REMOVE ) {
-                continue;
-            }
+//            if ( aj->flags & ACTOR_FLAG_REMOVE ) {
+//                continue;
+//            }
 
-            if ( ai->flags & ACTOR_FLAG_SOLID || aj->flags & ACTOR_FLAG_SOLID ) {
-                continue; // don't bother
-            }
+//            if ( ai->flags & ACTOR_FLAG_SOLID || aj->flags & ACTOR_FLAG_SOLID ) {
+//                continue; // don't bother
+//            }
 
             SDL_FRect hitbox_j = ActorHitbox(aj);
             if ( SDL_HasIntersectionF(&hitbox_i, &hitbox_j) ) {
 
                 // contact each other
-                if ( ai->state && ai->state->contact ) {
+                if ( ai->contact ) {
+                    ai->contact(ai, aj);
+                } else if ( ai->state && ai->state->contact ) {
                     ai->state->contact(ai, aj);
                 }
-                if ( aj->state && aj->state->contact ) {
+
+                if ( aj->contact ) {
+                    aj->contact(aj, ai);
+                } else if ( aj->state && aj->state->contact ) {
                     aj->state->contact(aj, ai);
                 }
             }
         }
     }
 
-    // Remove any actors that were flagged for removal. Loop through actual
-    // world actor array when removing so that the array will stay packed.
-    for ( int i = world->num_actors - 1; i >= 0; i-- ) {
-        if ( world->actors[i].flags & ACTOR_FLAG_REMOVE ) {
-            // Fast remove: move the last element to the element to be removed.
-            world->actors[i] = world->actors[--world->num_actors];
+    world->updating_actors = false;
+
+    // Remove any actors that were flagged for removal.
+    for ( int i = world->actors->count - 1; i >= 0; i-- ) {
+        actor_t * actor = GetElement(world->actors, i);
+        if ( actor->flags & ACTOR_FLAG_REMOVE ) {
+            printf("removing actor\n");
+            Remove(world->actors, i);
         }
+    }
+
+    // Move all pending actors to main array.
+    for ( int i = world->pending_actors->count - 1; i >= 0; i-- ) {
+        Append(world->actors, GetElement(world->pending_actors, i));
+        Remove(world->pending_actors, i);
     }
 }
 

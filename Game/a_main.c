@@ -6,9 +6,11 @@
 //
 
 #include "a_actor.h"
+#include "m_debug.h"
 #include "m_misc.h"
 #include "w_world.h"
 #include "mylib/genlib.h"
+#include "mylib/video.h"
 
 sprite_t * GetActorSprite(const actor_t * actor)
 {
@@ -26,24 +28,33 @@ actor_t * SpawnActor(actor_type_t type, vec2_t position, world_t * world)
     actor.pos = position;
     actor.world = world;
 
-    if ( world->num_actors + 1 > world->actor_array_capacity ) {
-        world->actor_array_capacity += 1024;
-        world->actors = realloc
-        (   world->actors,
-            world->actor_array_capacity * sizeof(world->actors[0]) );
-
-        printf("resized actor array to %d actors\n", world->actor_array_capacity);
+    if ( !world->updating_actors ) {
+        return Append(world->actors, &actor);
+    } else {
+        return Append(world->pending_actors, &actor);
     }
+}
 
-    world->actors[world->num_actors++] = actor;
-    return &world->actors[world->num_actors - 1];
+void DamageActor(actor_t * attacker, actor_t * target)
+{
+    if ( attacker->damage.level >= target->health.minimum_damage_level ) {
+        // attacker damage is strong enough
+        target->health.amount -= attacker->damage.amount; // TODO: randomize
+        if ( target->health.amount <= 0 ) {
+            target->flags |= ACTOR_FLAG_REMOVE; // TODO: some kind of kill func
+        }
+    }
 }
 
 void UpdateActor(actor_t * actor, float dt)
 {
-    // update actor's facing direction
-    if ( actor->vel.x || actor->vel.y ) {
-        actor->direction = VelocityToDirection(actor->vel);
+    if ( actor->facing == NO_DIRECTION ) {
+        // Update actor's facing direction according to its movement.
+        if ( actor->vel.x || actor->vel.y ) {
+            actor->direction = VectorToCardinal(actor->vel);
+        }
+    } else {
+        actor->direction = actor->facing;
     }
 
     sprite_t * sprite = GetActorSprite(actor);
@@ -159,6 +170,48 @@ void DoCollisions(bool vertical, actor_t * actor, actor_t ** blocks, int num_blo
             } else {
                 ResolveHorizontalCollision(actor, ibox, jbox);
             }
+        }
+    }
+}
+
+void DrawActorSprite(actor_t * actor, sprite_t * sprite, int x, int y)
+{
+    DrawSprite
+    (   sprite,
+        actor->current_frame,
+        actor->flags & ACTOR_FLAG_DIRECTIONAL
+            ? SpriteDirection(actor->direction)
+            : 0,
+        x,
+        y,
+        DRAW_SCALE,
+        0 ); // TODO: actor flippable?
+}
+
+void DrawActor(actor_t * actor, SDL_Rect visible_rect, bool show_hitboxes)
+{
+    sprite_t * sprite = GetActorSprite(actor);
+
+    if ( sprite ) {
+        SDL_Rect r = GetActorVisibleRect(actor);
+        r.x -= visible_rect.x; // convert to window space
+        r.y -= visible_rect.y;
+
+        SetSpriteColorMod(sprite, actor->lighting);
+
+        if ( actor->draw ) {
+            actor->draw(actor, r.x, r.y);
+        } else {
+            DrawActorSprite(actor, sprite, r.x, r.y);
+        }
+
+        if ( show_hitboxes ) {
+            SDL_FRect hitbox = ActorHitbox(actor);
+            V_SetRGBA(90, 90, 255, 255);
+            hitbox.x -= visible_rect.x;
+            hitbox.y -= visible_rect.y;
+            SDL_Rect hitbox_i = { hitbox.x, hitbox.y, hitbox.w, hitbox.h };
+            V_DrawRect(&hitbox_i);
         }
     }
 }

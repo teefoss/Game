@@ -18,6 +18,9 @@
 		6076642B28C68F8400CD99E5 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076642A28C68F8400CD99E5 /* main.c */; };
 		60E06B2328E256AD0077F607 /* inventory.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E06B2228E256AD0077F607 /* inventory.c */; };
 		60E06B2628E373FE0077F607 /* input.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E06B2528E373FE0077F607 /* input.c */; };
+		60E06B2C28E7844B0077F607 /* cardinal.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E06B2B28E7844B0077F607 /* cardinal.c */; };
+		60E06B2F28E7A3730077F607 /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E06B2E28E7A3730077F607 /* list.c */; };
+		60E06B3228E7A8520077F607 /* array.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E06B3128E7A8520077F607 /* array.c */; };
 		60E0BDC428D021EA00413F7B /* a_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E0BDC328D021EA00413F7B /* a_main.c */; };
 		60E0BDC728D0244200413F7B /* sprite.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E0BDC628D0244200413F7B /* sprite.c */; };
 		60E0BDCA28D0264A00413F7B /* sprites.c in Sources */ = {isa = PBXBuildFile; fileRef = 60E0BDC928D0264A00413F7B /* sprites.c */; };
@@ -70,6 +73,12 @@
 		60E06B2228E256AD0077F607 /* inventory.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = inventory.c; sourceTree = "<group>"; };
 		60E06B2428E373FE0077F607 /* input.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = input.h; sourceTree = "<group>"; };
 		60E06B2528E373FE0077F607 /* input.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = input.c; sourceTree = "<group>"; };
+		60E06B2A28E7844B0077F607 /* cardinal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cardinal.h; sourceTree = "<group>"; };
+		60E06B2B28E7844B0077F607 /* cardinal.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cardinal.c; sourceTree = "<group>"; };
+		60E06B2D28E7A3730077F607 /* list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = list.h; sourceTree = "<group>"; };
+		60E06B2E28E7A3730077F607 /* list.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = list.c; sourceTree = "<group>"; };
+		60E06B3028E7A8520077F607 /* array.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = array.h; sourceTree = "<group>"; };
+		60E06B3128E7A8520077F607 /* array.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = array.c; sourceTree = "<group>"; };
 		60E0BDC128CEEF1A00413F7B /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Assets; sourceTree = "<group>"; };
 		60E0BDC228D021EA00413F7B /* a_actor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = a_actor.h; sourceTree = "<group>"; };
 		60E0BDC328D021EA00413F7B /* a_main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = a_main.c; sourceTree = "<group>"; };
@@ -127,6 +136,8 @@
 				60E4987028D37D6100F4A322 /* a_types.h */,
 				60E4986C28D3707300F4A322 /* a_definitions.c */,
 				60E0BDC328D021EA00413F7B /* a_main.c */,
+				60E06B2A28E7844B0077F607 /* cardinal.h */,
+				60E06B2B28E7844B0077F607 /* cardinal.c */,
 				56CA3EB628C69FFD00AE2DD5 /* game.h */,
 				56CA3EB728C69FFD00AE2DD5 /* game.c */,
 				60E06B2128E256AD0077F607 /* inventory.h */,
@@ -153,10 +164,14 @@
 			isa = PBXGroup;
 			children = (
 				6076643F28C68FB200CD99E5 /* fonts */,
+				60E06B3028E7A8520077F607 /* array.h */,
+				60E06B3128E7A8520077F607 /* array.c */,
 				6076643928C68FB200CD99E5 /* genlib.h */,
 				6076643328C68FB200CD99E5 /* genlib.c */,
 				60E06B2428E373FE0077F607 /* input.h */,
 				60E06B2528E373FE0077F607 /* input.c */,
+				60E06B2D28E7A3730077F607 /* list.h */,
+				60E06B2E28E7A3730077F607 /* list.c */,
 				6076643728C68FB200CD99E5 /* mathlib.h */,
 				6076643E28C68FB200CD99E5 /* mathlib.c */,
 				60E0BDC528D0244200413F7B /* sprite.h */,
@@ -243,7 +258,9 @@
 			files = (
 				56CA3EB928C6AA7E00AE2DD5 /* genlib.c in Sources */,
 				60E498A528DA81DE00F4A322 /* m_misc.c in Sources */,
+				60E06B2F28E7A3730077F607 /* list.c in Sources */,
 				60E0BDC728D0244200413F7B /* sprite.c in Sources */,
+				60E06B2C28E7844B0077F607 /* cardinal.c in Sources */,
 				56CA3EBB28C6AA7E00AE2DD5 /* mathlib.c in Sources */,
 				60E0BDCA28D0264A00413F7B /* sprites.c in Sources */,
 				60E06B2328E256AD0077F607 /* inventory.c in Sources */,
@@ -254,6 +271,7 @@
 				60E498AF28DCB27600F4A322 /* vector.c in Sources */,
 				60E498AC28DC976100F4A322 /* m_debug.c in Sources */,
 				60E498A828DB45E000F4A322 /* w_update.c in Sources */,
+				60E06B3228E7A8520077F607 /* array.c in Sources */,
 				60E497CF28D12B3C00F4A322 /* w_render.c in Sources */,
 				60E06B2628E373FE0077F607 /* input.c in Sources */,
 				56CA3EBD28C6AA7E00AE2DD5 /* texture.c in Sources */,

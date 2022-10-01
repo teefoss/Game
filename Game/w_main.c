@@ -29,6 +29,15 @@ tile_t * GetTile(tile_t * tiles, int x, int y)
     return &tiles[y * WORLD_HEIGHT + x];
 }
 
+/// Tile coordinate to center of tile in world coords.
+vec2_t GetTileCenter(int x, int y)
+{
+    return (vec2_t){
+        x * SCALED_TILE_SIZE + SCALED_TILE_SIZE / 2,
+        y * SCALED_TILE_SIZE + SCALED_TILE_SIZE / 2
+    };
+}
+
 void GetAdjacentTiles
 (   int x,
     int y,
@@ -51,11 +60,9 @@ void DestroyWorld(world_t * world)
         }
     }
 
-    if ( world->actors ) {
-        free(world->actors);
-        world->actors = NULL;
-    }
-    
+    FreeArray(world->actors);
+    FreeArray(world->pending_actors);
+
     free(world);
 }
 

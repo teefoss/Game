@@ -9,6 +9,7 @@
 #include "w_world.h"
 #include "game.h"
 #include "m_debug.h"
+#include "m_misc.h"
 #include "sprites.h"
 #include "w_tile.h"
 
@@ -33,7 +34,7 @@ void UpdateDebugMap(tile_t * tiles,  SDL_Texture ** debug_map, vec2_t camera)
     };
 
     if ( *debug_map == NULL ) {
-        *debug_map = CreateTexture(WORLD_WIDTH, WORLD_HEIGHT);
+        *debug_map = V_CreateTexture(WORLD_WIDTH, WORLD_HEIGHT);
     }
 
     SDL_SetRenderTarget(renderer, *debug_map);
@@ -43,18 +44,18 @@ void UpdateDebugMap(tile_t * tiles,  SDL_Texture ** debug_map, vec2_t camera)
             tile_t * tile = GetTile(tiles, x, y);
 
             // render pixel to debug texture for this tile's terrain type
-            SetColor(layer_colors[tile->terrain]);
-            DrawPoint(x, y);
+            V_SetColor(layer_colors[tile->terrain]);
+            V_DrawPoint(x, y);
         }
     }
 
-    SetGray(255);
+    V_SetGray(255);
     SDL_Rect vis_rect = GetVisibleRect(camera);
     vis_rect.x /= TILE_SIZE;
     vis_rect.y /= TILE_SIZE;
     vis_rect.w /= TILE_SIZE;
     vis_rect.h /= TILE_SIZE;
-    DrawRect(&vis_rect);
+    V_DrawRect(&vis_rect);
 
     SDL_SetRenderTarget(renderer, NULL);
 }
@@ -108,13 +109,13 @@ void RenderGrassEffectTexture
 {
     // < 0.1 ms
 //    PROFILE_START(create_texture);
-    tile->effect = CreateTexture(TILE_SIZE, TILE_SIZE);
+    tile->effect = V_CreateTexture(TILE_SIZE, TILE_SIZE);
 //    PROFILE_END(create_texture);
     SDL_SetTextureBlendMode(tile->effect, SDL_BLENDMODE_BLEND);
     SDL_SetRenderTarget(renderer, tile->effect);
 
-    SetRGBA(0, 0, 0, 0);
-    Clear();
+    V_SetRGBA(0, 0, 0, 0);
+    V_Clear();
 
     // Render moss.
 
@@ -142,11 +143,11 @@ void RenderGrassEffectTexture
 //            SeedRandom(wx * wy); // TODO: more than one prng
 
             if ( noise_map[py][px] > 0.2f ) { //}|| (noise > 0.05f && Random(0, 3) == 0) ) {
-                SetRGBA(78, 138, 36, 255); // darker green
-                DrawPoint(px, py);
+                V_SetRGBA(78, 138, 36, 255); // darker green
+                V_DrawPoint(px, py);
             } else if ( noise_map[py][px] > 0.1 ) {
-                SetRGBA(114, 201, 52, 255); // faintly lighter shade of same grass color
-                DrawPoint(px, py);
+                V_SetRGBA(114, 201, 52, 255); // faintly lighter shade of same grass color
+                V_DrawPoint(px, py);
             }
 
             if ( noise_map[py][px] > 0.7f ) {
@@ -203,7 +204,7 @@ void RenderGrassEffectTexture
     }
 
     // Draw highlights at water edges.
-    SetRGBA(122, 214, 56, 255);
+    V_SetRGBA(122, 214, 56, 255);
     if ( adjacent_tiles[NORTH]->terrain <= TERRAIN_SHALLOW_WATER ) {
         SDL_RenderDrawLine(renderer, 0, 0, TILE_SIZE + 1, 0);
     }
@@ -251,7 +252,7 @@ static void RenderGrass
         tile->lighting.y,
         tile->lighting.z );
 
-    DrawTexture(tile->effect, NULL, dst);
+    V_DrawTexture(tile->effect, NULL, dst);
 }
 
 static void RenderVisibleTerrain(world_t * world)
@@ -314,15 +315,15 @@ static void RenderVisibleTerrain(world_t * world)
             if (show_debug_info
                 && ((int)mouse_tile.x == tile_x && (int)mouse_tile.y == tile_y) )
             {
-                SetRGBA(255, 90, 90, 255);
-                DrawRect(&dst);
+                V_SetRGBA(255, 90, 90, 255);
+                V_DrawRect(&dst);
             }
 
             if ( show_geometry ) {
-                SetRGBA(255, 255, 90, 255);
+                V_SetRGBA(255, 255, 90, 255);
                 SDL_Rect corner_dot = dst;
                 corner_dot.w = corner_dot.h = DRAW_SCALE;
-                FillRect(&corner_dot);
+                V_FillRect(&corner_dot);
             }
 
             dst.x += TILE_SIZE;
@@ -339,9 +340,8 @@ void RenderVisibleActors(world_t * world, bool show_hitboxes)
     // Filter the world actor array: only visible actors
     actor_t * visible_actors[500] = { 0 }; // TODO: think about size
     int num_visible = 0;
-    for ( int i = 0; i < world->num_actors; i++ ) {
-        actor_t * actor = &world->actors[i];
-
+    actor_t * actor = world->actors->data;
+    for ( int i = 0; i < world->actors->count; i++, actor++ ) {
         if ( GetActorSprite(actor)
             && RectsIntersect(visible_rect, GetActorVisibleRect(actor)) )
         {
@@ -371,43 +371,15 @@ void RenderVisibleActors(world_t * world, bool show_hitboxes)
             shadow.x = actor->pos.x - shadow.w / 2 - visible_rect.x;
             shadow.y = actor->pos.y - shadow.h / 2 - visible_rect.y;
 
-            SetRGBA(0, 0, 0, 64);
-            FillRect(&shadow);
+            V_SetRGBA(0, 0, 0, 64);
+            V_FillRect(&shadow);
         }
     }
 
     // draw actors
     for ( int i = 0; i < num_visible; i++ ) {
-        actor_t * actor = visible_actors[i];
-        sprite_t * sprite = GetActorSprite(actor);
-
-        if ( sprite ) {
-            SDL_Rect r = GetActorVisibleRect(actor);
-            r.x -= visible_rect.x; // convert to window space
-            r.y -= visible_rect.y;
-
-            SetSpriteColorMod(sprite, actor->lighting);
-
-            DrawSprite
-            (   sprite,
-                actor->current_frame,
-                actor->flags & ACTOR_FLAG_DIRECTIONAL ? actor->direction : 0,
-                r.x,
-                r.y,
-                DRAW_SCALE,
-                0 ); // TODO: actor flippable?
-
-            if ( show_hitboxes ) {
-                SDL_FRect hitbox = ActorHitbox(actor);
-                SetRGBA(90, 90, 255, 255);
-                hitbox.x -= visible_rect.x;
-                hitbox.y -= visible_rect.y;
-                SDL_Rect hitbox_i = { hitbox.x, hitbox.y, hitbox.w, hitbox.h };
-                DrawRect(&hitbox_i);
-            }
-        }
+        DrawActor(visible_actors[i], visible_rect, show_hitboxes);
     }
-
 }
 
 void RenderWorld(world_t * world, bool show_hitboxes)

@@ -38,12 +38,11 @@ button_state_t I_GetKeyState(input_state_t *, SDL_Scancode code);
 
 // Controller
 
-void I_ConnectController(input_state_t *);
-void I_DisconnectController(input_state_t *);
 bool I_IsControllerConnected(input_state_t *);
 bool I_IsControllerButtonDown(input_state_t *, SDL_GameControllerButton button);
 button_state_t I_GetControllerButtonState(input_state_t *, SDL_GameControllerButton button);
 vec2_t I_GetStickDirection(input_state_t *, controller_side_t side);
+float I_GetTriggerState(input_state_t *, controller_side_t side);
 
 // Mouse
 

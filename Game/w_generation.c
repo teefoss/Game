@@ -10,14 +10,6 @@
 #include "game.h"
 #include "mylib/video.h"
 
-static vec2_t GetTileCenter(int x, int y)
-{
-    return (vec2_t){
-        x * SCALED_TILE_SIZE + SCALED_TILE_SIZE / 2,
-        y * SCALED_TILE_SIZE + SCALED_TILE_SIZE / 2
-    };
-}
-
 static const float terrain_elevations[NUM_TERRAIN_TYPES] = {
     -1.00, // deep ocean
     -0.45, // shallow ocean
@@ -150,7 +142,7 @@ void SpawnPlayer(world_t * world)
 
     vec2_t position = GetTileCenter(potentials[i].x, potentials[i].y);
     SpawnActor(ACTOR_PLAYER, position, world);
-
+    world->player = (actor_t *)GetElement(world->actors, 0);
     world->camera = position;
     world->camera_target = position;
 }
@@ -222,6 +214,9 @@ world_t * CreateWorld(void)
 
     memset(occupied, 0, sizeof(occupied));
 
+    world->actors = NewArray(0, sizeof(actor_t));
+    world->pending_actors = NewArray(0, sizeof(actor_t));
+
     PROFILE_START(generate_terrain);
     GenerateTerrain(world);
     PROFILE_END(generate_terrain);
@@ -232,7 +227,7 @@ world_t * CreateWorld(void)
 
     SpawnPlayer(world);
     SpawnActors(world);
-    printf("num actors: %d\n", world->num_actors);
+    printf("num actors: %d\n", world->actors->count);
 
     return world;
 }

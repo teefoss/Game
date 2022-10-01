@@ -17,6 +17,8 @@ typedef struct {
 
     /// Which axes this sprite can be flipped along (SDL_).
     SDL_RendererFlip flip;
+    bool transparent;
+    u8 alpha;
 } sprite_t;
 
 /// Draw sprite at pixel coordinate `dst_x`, `dst_y` using spritesheet

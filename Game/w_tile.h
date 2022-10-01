@@ -8,11 +8,12 @@
 #ifndef w_tile_h
 #define w_tile_h
 
-#include <SDL.h>
+#include "cardinal.h"
 #include "mylib/genlib.h"
 #include "mylib/vector.h"
+#include <SDL.h>
 
-#define TILE_SIZE 16
+#define TILE_SIZE 16 // sprite size in pixels
 
 typedef enum {
     TERRAIN_DEEP_WATER,
@@ -41,5 +42,6 @@ typedef struct {
 } tile_t;
 
 void GetTileNoise(int tile_x, int tile_y, float out[TILE_SIZE][TILE_SIZE]);
+vec2_t GetAdjacentTile(vec2_t position, cardinal_t direction);
 
 #endif /* w_tile_h */

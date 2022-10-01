@@ -32,7 +32,7 @@ void DisplayScreenGeometry(void)
     SDL_RenderSetScale(renderer, DRAW_SCALE, DRAW_SCALE);
     int hw = (GAME_WIDTH / 2) / DRAW_SCALE;
     int hh = (GAME_HEIGHT / 2) / DRAW_SCALE;
-    SetRGBA(255, 0, 0, 128);
+    V_SetRGBA(255, 0, 0, 128);
     SDL_RenderDrawLine(renderer, hw, 0, hw, GAME_HEIGHT / DRAW_SCALE);
     SDL_RenderDrawLine(renderer, 0, hh, GAME_WIDTH / DRAW_SCALE, hh);
 
@@ -49,7 +49,7 @@ void DisplayScreenGeometry(void)
 
 void DisplayGeneralInfo(world_t * world)
 {
-    SetGray(255);
+    V_SetGray(255);
     int h = CharHeight();
     int row = 0;
 
@@ -93,7 +93,7 @@ void DisplayDebugInfo(world_t * world, vec2_t mouse_position)
     // draw debug world texture
     if ( show_world ) {
         SDL_Rect dst = { 0, 0, GAME_HEIGHT, GAME_HEIGHT };
-        DrawTexture(world->debug_map, NULL, &dst);
+        V_DrawTexture(world->debug_map, NULL, &dst);
     }
 
     if ( show_debug_info ) {

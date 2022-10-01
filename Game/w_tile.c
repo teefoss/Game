@@ -18,3 +18,11 @@ void GetTileNoise(int tile_x, int tile_y, float out[TILE_SIZE][TILE_SIZE])
         }
     }
 }
+
+vec2_t GetAdjacentTile(vec2_t position, cardinal_t direction)
+{
+    int tile_x = (int)(position.x / SCALED_TILE_SIZE) + x_dirs[direction];
+    int tile_y = (int)(position.y / SCALED_TILE_SIZE) + y_dirs[direction];
+
+    return (vec2_t){ tile_x, tile_y };
+}
