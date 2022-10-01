@@ -22,7 +22,7 @@
 
 void UpdateDebugMap(tile_t * tiles,  SDL_Texture ** debug_map, vec2_t camera)
 {
-    // TODO: add these as tile_t property, add tile defintions
+    // TODO: add these as tile_t property, add tile definitions
     static const SDL_Color layer_colors[] = {
         { 0x00, 0x00,  160, 0xFF },
         {   32,   32,  200, 0xFF },
@@ -51,10 +51,10 @@ void UpdateDebugMap(tile_t * tiles,  SDL_Texture ** debug_map, vec2_t camera)
 
     V_SetGray(255);
     SDL_Rect vis_rect = GetVisibleRect(camera);
-    vis_rect.x /= TILE_SIZE;
-    vis_rect.y /= TILE_SIZE;
-    vis_rect.w /= TILE_SIZE;
-    vis_rect.h /= TILE_SIZE;
+    vis_rect.x /= SCALED_TILE_SIZE;
+    vis_rect.y /= SCALED_TILE_SIZE;
+    vis_rect.w /= SCALED_TILE_SIZE;
+    vis_rect.h /= SCALED_TILE_SIZE;
     V_DrawRect(&vis_rect);
 
     SDL_SetRenderTarget(renderer, NULL);
