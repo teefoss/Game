@@ -10,36 +10,59 @@
 
 #include "a_types.h"
 #include "cardinal.h"
+#include "mylib/array.h"
 #include "mylib/mathlib.h"
 #include "mylib/sprite.h"
 #include "mylib/input.h"
 
 typedef enum {
+    // Removed actor at end of frame.
     ACTOR_FLAG_REMOVE           = 0x0001,
+
+    // Do clipping for things that contant this actor.
     ACTOR_FLAG_SOLID            = 0x0002,
 
+    ACTOR_FLAG_CAN_BE_DAMAGED   = 0x0004,
+
     // sprite cell y according to actor's direction
-    ACTOR_FLAG_DIRECTIONAL      = 0x0004,
+    ACTOR_FLAG_DIRECTIONAL      = 0x0008,
 
     // sprite cell x according to actor's current_frame, otherwise its variety
-    ACTOR_FLAG_ANIMATED         = 0x0008,
+    ACTOR_FLAG_ANIMATED         = 0x0010,
 
     // don't check if tile is walkable
-    ACTOR_FLAG_FLY              = 0x0010,
+    ACTOR_FLAG_FLY              = 0x0020,
 
     // don't do collision checking
-    ACTOR_FLAG_NONINTERACTIVE   = 0x0020,
+    ACTOR_FLAG_NONINTERACTIVE   = 0x0040,
 
     // player can pick it up
-    ACTOR_FLAG_COLLETIBLE       = 0x0040,
+    ACTOR_FLAG_COLLETIBLE       = 0x0080,
+
+    // drops items on death, check info.drops
+    ACTOR_DROPS_ITEMS           = 0x0100,
+
+    ACTOR_FLAG_CASTS_SHADOW     = 0x0200,
 } actor_flags_t;
 
+typedef struct inventory inventory_t;
+
 typedef struct {
+    inventory_t * inventory;
+
     /// No movement buttons are pressed.
     bool stopping_x;
     bool stopping_y;
     bool strike_button_down;
 } player_info_t;
+
+typedef struct {
+    // Size in inventory cells
+    int width;
+    int height;
+
+    bool sideways; // If true, width <-> height
+} item_info_t;
 
 typedef struct {
     u8 level; // damage "rating", e.g. hand = 0 (weak)
@@ -52,6 +75,13 @@ typedef struct {
     // what damage level or greater is required to affect health
     u8 minimum_damage_level;
 } health_t;
+
+typedef struct {
+    u8 quantity;
+    actor_type_t actor_type;
+} drop_t;
+
+#define MAX_DROPS 10
 
 typedef struct actor actor_t;
 typedef struct actor_state actor_state_t;
@@ -96,6 +126,8 @@ struct actor {
     union {
         s16 timer;
         player_info_t player;
+        item_info_t item;
+        drop_t drops[MAX_DROPS + 1]; // one extra for 0-terminated
     } info;
 
     // Actors may change the world, so keep an internal reference.
@@ -131,7 +163,10 @@ SDL_FRect ActorHitbox(const actor_t * actor);
 void DoCollisions(bool vertical, actor_t * actor, actor_t ** blocks, int num_blocks);
 
 void DrawActorSprite(actor_t * actor, sprite_t * sprite, int x, int y);
-void DrawActor(actor_t * actor, SDL_Rect visible_rect, bool show_hitboxes);
+void DrawActor(actor_t * actor, SDL_Rect visible_rect);
+
+const char * ActorName(actor_type_t type);
+actor_t * GetActorType(array_t * array, actor_type_t type);
 
 // -----------------------------------------------------------------------------
 // a_definitions.c

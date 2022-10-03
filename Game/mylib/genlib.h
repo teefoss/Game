@@ -55,6 +55,8 @@ extern "C" {
                      fprintf(stderr, "\n");             \
                      exit(EXIT_FAILURE); }
 
+#define CASE_RETURN_STRING(e) case e: return #e;
+
 //
 // STORAGE
 // Sort of experimental.

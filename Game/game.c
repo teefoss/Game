@@ -18,48 +18,103 @@
 
 #include <SDL.h>
 
-bool GameHandleEvent(const SDL_Event * event);
+static void PlayUpdate(game_t * game, float dt);
+static void PlayRender(game_t * game);
+static void InventoryUpdate(game_t * game, float dt);
+static void InventoryRender(game_t * game);
 
-game_state_t game_play = {
-    .handle_event = GameHandleEvent,
-    .update = UpdateWorld,
-    .render = RenderWorld,
+game_state_t game_state_play = {
+    .update = PlayUpdate,
+    .render = PlayRender,
 };
 
-bool GameHandleEvent(const SDL_Event * event)
+game_state_t game_state_inventory = {
+    .update = InventoryUpdate,
+    .render = InventoryRender,
+};
+
+#pragma mark - GAME STATE
+
+static void PushState(game_t * game, game_state_t state)
 {
-    switch ( event->type ) {
-        default:
-            break;
+    if ( game->state_stack_top + 1 >= MAX_GAME_STATES ) {
+        Error("ran out of room in game state stack, please increase MAX_GAME_STATES");
     }
 
-    return false;
+    game->state[++game->state_stack_top] = state;
 }
 
-static bool DoFrame
-(   game_t * game,
-    world_t * world,
-    input_state_t * input_state,
-    float dt )
+static void PopState(game_t * game)
 {
-    I_StartFrame(input_state);
+    if ( --game->state_stack_top < -1 ) {
+        Error("tried to pop from empty game state stack!");
+    }
+}
+
+static void PlayUpdate(game_t * game, float dt)
+{
+    if ( I_GetControllerButtonState(game->input_state, SDL_CONTROLLER_BUTTON_Y) == BUTTON_STATE_PRESSED ) {
+        PushState(game, game_state_inventory);
+    }
+
+    UpdateWorld(game->world, game->input_state, dt);
+}
+
+static void PlayRender(game_t * game)
+{
+    RenderWorld(game->world);
+    // TODO: HUD render goes here
+}
+
+static void InventoryUpdate(game_t * game, float dt)
+{
+    if ( I_GetControllerButtonState(game->input_state, SDL_CONTROLLER_BUTTON_Y) == BUTTON_STATE_PRESSED ) {
+        PopState(game);
+    }
+
+    UpdateWorld(game->world, NULL, dt);
+}
+
+static void InventoryRender(game_t * game)
+{
+    RenderWorld(game->world);
+
+    // commence hack version:
+
+    actor_t * player = GetActorType(game->world->actors, ACTOR_PLAYER);
+    inventory_t * inv = player->info.player.inventory;
+
+    // draw grid
+    for ( int y = 0; y < inv->grid_height; y++ ) {
+        for ( int x = 0; x < inv->grid_width; x++ ) {
+            V_SetGray(255);
+            int cell_size = 12 * DRAW_SCALE;
+            SDL_Rect r = { x * cell_size, y * cell_size, cell_size, cell_size };
+            V_DrawRect(&r);
+        }
+    }
+
+    for ( int i = 0; i < inv->num_items; i++ ) {
+
+    }
+}
+
+#pragma mark -
+
+static void DoFrame(game_t * game, float dt )
+{
+    I_StartFrame(game->input_state);
 
     SDL_Event event;
     while ( SDL_PollEvent(&event) ) {
 
-        I_ProcessEvent(input_state, event);
+        I_ProcessEvent(game->input_state, event);
 
-        if ( game->state.handle_event ) {
-            if ( game->state.handle_event(&event) ) {
-                continue;
-            }
-        }
-
-        // The current game state did not handle this event. Handle any
-        // universal events, like quit:
+        // Handle any "universal" events
         switch ( event.type ) {
             case SDL_QUIT:
-                return false;
+                game->is_running = false;
+                return;
             case SDL_KEYDOWN:
                 if ( event.key.repeat != 0 ) {
                     break;
@@ -67,7 +122,8 @@ static bool DoFrame
 
                 switch ( event.key.keysym.sym ) {
                     case SDLK_ESCAPE:
-                        return false;
+                        game->is_running = false;
+                        return;
                     case SDLK_F1:
                         show_debug_info = !show_debug_info;
                         break;
@@ -75,21 +131,24 @@ static bool DoFrame
                         show_world = !show_world;
                         if ( show_world ) {
                             UpdateDebugMap
-                            (   world->tiles,
-                                &world->debug_map,
-                                world->camera );
+                            (   game->world->tiles,
+                                &game->world->debug_map,
+                                game->world->camera );
                         }
                         break;
                     case SDLK_F3:
                         show_geometry = !show_geometry;
                         break;
+                    case SDLK_F4:
+                        show_inventory = !show_inventory;
+                        break;
                     case SDLK_RIGHT:
-                        world->clock += HOUR_TICKS / 2;
+                        game->world->clock += HOUR_TICKS / 2;
                         break;
                     case SDLK_LEFT:
-                        world->clock -= HOUR_TICKS / 2;
-                        if ( world->clock < 0 ) {
-                            world->clock += DAY_LENGTH_TICKS;
+                        game->world->clock -= HOUR_TICKS / 2;
+                        if ( game->world->clock < 0 ) {
+                            game->world->clock += DAY_LENGTH_TICKS;
                         }
                         break;
                     case SDLK_BACKSLASH:
@@ -104,16 +163,18 @@ static bool DoFrame
         }
     }
 
-    I_Update(input_state);
+    I_Update(game->input_state);
 
-    game->state.update(world, input_state, dt);
+    game->state[game->state_stack_top].update(game, dt);
 
     V_SetGray(0);
     V_Clear();
-    game->state.render(world, show_geometry);
-    DisplayDebugInfo(world, I_GetMousePosition(input_state));
+    game->state[game->state_stack_top].render(game);
+    DisplayDebugInfo(game->world, I_GetMousePosition(game->input_state));
+
     V_Present();
 
+    // debug
     static int max_render = 0;
     if ( frame > FPS * 2 && render_ms > max_render ) {
         max_render = render_ms;
@@ -125,14 +186,12 @@ static bool DoFrame
     }
 
     frame++;
-
-    return true;
 }
 
-static void GameLoop(game_t * game, world_t * world, input_state_t * input_state)
+static void GameLoop(game_t * game)
 {
     float old_time = ProgramTime();
-    while ( true ) {
+    while ( game->is_running ) {
         float new_time = ProgramTime();
         float dt = new_time - old_time;
 
@@ -148,10 +207,9 @@ static void GameLoop(game_t * game, world_t * world, input_state_t * input_state
         debug_dt = dt;
 
         int frame_start = SDL_GetTicks();
-        if ( !DoFrame(game, world, input_state, dt) ) {
-            return;
-        }
+        DoFrame(game, dt);
         frame_ms = SDL_GetTicks() - frame_start;
+
         if ( frame_ms > 1000 / FPS ) {
             printf("frame took %d ms!\n", frame_ms);
         }
@@ -176,20 +234,21 @@ void GameMain(void)
     SetTextScale(2.0f, 2.0f);
 
     game_t * game = calloc(1, sizeof(*game));
-    game->state = game_play;
-    world_t * world = CreateWorld();
-    input_state_t * input_state = I_Initialize();
+    PushState(game, game_state_play);
+    game->world = CreateWorld();
+    game->input_state = I_Initialize();
+    game->is_running = true;
 
     // debug: check things aren't getting too big
-    printf("- tile data size: %zu bytes\n", sizeof(world->tiles[0]));
-    printf("- world data size: %zu bytes\n", sizeof(*world));
+    printf("- tile data size: %zu bytes\n", sizeof(tile_t));
+    printf("- world data size: %zu bytes\n", sizeof(world_t));
     printf("- actor size: %zu bytes\n", sizeof(actor_t));
 
-    GameLoop(game, world, input_state);
+    GameLoop(game);
 
     // clean up
     FreeAllTextures();
-    DestroyWorld(world);
-    free(input_state);
+    DestroyWorld(game->world);
+    free(game->input_state);
     free(game);
 }

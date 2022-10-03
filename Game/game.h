@@ -26,22 +26,26 @@
 
 typedef struct world world_t;
 typedef struct input_state input_state_t;
+typedef struct game game_t;
 
 typedef struct {
-    bool (* handle_event)(const SDL_Event * event);
-    void (* update)(world_t *, input_state_t *, float dt);
-    void (* render)();
+    void (* update)(game_t * game, float dt);
+    void (* render)(game_t * game);
 } game_state_t;
 
-typedef struct {
-    game_state_t state;
+#define MAX_GAME_STATES 10
+
+struct game {
+    bool is_running;
+
+    int state_stack_top;
+    game_state_t state[MAX_GAME_STATES];
+
     int ticks;
-    inventory_t inventory;
-} game_t;
+    input_state_t * input_state;
+    world_t * world;
+};
 
 void GameMain(void);
-
-/// Draw sprite and scaled pixel coordinates with scaled size
-void G_DrawSprite(sprite_t * sprite, vec2_t position, u8 frame);
 
 #endif /* game_h */

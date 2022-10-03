@@ -15,6 +15,7 @@ void DisplayDebugInfo(world_t * world, vec2_t mouse_position);
 extern bool show_geometry;
 extern bool show_world;
 extern bool show_debug_info;
+extern bool show_inventory;
 
 extern int frame;
 extern int frame_ms;

@@ -7,6 +7,7 @@
 
 #include "a_actor.h"
 #include "game.h"
+#include "inventory.h"
 #include "m_misc.h"
 #include "w_world.h"
 #include "sprites.h"
@@ -20,6 +21,7 @@ void PlayerStandUpdate(actor_t * player, float dt);
 void PlayerWalkUpdate(actor_t * player, float dt);
 void ButterflyUpdate(actor_t * actor, float dt);
 
+void PlayerContact(actor_t * player, actor_t * hit);
 void PlayerStrikeContact(actor_t *, actor_t *);
 
 void DrawPlayer(actor_t * player, int x, int y);
@@ -28,13 +30,14 @@ static actor_state_t player_stand = {
     .sprite = &sprites[SPRITE_PLAYER_STAND],
     .handle_input = PlayerHandleInput,
     .update = PlayerStandUpdate,
-    .contact = NULL, // TODO: player stand contact
+    .contact = PlayerContact, // TODO: does the player only need 1 contact func?
 };
 
 static actor_state_t player_run = {
     .sprite = &sprites[SPRITE_PLAYER_WALK],
     .handle_input = PlayerHandleInput,
-    .update = PlayerWalkUpdate
+    .update = PlayerWalkUpdate,
+    .contact = PlayerContact,
 };
 
 static actor_state_t state_butterfly = {
@@ -43,8 +46,14 @@ static actor_state_t state_butterfly = {
 };
 
 static actor_t actor_definitions[NUM_ACTOR_TYPES] = {
+    [ACTOR_NONE] = {
+        0
+    },
     [ACTOR_PLAYER] = {
-        .flags = ACTOR_FLAG_DIRECTIONAL | ACTOR_FLAG_ANIMATED,
+        .flags =    ACTOR_FLAG_DIRECTIONAL |
+                    ACTOR_FLAG_ANIMATED |
+                    ACTOR_FLAG_CAN_BE_DAMAGED |
+                    ACTOR_FLAG_CASTS_SHADOW,
         .state = &player_stand,
         .hitbox_width = 5,
         .hitbox_height = 4,
@@ -60,14 +69,23 @@ static actor_t actor_definitions[NUM_ACTOR_TYPES] = {
         .contact = PlayerStrikeContact,
     },
     [ACTOR_TREE] = {
-        .flags = ACTOR_FLAG_SOLID,
+        .flags =    ACTOR_FLAG_SOLID |
+                    ACTOR_FLAG_CAN_BE_DAMAGED |
+                    ACTOR_DROPS_ITEMS |
+                    ACTOR_FLAG_CASTS_SHADOW,
         .sprite = &sprites[SPRITE_TREE],
         .hitbox_width = 4,
         .hitbox_height = 4,
-        .health = { .amount = 30, .minimum_damage_level = 3 },
+        .health = { .amount = 30, .minimum_damage_level = 0 },
+        .info.drops = {
+            { 1, ACTOR_LOG },
+        },
     },
     [ACTOR_BUSH] = {
-        .flags = ACTOR_FLAG_SOLID,
+        .flags =    ACTOR_FLAG_SOLID |
+                    ACTOR_FLAG_CAN_BE_DAMAGED |
+                    ACTOR_DROPS_ITEMS |
+                    ACTOR_FLAG_CASTS_SHADOW,
         .sprite = &sprites[SPRITE_BUSH],
         .hitbox_width = 4,
         .hitbox_height = 4,
@@ -77,7 +95,14 @@ static actor_t actor_definitions[NUM_ACTOR_TYPES] = {
         .flags = ACTOR_FLAG_ANIMATED | ACTOR_FLAG_FLY | ACTOR_FLAG_NONINTERACTIVE,
         .state = &state_butterfly,
     },
-    [ACTOR_LOG] = { .flags = ACTOR_FLAG_COLLETIBLE },
+    [ACTOR_LOG] = {
+        .flags = ACTOR_FLAG_COLLETIBLE,
+        .sprite = &sprites[SPRITE_LOG],
+        .info.item = {
+            .width = 2,
+            .height = 2,
+        },
+    },
 };
 
 #pragma mark -
@@ -159,7 +184,6 @@ void PlayerHandleInput(actor_t * player, input_state_t * input_state, float dt)
             coord.y += SCALED_TILE_SIZE / 2; // actor position is at the bottom
 
             SpawnActor(ACTOR_HAND_STRIKE, coord, player->world);
-            puts("left trigger");
         }
 
         if ( left_trigger == 0.0f ) {
@@ -256,6 +280,15 @@ void ButterflyUpdate(actor_t * actor, float dt)
 }
 
 #pragma mark - CONTACT FUNCTIONS
+
+void PlayerContact(actor_t * player, actor_t * hit)
+{
+    if ( hit->flags & ACTOR_FLAG_COLLETIBLE ) {
+        if ( InventoryInsertItem(hit, player->info.player.inventory) ) {
+            hit->flags |= ACTOR_FLAG_REMOVE;
+        }
+    }
+}
 
 void PlayerStrikeContact(actor_t * strike, actor_t * hit)
 {

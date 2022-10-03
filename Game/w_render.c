@@ -333,7 +333,7 @@ static void RenderVisibleTerrain(world_t * world)
     }
 }
 
-void RenderVisibleActors(world_t * world, bool show_hitboxes)
+void RenderVisibleActors(world_t * world)
 {
     SDL_Rect visible_rect = GetVisibleRect(world->camera);
 
@@ -349,6 +349,14 @@ void RenderVisibleActors(world_t * world, bool show_hitboxes)
         }
     }
 
+    // Draw collectible items first. TODO: think about a drawing order mechanism.
+    for ( int i = num_visible - 1; i >= 0; i-- ) {
+        if ( visible_actors[i]->flags & ACTOR_FLAG_COLLETIBLE ) {
+            DrawActor(visible_actors[i], visible_rect);
+            visible_actors[i] = visible_actors[--num_visible]; // remove it.
+        }
+    }
+
     // Sort the visible list by y position.
     for ( int i = 0; i < num_visible; i++ ) {
         for ( int j = i + 1; j < num_visible; j++ ) {
@@ -359,11 +367,10 @@ void RenderVisibleActors(world_t * world, bool show_hitboxes)
     }
 
     // draw actor shadow
-    // TODO: make a actor shadow flag
     for ( int i = 0; i < num_visible; i++ ) {
         actor_t * actor = visible_actors[i];
 
-        if ( GetActorSprite(actor) ) {
+        if ( GetActorSprite(actor) && actor->flags & ACTOR_FLAG_CASTS_SHADOW ) {
             SDL_Rect shadow = {
                 .w = (actor->hitbox_width + 4) * DRAW_SCALE,
                 .h = (actor->hitbox_height + 2) * DRAW_SCALE
@@ -378,16 +385,16 @@ void RenderVisibleActors(world_t * world, bool show_hitboxes)
 
     // draw actors
     for ( int i = 0; i < num_visible; i++ ) {
-        DrawActor(visible_actors[i], visible_rect, show_hitboxes);
+        DrawActor(visible_actors[i], visible_rect);
     }
 }
 
-void RenderWorld(world_t * world, bool show_hitboxes)
+void RenderWorld(world_t * world)
 {
     int render_start = SDL_GetTicks(); // debug
 
     RenderVisibleTerrain(world);
-    RenderVisibleActors(world, show_hitboxes);
+    RenderVisibleActors(world);
 
     render_ms = SDL_GetTicks() - render_start; // debug
 }

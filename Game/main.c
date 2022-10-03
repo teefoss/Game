@@ -15,6 +15,7 @@
 
  BUGS
  TODO: TF water edge not randomizing
+ TODO: debug info effed while in fullscreen
  */
 
 int main(void)

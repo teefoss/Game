@@ -28,10 +28,64 @@ actor_t * SpawnActor(actor_type_t type, vec2_t position, world_t * world)
     actor.pos = position;
     actor.world = world;
 
+    // A hitbox size of 0 signals to use the whatever the sprite size is.
+    if ( actor.sprite ) {
+        if ( actor.hitbox_width == 0 ) {
+            actor.hitbox_width = actor.sprite->location.w;
+        }
+
+        if ( actor.hitbox_height == 0 ) {
+            actor.hitbox_height = actor.sprite->location.h;
+        }
+    }
+
+    switch ( type ) {
+        case ACTOR_PLAYER: {
+            actor.info.player.inventory = calloc(1, sizeof(inventory_t));
+            inventory_t * inv = actor.info.player.inventory;
+
+            inv->selected = GetActorDefinition(ACTOR_NONE);
+            inv->right_hand = GetActorDefinition(ACTOR_NONE);
+            inv->left_hand = GetActorDefinition(ACTOR_NONE);
+            inv->grid_width = INITIAL_GRID_WIDTH;
+            inv->grid_height = INITIAL_GRID_HEIGHT;
+            break;
+        }
+        default:
+            break;
+    }
+
     if ( !world->updating_actors ) {
         return Append(world->actors, &actor);
     } else {
         return Append(world->pending_actors, &actor);
+    }
+}
+
+void KillActor(actor_t * actor)
+{
+    actor->flags |= ACTOR_FLAG_REMOVE;
+    if ( actor->flags & ACTOR_DROPS_ITEMS ) {
+        drop_t * drops = actor->info.drops;
+
+        for ( int i = 0; i < MAX_DROPS; i++ ) {
+            if ( drops[i].actor_type == 0 ) {
+                break; // end of list
+            }
+
+            // TODO: randomize drop position
+            for ( int j = 0; j < drops[i].quantity; j++ ) {
+                SpawnActor(drops[i].actor_type, actor->pos, actor->world);
+            }
+        }
+    }
+
+    switch ( actor->type ) {
+        case ACTOR_PLAYER:
+            free(actor->info.player.inventory);
+            break;
+        default:
+            break;
     }
 }
 
@@ -41,7 +95,7 @@ void DamageActor(actor_t * attacker, actor_t * target)
         // attacker damage is strong enough
         target->health.amount -= attacker->damage.amount; // TODO: randomize
         if ( target->health.amount <= 0 ) {
-            target->flags |= ACTOR_FLAG_REMOVE; // TODO: some kind of kill func
+            KillActor(target);
         }
     }
 }
@@ -188,7 +242,7 @@ void DrawActorSprite(actor_t * actor, sprite_t * sprite, int x, int y)
         0 ); // TODO: actor flippable?
 }
 
-void DrawActor(actor_t * actor, SDL_Rect visible_rect, bool show_hitboxes)
+void DrawActor(actor_t * actor, SDL_Rect visible_rect)
 {
     sprite_t * sprite = GetActorSprite(actor);
 
@@ -205,7 +259,7 @@ void DrawActor(actor_t * actor, SDL_Rect visible_rect, bool show_hitboxes)
             DrawActorSprite(actor, sprite, r.x, r.y);
         }
 
-        if ( show_hitboxes ) {
+        if ( show_geometry ) {
             SDL_FRect hitbox = ActorHitbox(actor);
             V_SetRGBA(90, 90, 255, 255);
             hitbox.x -= visible_rect.x;
@@ -214,4 +268,34 @@ void DrawActor(actor_t * actor, SDL_Rect visible_rect, bool show_hitboxes)
             V_DrawRect(&hitbox_i);
         }
     }
+}
+
+const char * ActorName(actor_type_t type)
+{
+    switch ( type ) {
+            CASE_RETURN_STRING(ACTOR_NONE);
+            CASE_RETURN_STRING(ACTOR_PLAYER);
+            CASE_RETURN_STRING(ACTOR_HAND_STRIKE);
+            CASE_RETURN_STRING(ACTOR_TREE);
+            CASE_RETURN_STRING(ACTOR_BUSH);
+            CASE_RETURN_STRING(ACTOR_BUTTERFLY);
+            CASE_RETURN_STRING(ACTOR_LOG);
+
+        case NUM_ACTOR_TYPES:
+            return NULL;
+    }
+
+    return NULL;
+}
+
+actor_t * GetActorType(array_t * actor_array, actor_type_t type)
+{
+    for ( int i = 0; i <  actor_array->count; i++ ) {
+        actor_t * actor = GetElement(actor_array, i);
+        if ( actor->type == type ) {
+            return actor;
+        }
+    }
+
+    return NULL;
 }

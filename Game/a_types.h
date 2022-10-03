@@ -9,12 +9,16 @@
 #define a_types_h
 
 typedef enum {
+    ACTOR_NONE,
     ACTOR_PLAYER,
     ACTOR_HAND_STRIKE,
     ACTOR_TREE,
     ACTOR_BUSH,
     ACTOR_BUTTERFLY,
+
+    // items
     ACTOR_LOG,
+
     NUM_ACTOR_TYPES,
 } actor_type_t;
 

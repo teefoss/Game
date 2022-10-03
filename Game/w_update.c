@@ -54,10 +54,6 @@ static void UpdateActors(world_t * world, input_state_t * input_state, float dt)
     for ( int i = 0; i < world->actors->count; i++ ) {
         actor_t * actor = GetElement(world->actors, i);
 
-        if ( actor->type == ACTOR_HAND_STRIKE ) {
-
-        }
-
         if ( RectsIntersect(GetActorVisibleRect(actor), active_rect) ) {
             if ( num_active < max_active ) {
                 active_actors[num_active++] = actor;
@@ -68,22 +64,22 @@ static void UpdateActors(world_t * world, input_state_t * input_state, float dt)
         }
     }
 
+    // Any actors spawned during updated will be added to the
+    // pending_actors array, to be process on the next frame.
     world->updating_actors = true;
 
     // Let any actors that respond to input do so.
-    for ( actor_t ** actor = active_actors; *actor; actor++ ) {
-        if ( (*actor)->state && (*actor)->state->handle_input ) {
-            (*actor)->state->handle_input(*actor, input_state, dt);
+    if ( input_state ) {
+        for ( actor_t ** actor = active_actors; *actor; actor++ ) {
+            if ( (*actor)->state && (*actor)->state->handle_input ) {
+                (*actor)->state->handle_input(*actor, input_state, dt);
+            }
         }
     }
 
     // Update actors.
     for ( int i = 0; i < num_active; i++ ) {
         actor_t * actor = active_actors[i];
-
-        if ( actor->type == ACTOR_HAND_STRIKE ) {
-
-        }
 
         // Move actors.
         // Do horizontal and vertical movement separately, resolving
@@ -112,30 +108,15 @@ static void UpdateActors(world_t * world, input_state_t * input_state, float dt)
     for ( int i = 0; i < num_active; i++ ) {
         actor_t * ai = active_actors[i];
 
-        if ( ai->type == ACTOR_HAND_STRIKE ) {
-
-        }
-
-
-//        if ( ai->flags & ACTOR_FLAG_REMOVE ) {
-//            continue;
-//        }
-
         SDL_FRect hitbox_i = ActorHitbox(ai);
 
         for ( int j = i + 1; j < num_active; j++ ) {
             actor_t * aj = active_actors[j];
 
-//            if ( aj->flags & ACTOR_FLAG_REMOVE ) {
-//                continue;
-//            }
-
-//            if ( ai->flags & ACTOR_FLAG_SOLID || aj->flags & ACTOR_FLAG_SOLID ) {
-//                continue; // don't bother
-//            }
-
             SDL_FRect hitbox_j = ActorHitbox(aj);
             if ( SDL_HasIntersectionF(&hitbox_i, &hitbox_j) ) {
+
+                printf("%s hit an %s\n", ActorName(ai->type), ActorName(aj->type));
 
                 // contact each other
                 if ( ai->contact ) {
@@ -159,7 +140,6 @@ static void UpdateActors(world_t * world, input_state_t * input_state, float dt)
     for ( int i = world->actors->count - 1; i >= 0; i-- ) {
         actor_t * actor = GetElement(world->actors, i);
         if ( actor->flags & ACTOR_FLAG_REMOVE ) {
-            printf("removing actor\n");
             Remove(world->actors, i);
         }
     }

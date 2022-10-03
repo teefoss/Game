@@ -78,7 +78,7 @@ void GetAdjacentTiles
     tile_t * world_tiles,
     tile_t * out[NUM_DIRECTIONS] );
 
-void RenderWorld(world_t * world, bool show_hitboxes);
+void RenderWorld(world_t * world);
 void RenderGrassEffectTexture
 (   tile_t * tile,
     tile_t ** adjacent_tiles,

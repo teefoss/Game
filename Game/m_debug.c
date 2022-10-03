@@ -15,6 +15,7 @@
 bool show_geometry;
 bool show_world;
 bool show_debug_info;
+bool show_inventory;
 
 int debug_hours;
 int debug_minutes;
@@ -84,6 +85,21 @@ void DisplayTileInfo(world_t * world, vec2_t mouse_position)
           tile->lighting.z);
 }
 
+void DisplayPlayerInventory(array_t * actors)
+{
+    actor_t * player = GetActorType(actors, ACTOR_PLAYER);
+    inventory_t * inventory = player->info.player.inventory;
+
+    int row = 0;
+    int h = CharHeight();
+    V_SetGray(255);
+    Print(0, h*row++, "Player Inventory (%d items)", inventory->num_items);
+
+    for ( int i = 0; i < inventory->num_items; i++ ) {
+        Print(0, h*row++, "%d: %s", i, ActorName(inventory->items[i].type));
+    }
+}
+
 void DisplayDebugInfo(world_t * world, vec2_t mouse_position)
 {
     if ( show_geometry ) {
@@ -102,5 +118,9 @@ void DisplayDebugInfo(world_t * world, vec2_t mouse_position)
 
     if ( show_debug_info ) {
         DisplayTileInfo(world, mouse_position);
+    }
+
+    if ( show_inventory ) {
+        DisplayPlayerInventory(world->actors);
     }
 }

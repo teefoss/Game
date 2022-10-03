@@ -14,8 +14,13 @@
 typedef enum {
     BUTTON_STATE_UNDEFINED = -1,
     BUTTON_STATE_NONE,
+
+    // Button/key when down this frame.
     BUTTON_STATE_PRESSED,
+
     BUTTON_STATE_HELD,
+
+    // Button/key was released this frame.
     BUTTON_STATE_RELEASED
 } button_state_t; // also for keys
 
