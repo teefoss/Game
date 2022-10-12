@@ -49,6 +49,7 @@ actor_t * SpawnActor(actor_type_t type, vec2_t position, world_t * world)
             inv->left_hand = GetActorDefinition(ACTOR_NONE);
             inv->grid_width = INITIAL_GRID_WIDTH;
             inv->grid_height = INITIAL_GRID_HEIGHT;
+            memset(inv->grid, EMPTY_SLOT, sizeof(inv->grid));
             break;
         }
         default:
@@ -65,6 +66,7 @@ actor_t * SpawnActor(actor_type_t type, vec2_t position, world_t * world)
 void KillActor(actor_t * actor)
 {
     actor->flags |= ACTOR_FLAG_REMOVE;
+
     if ( actor->flags & ACTOR_DROPS_ITEMS ) {
         drop_t * drops = actor->info.drops;
 

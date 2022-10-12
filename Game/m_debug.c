@@ -98,6 +98,13 @@ void DisplayPlayerInventory(array_t * actors)
     for ( int i = 0; i < inventory->num_items; i++ ) {
         Print(0, h*row++, "%d: %s", i, ActorName(inventory->items[i].type));
     }
+
+    for ( int y = 0; y < inventory->grid_height; y++ ) {
+        for ( int x = 0; x < inventory->grid_width; x++ ) {
+            Print(x * CharWidth() * 2, h * row, "%02X", inventory->grid[y][x]);
+        }
+        row++;
+    }
 }
 
 void DisplayDebugInfo(world_t * world, vec2_t mouse_position)

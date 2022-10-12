@@ -30,6 +30,7 @@ list_t NewList(size_t entry_size)
 void ListPush(list_t * list, void * data)
 {
     list_node_t * node = calloc(1, sizeof(*node));
+    node->data = malloc(list->entry_size);
     memcpy(node->data, data, list->entry_size);
     node->next = list->head;
     list->head = node;

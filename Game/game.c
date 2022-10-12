@@ -33,7 +33,24 @@ game_state_t game_state_inventory = {
     .render = InventoryRender,
 };
 
-#pragma mark - GAME STATE
+// TODO: load from file or something
+const control_t controls[NUM_CONTROLS] = {
+    [CONTROL_INVENTORY] = {
+        .button = SDL_CONTROLLER_BUTTON_Y,
+        .key = SDL_SCANCODE_TAB,
+    },
+};
+
+bool ControlPressed(input_state_t * input,  control_list_t control)
+{
+    return
+    I_GetControllerButtonState(input, controls[control].button) == BUTTON_STATE_PRESSED
+    || I_GetKeyState(input, controls[control].key) == BUTTON_STATE_PRESSED;
+}
+
+
+
+#pragma mark - GAME STATE STACK
 
 static void PushState(game_t * game, game_state_t state)
 {
@@ -51,9 +68,14 @@ static void PopState(game_t * game)
     }
 }
 
+
+
+#pragma mark - PLAY STATE
+
 static void PlayUpdate(game_t * game, float dt)
 {
-    if ( I_GetControllerButtonState(game->input_state, SDL_CONTROLLER_BUTTON_Y) == BUTTON_STATE_PRESSED ) {
+    // open inventory
+    if ( ControlPressed(game->input_state, CONTROL_INVENTORY) ) {
         PushState(game, game_state_inventory);
     }
 
@@ -66,9 +88,14 @@ static void PlayRender(game_t * game)
     // TODO: HUD render goes here
 }
 
+
+
+#pragma mark - INVENTORY STATE
+
 static void InventoryUpdate(game_t * game, float dt)
 {
-    if ( I_GetControllerButtonState(game->input_state, SDL_CONTROLLER_BUTTON_Y) == BUTTON_STATE_PRESSED ) {
+    // close inventory
+    if ( ControlPressed(game->input_state, CONTROL_INVENTORY) ) {
         PopState(game);
     }
 
@@ -85,19 +112,27 @@ static void InventoryRender(game_t * game)
     inventory_t * inv = player->info.player.inventory;
 
     // draw grid
+    int size = 12 * DRAW_SCALE;
     for ( int y = 0; y < inv->grid_height; y++ ) {
         for ( int x = 0; x < inv->grid_width; x++ ) {
             V_SetGray(255);
-            int cell_size = 12 * DRAW_SCALE;
-            SDL_Rect r = { x * cell_size, y * cell_size, cell_size, cell_size };
+            SDL_Rect r = { x * size, y * size, size, size };
             V_DrawRect(&r);
         }
     }
 
     for ( int i = 0; i < inv->num_items; i++ ) {
-
+        int x, y;
+        if ( InventoryGetGridCell(inv, i, &x, &y) ) {
+            actor_t * item = &inv->items[i];
+            int dst_x = x * size;
+            int dst_y = y * size;
+            DrawSprite(item->info.item.sprite, 0, 0, dst_x, dst_y, DRAW_SCALE, 0);
+        }
     }
 }
+
+
 
 #pragma mark -
 

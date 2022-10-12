@@ -87,9 +87,13 @@ sprite_t sprites[NUM_SPRITES] = {
         .fps = 12,
         //.flags = SPRITE_FLAG_ANIMATED,
     },
-    [SPRITE_LOG] = {
+    [SPRITE_LOG_WORLD] = {
         .texture_name = ""SPRITE_DIR"items.png",
         .location = { 0, 0, 12, 12 }
+    },
+    [SPRITE_LOG_INVENTORY] = {
+        .texture_name = ""SPRITE_DIR"items.png",
+        .location = { 0, 12, 24, 24 }
     },
     [SPRITE_ICON_NO_ITEM] = {
         .texture_name = ""SPRITE_DIR"icons.png",

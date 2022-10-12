@@ -92,15 +92,19 @@ static actor_t actor_definitions[NUM_ACTOR_TYPES] = {
         .health = { .amount = 30, .minimum_damage_level = 0 },
     },
     [ACTOR_BUTTERFLY] = {
-        .flags = ACTOR_FLAG_ANIMATED | ACTOR_FLAG_FLY | ACTOR_FLAG_NONINTERACTIVE,
+        .flags =    ACTOR_FLAG_ANIMATED |
+                    ACTOR_FLAG_FLY |
+                    ACTOR_FLAG_NONINTERACTIVE |
+                    ACTOR_FLAG_CASTS_SHADOW,
         .state = &state_butterfly,
     },
     [ACTOR_LOG] = {
         .flags = ACTOR_FLAG_COLLETIBLE,
-        .sprite = &sprites[SPRITE_LOG],
+        .sprite = &sprites[SPRITE_LOG_WORLD],
         .info.item = {
             .width = 2,
             .height = 2,
+            .sprite = &sprites[SPRITE_LOG_INVENTORY]
         },
     },
 };
@@ -129,6 +133,27 @@ actor_t GetActorDefinition(actor_type_t type)
  http://gafferongames.com/game-physics/integration-basics/
  With respect to integration and timesteps, just something to look at if you decide "my physics isn't working well enough". If you're going to go with an approach that's not "correct" or based purely in the physical world, you may as well know why and how it's incorrect.
  */
+
+static void PlayerStrike(actor_t * player)
+{
+    player_info_t * info = &player->info.player;
+    info->strike_button_down = true;
+
+    cardinal_t facing;
+    if ( player->facing == NO_DIRECTION ) {
+        facing = player->direction;
+    } else {
+        facing = player->facing;
+    }
+
+    vec2_t tile = GetAdjacentTile(player->pos, facing);
+
+    // upper left corner
+    vec2_t coord = GetTileCenter(tile.x, tile.y);
+    coord.y += SCALED_TILE_SIZE / 2; // actor position is at the bottom
+
+    SpawnActor(ACTOR_HAND_STRIKE, coord, player->world);
+}
 
 void PlayerHandleInput(actor_t * player, input_state_t * input_state, float dt)
 {
@@ -168,22 +193,7 @@ void PlayerHandleInput(actor_t * player, input_state_t * input_state, float dt)
         float left_trigger = I_GetTriggerState(input_state, SIDE_RIGHT);
 
         if ( !info->strike_button_down && left_trigger > 0.0f ) {
-            info->strike_button_down = true;
-
-            cardinal_t facing;
-            if ( player->facing == NO_DIRECTION ) {
-                facing = player->direction;
-            } else {
-                facing = player->facing;
-            }
-
-            vec2_t tile = GetAdjacentTile(player->pos, facing);
-
-            // upper left corner
-            vec2_t coord = GetTileCenter(tile.x, tile.y);
-            coord.y += SCALED_TILE_SIZE / 2; // actor position is at the bottom
-
-            SpawnActor(ACTOR_HAND_STRIKE, coord, player->world);
+            PlayerStrike(player);
         }
 
         if ( left_trigger == 0.0f ) {
@@ -197,21 +207,29 @@ void PlayerHandleInput(actor_t * player, input_state_t * input_state, float dt)
         if ( I_IsKeyDown(input_state, SDL_SCANCODE_A) ) {
             player->vel.x = Lerp(player->vel.x, -PLAYER_VELOCITY, dt * factor);
             info->stopping_x = false;
+            player->facing = WEST;
         }
 
         if ( I_IsKeyDown(input_state, SDL_SCANCODE_D) ) {
             player->vel.x = Lerp(player->vel.x, PLAYER_VELOCITY, dt * factor);
             info->stopping_x = false;
+            player->facing = EAST;
         }
 
         if ( I_IsKeyDown(input_state, SDL_SCANCODE_W) ) {
             player->vel.y = Lerp(player->vel.y, -PLAYER_VELOCITY, dt * factor);
             info->stopping_y = false;
+            player->facing = NORTH;
         }
 
         if ( I_IsKeyDown(input_state, SDL_SCANCODE_S) ) {
             player->vel.y = Lerp(player->vel.y, PLAYER_VELOCITY, dt * factor);
             info->stopping_y = false;
+            player->facing = SOUTH;
+        }
+
+        if ( I_GetKeyState(input_state, SDL_SCANCODE_SPACE) == BUTTON_STATE_PRESSED ) {
+            PlayerStrike(player);
         }
     }
 }
@@ -292,7 +310,6 @@ void PlayerContact(actor_t * player, actor_t * hit)
 
 void PlayerStrikeContact(actor_t * strike, actor_t * hit)
 {
-    printf("hit a %d\n", hit->type);
     DamageActor(strike, hit);
 }
 

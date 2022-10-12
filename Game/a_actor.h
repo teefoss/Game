@@ -62,6 +62,7 @@ typedef struct {
     int height;
 
     bool sideways; // If true, width <-> height
+    sprite_t * sprite; // inventory sprite
 } item_info_t;
 
 typedef struct {

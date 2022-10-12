@@ -29,6 +29,16 @@ typedef struct input_state input_state_t;
 typedef struct game game_t;
 
 typedef struct {
+    SDL_GameControllerButton button;
+    SDL_Scancode key;
+} control_t;
+
+typedef enum {
+    CONTROL_INVENTORY,
+    NUM_CONTROLS,
+} control_list_t;
+
+typedef struct {
     void (* update)(game_t * game, float dt);
     void (* render)(game_t * game);
 } game_state_t;

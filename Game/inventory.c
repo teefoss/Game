@@ -17,7 +17,7 @@ bool InventoryInsertItemInSlot(inventory_t * inventory, actor_t * item, int x, i
         SWAP(w, h);
     }
 
-    // save all available grid slots
+    // Make a list of the coordinates of all available grid slots.
     SDL_Point slots[MAX_GRID_SIZE * MAX_GRID_SIZE];
     int num_coords = 0;
 
@@ -36,7 +36,7 @@ bool InventoryInsertItemInSlot(inventory_t * inventory, actor_t * item, int x, i
             }
 
             // something's already in that slot
-            if ( inventory->grid[check_y][check_x]) {
+            if ( inventory->grid[check_y][check_x] != EMPTY_SLOT ) {
                 return false;
             }
 
@@ -46,19 +46,23 @@ bool InventoryInsertItemInSlot(inventory_t * inventory, actor_t * item, int x, i
         }
     }
 
-    // all required slots at x, y are available, put item in items[]
+    // All required slots at x, y are available. Put the item in items[]
     // and the grid:
-
-    inventory->items[inventory->num_items++] = *item;
+    inventory->items[inventory->num_items] = *item;
     for ( int i = 0; i < num_coords; i++ ) {
         // put the current item's index in the grid at each
         // coordinate that was previously recorded
         inventory->grid[slots[i].y][slots[i].x] = inventory->num_items;
     }
 
+    ++inventory->num_items;
+
     return true;
 }
 
+/// Insert item into first free spot in inventory.
+///
+/// - Return: true is the item was able to be inserted, false otherwise.
 bool InventoryInsertItem(actor_t * item, inventory_t * inventory)
 {
     // for each grid slot
@@ -74,5 +78,20 @@ bool InventoryInsertItem(actor_t * item, inventory_t * inventory)
     }
 
     // no space free for this item
+    return false;
+}
+
+bool InventoryGetGridCell(inventory_t * inventory, int item_index, int * x, int * y)
+{
+    for ( int cell_y = 0; cell_y < inventory->grid_height; cell_y++ ) {
+        for ( int cell_x = 0; cell_x < inventory->grid_width; cell_x++ ) {
+            if ( inventory->grid[cell_y][cell_x] == item_index ) {
+                *x = cell_x;
+                *y = cell_y;
+                return true;
+            }
+        }
+    }
+
     return false;
 }

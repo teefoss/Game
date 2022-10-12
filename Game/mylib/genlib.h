@@ -22,7 +22,6 @@ extern "C" {
 
 #define BIT(n) (1 << n)
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
-#define FOR_EACH_INDEX(arr, i) for (int i = 0; i < ARRAY_SIZE(arr); i++)
 #define MS2TICKS(ms, fps) ((float)(ms) / (1000.0f / (float)fps))
 #define SWAP(a, b) { typeof(a) temp = a; a = b; b = temp; }
 
