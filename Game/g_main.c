@@ -146,6 +146,7 @@ void G_Main(void)
     window_info_t info = {
         .width = GAME_WIDTH,
         .height = GAME_HEIGHT,
+        .window_flags = SDL_WINDOW_RESIZABLE,
         .render_flags = SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC
     };
     InitWindow(&info);

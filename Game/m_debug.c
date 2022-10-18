@@ -30,12 +30,12 @@ float debug_dt;
 
 void DisplayScreenGeometry(void)
 {
-    SDL_RenderSetScale(renderer, DRAW_SCALE, DRAW_SCALE);
-    int hw = (GAME_WIDTH / 2) / DRAW_SCALE;
-    int hh = (GAME_HEIGHT / 2) / DRAW_SCALE;
+    //SDL_RenderSetScale(renderer, DRAW_SCALE, DRAW_SCALE);
+    int hw = (GAME_WIDTH / 2);
+    int hh = (GAME_HEIGHT / 2);
     V_SetRGBA(255, 0, 0, 128);
-    SDL_RenderDrawLine(renderer, hw, 0, hw, GAME_HEIGHT / DRAW_SCALE);
-    SDL_RenderDrawLine(renderer, 0, hh, GAME_WIDTH / DRAW_SCALE, hh);
+    SDL_RenderDrawLine(renderer, hw, 0, hw, GAME_HEIGHT);
+    SDL_RenderDrawLine(renderer, 0, hh, GAME_WIDTH, hh);
 
 #if 0
     for ( int y = 0; y <= GAME_HEIGHT / SCALED_TILE_SIZE; y++ ) {
@@ -45,7 +45,7 @@ void DisplayScreenGeometry(void)
     }
 #endif
     
-    SDL_RenderSetScale(renderer, 1, 1);
+    //SDL_RenderSetScale(renderer, 1, 1);
 }
 
 void DisplayGeneralInfo(world_t * world)
