@@ -282,7 +282,8 @@ const char * ActorName(actor_type_t type)
             CASE_RETURN_STRING(ACTOR_BUSH);
             CASE_RETURN_STRING(ACTOR_BUTTERFLY);
             CASE_RETURN_STRING(ACTOR_LOG);
-
+            CASE_RETURN_STRING(ACTOR_LEAVES);
+            CASE_RETURN_STRING(ACTOR_STICKS);
         case NUM_ACTOR_TYPES:
             return NULL;
     }

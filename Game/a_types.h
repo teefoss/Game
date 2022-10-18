@@ -18,6 +18,8 @@ typedef enum {
 
     // items
     ACTOR_LOG,
+    ACTOR_LEAVES,
+    ACTOR_STICKS,
 
     NUM_ACTOR_TYPES,
 } actor_type_t;

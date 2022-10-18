@@ -83,3 +83,17 @@ void Replace(array_t * arr, void * element, int i) {
 
     memmove(EL(arr, i), element, arr->esize);
 }
+
+void * PopLast(array_t * arr)
+{
+    return arr->data + (--arr->count * arr->esize);
+}
+
+void * GetLastElement(array_t * arr)
+{
+    if ( arr->count > 0 ) {
+        return arr->data + (arr->count - 1) * arr->esize;
+    }
+
+    return NULL;
+}

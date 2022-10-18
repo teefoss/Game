@@ -5,13 +5,16 @@
 //  Created by Thomas Foster on 9/5/22.
 //
 
-#include "game.h"
+#include "g_game.h"
 
 /*
  RESOURCES
  https://www.gamedeveloper.com/programming/dynamic-2d-character-lighting
 
- TODO: keyboard: facing direction
+ TODO: Merge text into video.c
+ TODO: Debug info is UI screen
+ TODO: Left stick to navigate menu
+ TODO: stop using floating point clock
 
  BUGS
  TODO: TF water edge not randomizing
@@ -20,6 +23,6 @@
 
 int main(void)
 {
-    GameMain();
+    G_Main();
     return 0;
 }

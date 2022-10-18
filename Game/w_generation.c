@@ -7,7 +7,9 @@
 //  World generation code
 
 #include "w_world.h"
-#include "game.h"
+
+#include "coord.h"
+#include "g_game.h"
 #include "mylib/video.h"
 
 static const float terrain_elevations[NUM_TERRAIN_TYPES] = {
@@ -43,6 +45,72 @@ struct {
     tile_t * tile;
 } grass_tiles[WORLD_WIDTH * WORLD_HEIGHT];
 int num_grass_tiles = 0;
+
+// Used by CreateWorld() to generate all terrain.
+bool initial_generation;
+static void GenerateTerrainInChunk(world_t * world, chunk_coord_t chunk_coord)
+{
+    RandomizeNoise(0);
+
+    float half_width = WORLD_WIDTH / 2.0f;
+    float half_height = WORLD_HEIGHT / 2.0f;
+
+//    num_grass_tiles = 0;
+    tile_coord_t corner = ChunkToTile(chunk_coord);
+    tile_coord_t tile_coord;
+    for (tile_coord.y = corner.y;
+         tile_coord.y < corner.y + CHUNK_SIZE;
+         tile_coord.y++) {
+        for (tile_coord.x = corner.x;
+             tile_coord.x < corner.x + CHUNK_SIZE;
+             tile_coord.x++ ) {
+
+            // get distance from this point to center of world
+            float distance = DISTANCE
+            (   half_width,
+                half_height,
+                tile_coord.x,
+                tile_coord.y );
+
+            // Use a gradient to apply a circular mask to the world.
+            // Its radius is equal to WORLD_HEIGHT / 2.
+            float gradient;
+
+            float noise;
+
+            // set noise and gradient
+            if ( distance < half_height ) {
+                // A gradient is applied around the world center: the farther
+                // out a tile is, the more it's elevation is lowered.
+                gradient = MAP(distance, 0.0f, half_height, 0.0f, 1.0f);
+                noise = Noise2
+                (   tile_coord.x,
+                    tile_coord.y,
+                    1.0f,
+                    0.01f,
+                    6,
+                    1.0f,
+                    0.5f,
+                    2.0f);
+                noise -= gradient;
+            } else {
+                // Outside the circular mask, land is removed entirely.
+                noise = -1.0f;
+            }
+
+            tile_t * tile = GetTile(world->tiles, tile_coord.x, tile_coord.y);
+            SetUpTile(tile, noise);
+
+            // Track grass tiles for player spawn.
+            if ( initial_generation && tile->terrain >= TERRAIN_GRASS ) {
+                grass_tiles[num_grass_tiles].tile = tile;
+                grass_tiles[num_grass_tiles].x = tile_coord.x;
+                grass_tiles[num_grass_tiles].y = tile_coord.y;
+                num_grass_tiles++;
+            }
+        }
+    }
+}
 
 // Used by CreateWorld() to generate all terrain.
 static void GenerateTerrain(world_t * world)
@@ -147,6 +215,67 @@ void SpawnPlayer(world_t * world)
     world->camera_target = position;
 }
 
+void SpawnActorsInChunk(world_t * world, chunk_coord_t chunk_coord)
+{
+    tile_coord_t corner = ChunkToTile(chunk_coord);
+
+    tile_coord_t tile_coord;
+    for (tile_coord.y = corner.y;
+         tile_coord.y < corner.y + CHUNK_SIZE;
+         tile_coord.y++)
+    {
+        for (tile_coord.x = corner.x;
+             tile_coord.x < corner.x + CHUNK_SIZE;
+             tile_coord.x++ )
+        {
+            if ( occupied[tile_coord.y][tile_coord.x] ) {
+                continue;
+            }
+
+            tile_t * tile = GetTile(world->tiles, tile_coord.x, tile_coord.y);
+            vec2_t v = GetTileCenter(tile_coord.x, tile_coord.y);
+            float r = SCALED_TILE_SIZE / 3;
+            v.x += RandomFloat(-r, r);
+            v.y += RandomFloat(-r, r);
+
+            switch ( tile->terrain ) {
+                case TERRAIN_GRASS:
+                    // butterflies
+                    if ( Chance(1.0f / 80.0f) ) {
+                        vec2_t p = GetTileCenter(tile_coord.x, tile_coord.y);
+                        actor_t * actor = SpawnActor(ACTOR_BUTTERFLY, p, world);
+                        actor->z = 16;
+                        continue;
+                    }
+
+                    // trees
+                    if ( Chance(1.0f / 100.0f) ) {
+                        SpawnActor(ACTOR_TREE, v, world);
+                        occupied[tile_coord.y][tile_coord.x] = true;
+                        continue;
+                    }
+
+                    // bushes
+                    if ( Chance(1.0f / 50.0f) ) {
+                        SpawnActor(ACTOR_BUSH, v, world);
+                        occupied[tile_coord.y][tile_coord.x] = true;
+                        continue;
+                    }
+                    break;
+                case TERRAIN_FOREST:
+                    if ( Chance(1.0f / 3.0f) ) {
+                        SpawnActor(ACTOR_TREE, v, world);
+                        occupied[tile_coord.y][tile_coord.x] = true;
+                        continue;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+}
+
 void SpawnActors(world_t * world)
 {
     for ( int y = 0; y < WORLD_HEIGHT; y++ ) {
@@ -243,7 +372,38 @@ world_t * CreateWorld(void)
     world->pending_actors = NewArray(0, sizeof(actor_t));
 
     PROFILE_START(generate_terrain);
-    GenerateTerrain(world);
+
+//    GenerateTerrain(world);
+
+    initial_generation = true;
+    num_grass_tiles = 0;
+    int spawn_area = 64; // w and h of region in which player spawns
+
+    tile_coord_t center_tile = { WORLD_WIDTH / 2, WORLD_HEIGHT / 2 };
+
+    tile_coord_t upper_left = {
+        .x = center_tile.x - spawn_area / 2,
+        .y = center_tile.y - spawn_area / 2
+    };
+
+    tile_coord_t lower_right = {
+        .x = upper_left.x + spawn_area,
+        .y = upper_left.y + spawn_area,
+    };
+
+    chunk_coord_t chunk_start = TileToChunk(upper_left);
+    chunk_coord_t chunk_end = TileToChunk(lower_right);
+
+    chunk_coord_t chunk;
+    for ( chunk.y = chunk_start.y; chunk.y < chunk_end.y; chunk.y++ ) {
+        for ( chunk.x = chunk_start.x; chunk.x < chunk_end.x; chunk.x++ ) {
+            GenerateTerrainInChunk(world, chunk);
+            SpawnActorsInChunk(world, chunk);
+        }
+    }
+
+    initial_generation = false;
+
     PROFILE_END(generate_terrain);
 
     PROFILE_START(render_all_grass);
@@ -251,7 +411,7 @@ world_t * CreateWorld(void)
     PROFILE_END(render_all_grass);
 
     SpawnPlayer(world);
-    SpawnActors(world);
+//    SpawnActors(world);
     printf("num actors: %d\n", world->actors->count);
 
     return world;

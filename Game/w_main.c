@@ -7,7 +7,7 @@
 //  General world code and utilities functions.
 
 #include "w_world.h"
-#include "game.h"
+#include "g_game.h"
 #include "sprites.h"
 
 #include "mylib/genlib.h"
@@ -26,7 +26,7 @@ tile_t * GetTile(tile_t * tiles, int x, int y)
         return NULL;
     }
 
-    return &tiles[y * WORLD_HEIGHT + x];
+    return &tiles[y * WORLD_WIDTH + x];
 }
 
 /// Tile coordinate to center of tile in world coords.

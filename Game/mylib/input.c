@@ -71,7 +71,7 @@ static vec2_t Filter2D(s16 x, s16 y)
 
 #pragma mark - PUBLIC
 
-input_state_t * I_Initialize(void)
+input_state_t * IN_Initialize(void)
 {
     if ( !SDL_WasInit(SDL_INIT_GAMECONTROLLER) ) {
         if ( SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) != 0 ) {
@@ -91,7 +91,7 @@ input_state_t * I_Initialize(void)
     return state;
 }
 
-void I_StartFrame(input_state_t * state)
+void IN_StartFrame(input_state_t * state)
 {
     memcpy
     (   state->keyboard_state.prev_keys,
@@ -106,7 +106,7 @@ void I_StartFrame(input_state_t * state)
     state->mouse_state.prev_buttons = state->mouse_state.curr_buttons;
 }
 
-void I_ProcessEvent(input_state_t * state, SDL_Event event)
+void IN_ProcessEvent(input_state_t * state, SDL_Event event)
 {
     switch ( event.type ) {
         case SDL_CONTROLLERDEVICEADDED:
@@ -127,7 +127,7 @@ void I_ProcessEvent(input_state_t * state, SDL_Event event)
     }
 }
 
-void I_Update(input_state_t * state)
+void IN_Update(input_state_t * state)
 {
     controller_state_t * cs = &state->controller_state;
 
@@ -167,61 +167,61 @@ void I_Update(input_state_t * state)
 
 #pragma mark - KEYBOARD
 
-bool I_IsKeyDown(input_state_t * state, SDL_Scancode code)
+bool IN_IsKeyDown(input_state_t * state, SDL_Scancode code)
 {
     return state->keyboard_state.curr_keys[code] == 1;
 }
 
-button_state_t I_GetKeyState(input_state_t * state, SDL_Scancode code)
+button_state_t IN_GetKeyState(input_state_t * state, SDL_Scancode code)
 {
     if ( state->keyboard_state.prev_keys[code] ) {
         return state->keyboard_state.curr_keys[code]
-        ? BUTTON_STATE_HELD
-        : BUTTON_STATE_RELEASED;
+        ? IN_HELD
+        : IN_RELEASED;
     } else {
         return state->keyboard_state.curr_keys[code]
-        ? BUTTON_STATE_PRESSED
-        : BUTTON_STATE_NONE;
+        ? IN_PRESSED
+        : IN_NONE;
     }
 }
 
 #pragma mark - CONTROLLER
 
-bool I_IsControllerConnected(input_state_t * state)
+bool IN_IsControllerConnected(input_state_t * state)
 {
     return state->controller != NULL;
 }
 
-bool I_IsControllerButtonDown(input_state_t * state, SDL_GameControllerButton button)
+bool IN_IsControllerButtonDown(input_state_t * state, SDL_GameControllerButton button)
 {
     return state->controller_state.curr_buttons[button] == 1;
 }
 
-button_state_t I_GetControllerButtonState(input_state_t * state, SDL_GameControllerButton button)
+button_state_t IN_GetControllerButtonState(input_state_t * state, SDL_GameControllerButton button)
 {
     if ( state->controller_state.prev_buttons[button] ) {
         return state->controller_state.curr_buttons[button]
-        ? BUTTON_STATE_HELD
-        : BUTTON_STATE_RELEASED;
+        ? IN_HELD
+        : IN_RELEASED;
     } else {
         return state->controller_state.curr_buttons[button]
-        ? BUTTON_STATE_PRESSED
-        : BUTTON_STATE_NONE;
+        ? IN_PRESSED
+        : IN_NONE;
     }
 }
 
-vec2_t I_GetStickDirection(input_state_t * state, controller_side_t side)
+vec2_t IN_GetStickDirection(input_state_t * state, controller_side_t side)
 {
-    if ( I_IsControllerConnected(state) ) {
+    if ( IN_IsControllerConnected(state) ) {
         return state->controller_state.sticks[side];
     } else {
         return (vec2_t){ 0 };
     }
 }
 
-float I_GetTriggerState(input_state_t * state, controller_side_t side)
+float IN_GetTriggerState(input_state_t * state, controller_side_t side)
 {
-    if ( I_IsControllerConnected(state) ) {
+    if ( IN_IsControllerConnected(state) ) {
         return state->controller_state.triggers[side];
     } else {
         return 0.0f;
@@ -230,25 +230,25 @@ float I_GetTriggerState(input_state_t * state, controller_side_t side)
 
 #pragma mark - MOUSE
 
-button_state_t I_GetMouseButtonState(input_state_t * state, int button)
+button_state_t IN_GetMouseButtonState(input_state_t * state, int button)
 {
     if ( state->mouse_state.prev_buttons & button ) {
         return state->mouse_state.curr_buttons & button
-        ? BUTTON_STATE_HELD
-        : BUTTON_STATE_RELEASED;
+        ? IN_HELD
+        : IN_RELEASED;
     } else {
         return state->mouse_state.curr_buttons & button
-        ? BUTTON_STATE_PRESSED
-        : BUTTON_STATE_NONE;
+        ? IN_PRESSED
+        : IN_NONE;
     }
 }
 
-bool I_IsMouseButtonDown(input_state_t * state, int button)
+bool IN_IsMouseButtonDown(input_state_t * state, int button)
 {
     return state->mouse_state.curr_buttons & button;
 }
 
-vec2_t I_GetMousePosition(input_state_t * state)
+vec2_t IN_GetMousePosition(input_state_t * state)
 {
     return state->mouse_state.position;
 }

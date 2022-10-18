@@ -80,6 +80,11 @@ inline void V_SetRGBA(u8 r, u8 g, u8 b, u8 a)
     SDL_SetRenderDrawColor(renderer, r, g, b, a);
 }
 
+inline void V_SetRGB(u8 r, u8 g, u8 b)
+{
+    V_SetRGBA(r, g, b, SDL_ALPHA_OPAQUE);
+}
+
 /// Set the draw color.
 inline void V_SetColor(SDL_Color color)
 {

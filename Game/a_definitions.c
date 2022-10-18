@@ -6,7 +6,7 @@
 //
 
 #include "a_actor.h"
-#include "game.h"
+#include "g_game.h"
 #include "inventory.h"
 #include "m_misc.h"
 #include "w_world.h"
@@ -79,6 +79,8 @@ static actor_t actor_definitions[NUM_ACTOR_TYPES] = {
         .health = { .amount = 30, .minimum_damage_level = 0 },
         .info.drops = {
             { 1, ACTOR_LOG },
+            { 2, ACTOR_STICKS, },
+            { 3, ACTOR_LEAVES },
         },
     },
     [ACTOR_BUSH] = {
@@ -107,6 +109,24 @@ static actor_t actor_definitions[NUM_ACTOR_TYPES] = {
             .sprite = &sprites[SPRITE_LOG_INVENTORY]
         },
     },
+    [ACTOR_LEAVES] = {
+        .flags = ACTOR_FLAG_COLLETIBLE,
+        .sprite = &sprites[SPRITE_LEAVES],
+        .info.item = {
+            .width = 1,
+            .height = 1,
+            .sprite = &sprites[SPRITE_LEAVES],
+        },
+    },
+    [ACTOR_STICKS] = {
+        .flags = ACTOR_FLAG_COLLETIBLE,
+        .sprite = &sprites[SPRITE_STICKS_WORLD],
+        .info.item = {
+            .width = 1,
+            .height = 2,
+            .sprite = &sprites[SPRITE_STICKS_INVENTORY],
+        },
+    },
 };
 
 #pragma mark -
@@ -119,19 +139,39 @@ actor_t GetActorDefinition(actor_type_t type)
 #pragma mark - INPUT FUNCTIONS
 
 /*
- I personally moved from a force/mass/acceleration model to a simpler, less realistic but more controllable/reliable dampening method for most of my entities.
- I did this because my force/acceleration model wasn't working for humanoids (and nor should it, it's an inappropriate model, legged creatures aren't billiard balls).
+ I personally moved from a force/mass/acceleration model to a simpler,
+ less realistic but more controllable/reliable dampening method for most
+ of my entities. I did this because my force/acceleration model wasn't working
+ for humanoids (and nor should it, it's an inappropriate model, legged creatures
+ aren't billiard balls).
+
  Basically:
- New Velocity = old_velocity * (1 - delta_time * transition_speed) + desired_velocity * (delta_time * transition_speed)
+ New Velocity = old_velocity *
+    (1 - dt * transition_speed) + desired_velocity * (dt * transition_speed)
  (we're just lerping here)
- transition_speed is one of a few constants (based on terrain type) largely simulated friction, water/ground has a transition speed of 4.0, and to have a smidge of air control, the air transition speed is 0.7.
- desired_velocity is a unit length "running force" (whatever the entity is trying to do) multiplied by the characters max speed for what they're standing on, e.g. higher for land than water.
- Implementing this immediately made my FPS experience immediately feel much tighter, and all issues I had applying f = ma to humanoids disappeared.
- Projectiles are still doing f = ma (with drag etc.), but I only apply it to new entities if the simple model fails me.
+
+ transition_speed is one of a few constants (based on terrain type) largely
+ simulated friction, water/ground has a transition speed of 4.0, and to have a
+ smidge of air control, the air transition speed is 0.7.
+
+ desired_velocity is a unit length "running force" (whatever the entity is
+ trying to do) multiplied by the characters max speed for what they're standing
+ on, e.g. higher for land than water.
+
+ Implementing this immediately made my FPS experience immediately feel much
+ tighter, and all issues I had applying f = ma to humanoids disappeared.
+ Projectiles are still doing f = ma (with drag etc.), but I only apply it to new
+ entities if the simple model fails me.
+
  Edit:
- If at some point you feel as if physics really is important in your game, check out:
+ If at some point you feel as if physics really is important in your game,
+ check out:
  http://gafferongames.com/game-physics/integration-basics/
- With respect to integration and timesteps, just something to look at if you decide "my physics isn't working well enough". If you're going to go with an approach that's not "correct" or based purely in the physical world, you may as well know why and how it's incorrect.
+
+ With respect to integration and timesteps, just something to look at if you
+ decide "my physics isn't working well enough". If you're going to go with an
+ approach that's not "correct" or based purely in the physical world, you may as
+ well know why and how it's incorrect.
  */
 
 static void PlayerStrike(actor_t * player)
@@ -162,8 +202,8 @@ void PlayerHandleInput(actor_t * player, input_state_t * input_state, float dt)
     info->stopping_y = true;
 
 #if 1
-    if ( I_IsControllerConnected(input_state) ) {
-        vec2_t move_dir = I_GetStickDirection(input_state, SIDE_LEFT);
+    if ( IN_IsControllerConnected(input_state) ) {
+        vec2_t move_dir = IN_GetStickDirection(input_state, SIDE_LEFT);
 
         // Make it easier to go exactly east/west and north/south
         const float minimum = 0.2f;
@@ -187,10 +227,10 @@ void PlayerHandleInput(actor_t * player, input_state_t * input_state, float dt)
         Vec2Lerp(&player->vel, &vel, dt * 10);
 
         // Set player facing according to right controller stick
-        vec2_t facing = I_GetStickDirection(input_state, SIDE_RIGHT);
+        vec2_t facing = IN_GetStickDirection(input_state, SIDE_RIGHT);
         player->facing = VectorToCardinal(facing);
 
-        float left_trigger = I_GetTriggerState(input_state, SIDE_RIGHT);
+        float left_trigger = IN_GetTriggerState(input_state, SIDE_RIGHT);
 
         if ( !info->strike_button_down && left_trigger > 0.0f ) {
             PlayerStrike(player);
@@ -204,31 +244,31 @@ void PlayerHandleInput(actor_t * player, input_state_t * input_state, float dt)
 #endif
     {
         float factor = 4.0f;
-        if ( I_IsKeyDown(input_state, SDL_SCANCODE_A) ) {
+        if ( IN_IsKeyDown(input_state, SDL_SCANCODE_A) ) {
             player->vel.x = Lerp(player->vel.x, -PLAYER_VELOCITY, dt * factor);
             info->stopping_x = false;
             player->facing = WEST;
         }
 
-        if ( I_IsKeyDown(input_state, SDL_SCANCODE_D) ) {
+        if ( IN_IsKeyDown(input_state, SDL_SCANCODE_D) ) {
             player->vel.x = Lerp(player->vel.x, PLAYER_VELOCITY, dt * factor);
             info->stopping_x = false;
             player->facing = EAST;
         }
 
-        if ( I_IsKeyDown(input_state, SDL_SCANCODE_W) ) {
+        if ( IN_IsKeyDown(input_state, SDL_SCANCODE_W) ) {
             player->vel.y = Lerp(player->vel.y, -PLAYER_VELOCITY, dt * factor);
             info->stopping_y = false;
             player->facing = NORTH;
         }
 
-        if ( I_IsKeyDown(input_state, SDL_SCANCODE_S) ) {
+        if ( IN_IsKeyDown(input_state, SDL_SCANCODE_S) ) {
             player->vel.y = Lerp(player->vel.y, PLAYER_VELOCITY, dt * factor);
             info->stopping_y = false;
             player->facing = SOUTH;
         }
 
-        if ( I_GetKeyState(input_state, SDL_SCANCODE_SPACE) == BUTTON_STATE_PRESSED ) {
+        if ( IN_GetKeyState(input_state, SDL_SCANCODE_SPACE) == IN_PRESSED ) {
             PlayerStrike(player);
         }
     }

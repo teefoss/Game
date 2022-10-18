@@ -10,15 +10,14 @@
 
 #include "w_tile.h"
 #include "a_actor.h"
-#include "game.h"
+#include "g_game.h"
 #include "mylib/array.h"
 #include "mylib/mathlib.h"
 
 #define WORLD_WIDTH  512
 #define WORLD_HEIGHT 512
 #define SCALED_TILE_SIZE (TILE_SIZE * DRAW_SCALE)
-#define CHUNCK_SIZE 32
-//#define MAX_ACTORS 5000
+#define CHUNK_SIZE 16
 
 #define DAY_LENGTH_TICKS    (int)(1200000.0f / (1000.0f / FPS))
 #define HOUR_TICKS          (DAY_LENGTH_TICKS / 24)

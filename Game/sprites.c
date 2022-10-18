@@ -95,6 +95,18 @@ sprite_t sprites[NUM_SPRITES] = {
         .texture_name = ""SPRITE_DIR"items.png",
         .location = { 0, 12, 24, 24 }
     },
+    [SPRITE_LEAVES] = {
+        .texture_name = ""SPRITE_DIR"items.png",
+        .location = { 24, 0, 12, 12 }
+    },
+    [SPRITE_STICKS_WORLD] = {
+        .texture_name = ""SPRITE_DIR"items.png",
+        .location = { 36, 0, 12, 12 }
+    },
+    [SPRITE_STICKS_INVENTORY] = {
+        .texture_name = ""SPRITE_DIR"items.png",
+        .location = { 36, 12, 24, 24 }
+    },
     [SPRITE_ICON_NO_ITEM] = {
         .texture_name = ""SPRITE_DIR"icons.png",
         .location = { 0, 0, 16, 16 },

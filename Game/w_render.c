@@ -7,7 +7,7 @@
 //  World rendering functions.
 
 #include "w_world.h"
-#include "game.h"
+#include "g_game.h"
 #include "m_debug.h"
 #include "m_misc.h"
 #include "sprites.h"

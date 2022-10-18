@@ -145,6 +145,7 @@ extern inline void V_DrawRect(SDL_Rect * rect);
 extern inline void V_FillRect(SDL_Rect * rect);
 extern inline void V_DrawPoint(int x, int y);
 extern inline void V_SetRGBA(u8 r, u8 g, u8 b, u8 a);
+extern inline void V_SetRGB(u8 r, u8 g, u8 b);
 extern inline void V_SetColor(SDL_Color color);
 extern inline void V_SetGray(u8 gray);
 extern inline void V_DrawTexture(SDL_Texture * t, SDL_Rect * src, SDL_Rect * dst);

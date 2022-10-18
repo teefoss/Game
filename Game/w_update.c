@@ -116,7 +116,7 @@ static void UpdateActors(world_t * world, input_state_t * input_state, float dt)
             SDL_FRect hitbox_j = ActorHitbox(aj);
             if ( SDL_HasIntersectionF(&hitbox_i, &hitbox_j) ) {
 
-                printf("%s hit an %s\n", ActorName(ai->type), ActorName(aj->type));
+                //printf("%s hit an %s\n", ActorName(ai->type), ActorName(aj->type));
 
                 // contact each other
                 if ( ai->contact ) {

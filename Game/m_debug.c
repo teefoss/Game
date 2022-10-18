@@ -6,7 +6,7 @@
 //
 
 #include "m_debug.h"
-#include "game.h"
+#include "g_game.h"
 #include "mylib/video.h"
 #include "mylib/text.h"
 #include "mylib/input.h"
