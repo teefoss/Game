@@ -7,8 +7,6 @@
 //  World generation code
 
 #include "w_world.h"
-
-#include "coord.h"
 #include "g_game.h"
 #include "mylib/video.h"
 
@@ -160,6 +158,10 @@ static void GenerateTerrain(world_t * world)
 // track occupied tiles during generation
 static bool occupied[WORLD_HEIGHT][WORLD_WIDTH];
 
+// TODO: Ensure the player does not spawn on a tiny off-shore island.
+// Get the highest elevation tile in the spawn region and
+// flood fill from it to get a list of tiles that are (hopefully) on a main
+// island.
 void SpawnPlayer(world_t * world)
 {
     // make a list of grass tiles ordered by how close they are to the
@@ -176,6 +178,7 @@ void SpawnPlayer(world_t * world)
     } potentials[WORLD_WIDTH * WORLD_HEIGHT];
 
     // fill the list
+    // TODO: only check generated chunks
     for ( int y = 0; y < WORLD_HEIGHT; y++ ) {
         for ( int x = 0; x < WORLD_WIDTH; x++ ) {
             tile_t * tile = GetTile(world->tiles, x, y);
@@ -357,6 +360,49 @@ void RenderAllGrassTextures(tile_t * world_tiles)
     }
 }
 
+void LoadChunkIfNeeded(world_t * world, chunk_coord_t chunk_coord)
+{
+    if ( world->loaded_chunks[chunk_coord.y][chunk_coord.x] ) {
+        return;
+    }
+
+    GenerateTerrainInChunk(world, chunk_coord);
+    SpawnActorsInChunk(world, chunk_coord);
+
+    world->loaded_chunks[chunk_coord.y][chunk_coord.x] = true;
+    printf("loaded chunk %d, %d\n", chunk_coord.x, chunk_coord.y);
+}
+
+void LoadChunksAroundPlayer(world_t * world)
+{
+    // TODO: multiple players?
+    actor_t * player = GetActorType(world->actors, ACTOR_PLAYER);
+
+    tile_coord_t player_tile = PositionToTile(player->pos);
+
+    // Upper left corner of load region.
+    tile_coord_t min_tile = {
+        player_tile.x - CHUNK_LOAD_RADIUS_TILES,
+        player_tile.y - CHUNK_LOAD_RADIUS_TILES
+    };
+
+    // Lower right corner of load region.
+    tile_coord_t max_tile = {
+        player_tile.x + CHUNK_LOAD_RADIUS_TILES,
+        player_tile.y + CHUNK_LOAD_RADIUS_TILES
+    };
+
+    chunk_coord_t min_chunk = TileToChunk(min_tile);
+    chunk_coord_t max_chunk = TileToChunk(max_tile);
+
+    chunk_coord_t chunk;
+    for ( chunk.y = min_chunk.y; chunk.y <= max_chunk.y; chunk.y++ ) {
+        for ( chunk.x = min_chunk.x; chunk.x <= max_chunk.x; chunk.x++ ) {
+            LoadChunkIfNeeded(world, chunk);
+        }
+    }
+}
+
 world_t * CreateWorld(void)
 {
     world_t * world = calloc(1, sizeof(*world));
@@ -397,8 +443,7 @@ world_t * CreateWorld(void)
     chunk_coord_t chunk;
     for ( chunk.y = chunk_start.y; chunk.y < chunk_end.y; chunk.y++ ) {
         for ( chunk.x = chunk_start.x; chunk.x < chunk_end.x; chunk.x++ ) {
-            GenerateTerrainInChunk(world, chunk);
-            SpawnActorsInChunk(world, chunk);
+            LoadChunkIfNeeded(world, chunk);
         }
     }
 
@@ -406,12 +451,12 @@ world_t * CreateWorld(void)
 
     PROFILE_END(generate_terrain);
 
-    PROFILE_START(render_all_grass);
+//    PROFILE_START(render_all_grass);
 //    RenderAllGrassTextures(world->tiles); // TODO: Justin
-    PROFILE_END(render_all_grass);
+//    PROFILE_END(render_all_grass);
 
     SpawnPlayer(world);
-//    SpawnActors(world);
+
     printf("num actors: %d\n", world->actors->count);
 
     return world;

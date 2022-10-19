@@ -11,8 +11,8 @@
 tile_coord_t PositionToTile(position_t position)
 {
     tile_coord_t tile = {
-        .x = (int)position.x,
-        .y = (int)position.y
+        .x = (int)position.x / SCALED_TILE_SIZE,
+        .y = (int)position.y / SCALED_TILE_SIZE
     };
 
     return tile;

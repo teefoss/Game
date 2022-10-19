@@ -7,6 +7,7 @@
 
 #include "m_debug.h"
 #include "g_game.h"
+#include "w_world.h"
 #include "mylib/video.h"
 #include "mylib/text.h"
 #include "mylib/input.h"
@@ -16,6 +17,7 @@ bool show_geometry;
 bool show_world;
 bool show_debug_info;
 bool show_inventory;
+bool show_chunk_map;
 
 int debug_hours;
 int debug_minutes;
@@ -36,16 +38,6 @@ void DisplayScreenGeometry(void)
     V_SetRGBA(255, 0, 0, 128);
     SDL_RenderDrawLine(renderer, hw, 0, hw, GAME_HEIGHT);
     SDL_RenderDrawLine(renderer, 0, hh, GAME_WIDTH, hh);
-
-#if 0
-    for ( int y = 0; y <= GAME_HEIGHT / SCALED_TILE_SIZE; y++ ) {
-        for ( int x = 0; x <= GAME_WIDTH / SCALED_TILE_SIZE; x++ ) {
-            DrawPoint(x * TILE_SIZE, y * TILE_SIZE);
-        }
-    }
-#endif
-    
-    //SDL_RenderSetScale(renderer, 1, 1);
 }
 
 void DisplayGeneralInfo(world_t * world)
@@ -107,6 +99,45 @@ void DisplayPlayerInventory(array_t * actors)
     }
 }
 
+void DisplayChunkMap(world_t * world)
+{
+    for ( int y = 0; y < WORLD_HEIGHT / CHUNK_SIZE; y++ ) {
+        for ( int x = 0; x < WORLD_WIDTH / CHUNK_SIZE; x++ ) {
+            int darken = (x + y) % 2 == 0 ? -32 : 0;
+            int size = TILE_SIZE;
+            SDL_Rect r = { x * size, y * size, size, size };
+            if ( world->loaded_chunks[y][x] ) {
+                V_SetRGB(255 + darken, 64 + darken, 64 + darken);
+                V_FillRect(&r);
+            } else {
+                V_SetRGB(64 + darken, 255 + darken, 64 + darken);
+                V_FillRect(&r);
+            }
+        }
+    }
+
+    actor_t * player = GetActorType(world->actors, ACTOR_PLAYER);
+    vec2_t pt = { player->pos.x / SCALED_TILE_SIZE, player->pos.y / SCALED_TILE_SIZE };
+    V_SetGray(255);
+    SDL_RenderDrawLine(renderer, pt.x, 0, pt.x, WORLD_HEIGHT);
+    SDL_RenderDrawLine(renderer, 0, pt.y, WORLD_WIDTH, pt.y);
+
+    SDL_Rect load_region = {
+        .x = pt.x - CHUNK_LOAD_RADIUS_TILES,
+        .y = pt.y - CHUNK_LOAD_RADIUS_TILES,
+        .w = CHUNK_LOAD_RADIUS_TILES * 2,
+        .h = CHUNK_LOAD_RADIUS_TILES * 2
+    };
+    V_DrawRect(&load_region);
+
+    SDL_Rect screen = GetVisibleRect(world->camera);
+    screen.x /= SCALED_TILE_SIZE;
+    screen.y /= SCALED_TILE_SIZE;
+    screen.w /= SCALED_TILE_SIZE;
+    screen.h /= SCALED_TILE_SIZE;
+    V_DrawRect(&screen);
+}
+
 void DisplayDebugInfo(world_t * world, vec2_t mouse_position)
 {
     if ( show_geometry ) {
@@ -129,5 +160,9 @@ void DisplayDebugInfo(world_t * world, vec2_t mouse_position)
 
     if ( show_inventory ) {
         DisplayPlayerInventory(world->actors);
+    }
+
+    if ( show_chunk_map ) {
+        DisplayChunkMap(world);
     }
 }

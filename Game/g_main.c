@@ -64,6 +64,9 @@ static void G_DoFrame(game_t * game, float dt )
                     case SDLK_F4:
                         show_inventory = !show_inventory;
                         break;
+                    case SDLK_F5:
+                        show_chunk_map = !show_chunk_map;
+                        break;
                     case SDLK_RIGHT:
                         game->world->clock += HOUR_TICKS / 2;
                         break;

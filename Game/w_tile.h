@@ -25,7 +25,8 @@ typedef enum {
     NUM_TERRAIN_TYPES,
 } terrain_t;
 
-typedef struct {
+typedef struct tile tile_t;
+struct tile {
     terrain_t terrain;
 
     // Some tiles have extra, per-tile decoration/
@@ -39,7 +40,9 @@ typedef struct {
 
     // Determined by world lighting and any nearby light-casting actors.
     vec3_t lighting;
-} tile_t;
+
+    void (* render)(tile_t *);
+};
 
 void GetTileNoise(int tile_x, int tile_y, float out[TILE_SIZE][TILE_SIZE]);
 vec2_t GetAdjacentTile(vec2_t position, cardinal_t direction);

@@ -151,7 +151,6 @@ static void UpdateActors(world_t * world, input_state_t * input_state, float dt)
     }
 }
 
-
 void UpdateWorld(world_t * world, input_state_t * input_state, float dt)
 {
     int update_start = SDL_GetTicks(); // debug
@@ -186,7 +185,8 @@ void UpdateWorld(world_t * world, input_state_t * input_state, float dt)
         world->lighting.z = 255;
     }
 
-    UpdateTiles(world);
+    LoadChunksAroundPlayer(world);
+    UpdateTiles(world); // lighting
     UpdateActors(world, input_state, dt);
 
     update_ms = SDL_GetTicks() - update_start; // debug

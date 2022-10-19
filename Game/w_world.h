@@ -10,6 +10,7 @@
 
 #include "w_tile.h"
 #include "a_actor.h"
+#include "coord.h"
 #include "g_game.h"
 #include "mylib/array.h"
 #include "mylib/mathlib.h"
@@ -18,6 +19,7 @@
 #define WORLD_HEIGHT 512
 #define SCALED_TILE_SIZE (TILE_SIZE * DRAW_SCALE)
 #define CHUNK_SIZE 16
+#define CHUNK_LOAD_RADIUS_TILES 24
 
 #define DAY_LENGTH_TICKS    (int)(1200000.0f / (1000.0f / FPS))
 #define HOUR_TICKS          (DAY_LENGTH_TICKS / 24)
@@ -30,6 +32,7 @@
 #define PENDING_ACTORS_MAX 200
 
 typedef struct world {
+    bool loaded_chunks[WORLD_HEIGHT / CHUNK_SIZE][WORLD_WIDTH / CHUNK_SIZE];
     tile_t tiles[WORLD_WIDTH * WORLD_HEIGHT];
 
 //    actor_t * actors;
@@ -88,5 +91,8 @@ void DestroyWorld(world_t * world); // maybe FreeWorld would be more positive?
 void UpdateWorld(world_t * world, input_state_t * input_state, float dt);
 
 void UpdateDebugMap(tile_t * tiles,  SDL_Texture ** debug_map, vec2_t camera);
+
+void LoadChunkIfNeeded(world_t * world, chunk_coord_t chunk_coord);
+void LoadChunksAroundPlayer(world_t * world);
 
 #endif /* world_h */
