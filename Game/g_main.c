@@ -35,47 +35,17 @@ static void G_DoFrame(game_t * game, float dt )
             continue;
         }
 
+        if ( ProcessDebugEvent(game, &event) ) {
+            continue;
+        }
+
         // Handle any "universal" events
         switch ( event.type ) {
             case SDL_QUIT:
                 game->is_running = false;
                 return;
             case SDL_KEYDOWN:
-                if ( event.key.repeat != 0 ) {
-                    break;
-                }
-
                 switch ( event.key.keysym.sym ) {
-                    case SDLK_F1:
-                        show_debug_info = !show_debug_info;
-                        break;
-                    case SDLK_F2:
-                        show_world = !show_world;
-                        if ( show_world ) {
-                            UpdateDebugMap
-                            (   game->world->tiles,
-                                &game->world->debug_map,
-                                game->world->camera );
-                        }
-                        break;
-                    case SDLK_F3:
-                        show_geometry = !show_geometry;
-                        break;
-                    case SDLK_F4:
-                        show_inventory = !show_inventory;
-                        break;
-                    case SDLK_F5:
-                        show_chunk_map = !show_chunk_map;
-                        break;
-                    case SDLK_RIGHT:
-                        game->world->clock += HOUR_TICKS / 2;
-                        break;
-                    case SDLK_LEFT:
-                        game->world->clock -= HOUR_TICKS / 2;
-                        if ( game->world->clock < 0 ) {
-                            game->world->clock += DAY_LENGTH_TICKS;
-                        }
-                        break;
                     case SDLK_BACKSLASH:
                         ToggleFullscreen(DESKTOP);
                         break;

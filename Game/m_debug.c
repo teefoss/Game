@@ -166,3 +166,47 @@ void DisplayDebugInfo(world_t * world, vec2_t mouse_position)
         DisplayChunkMap(world);
     }
 }
+
+bool ProcessDebugEvent(game_t * game, const SDL_Event * event)
+{
+    if ( event->type != SDL_KEYDOWN ) {
+        return false;
+    }
+
+    switch ( event->key.keysym.sym ) {
+        case SDLK_F1:
+            show_debug_info = !show_debug_info;
+            return true;
+        case SDLK_F2:
+            show_world = !show_world;
+            if ( show_world ) {
+                UpdateDebugMap
+                (   game->world->tiles,
+                    &game->world->debug_map,
+                    game->world->camera );
+            }
+            return true;
+        case SDLK_F3:
+            show_geometry = !show_geometry;
+            return true;
+        case SDLK_F4:
+            show_inventory = !show_inventory;
+            return true;
+        case SDLK_F5:
+            show_chunk_map = !show_chunk_map;
+            return true;
+        case SDLK_RIGHT:
+            game->world->clock += HOUR_TICKS / 2;
+            return true;
+        case SDLK_LEFT:
+            game->world->clock -= HOUR_TICKS / 2;
+            if ( game->world->clock < 0 ) {
+                game->world->clock += DAY_LENGTH_TICKS;
+            }
+            return true;
+        default:
+            break;
+    }
+
+    return false;
+}

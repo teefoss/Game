@@ -10,8 +10,6 @@
 
 #include "w_world.h"
 
-void DisplayDebugInfo(world_t * world, vec2_t mouse_position);
-
 extern bool show_geometry;
 extern bool show_world;
 extern bool show_debug_info;
@@ -26,5 +24,8 @@ extern float debug_dt;
 extern int debug_hours;
 extern int debug_minutes;
 extern vec2_t mouse_tile;
+
+void DisplayDebugInfo(world_t * world, vec2_t mouse_position);
+bool ProcessDebugEvent(game_t * game, const SDL_Event * event);
 
 #endif /* m_debug_h */
