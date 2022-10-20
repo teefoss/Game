@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 // Video Library
 //
-// Window and renderer stuff.
+// Window, renderer, and text.
 // -----------------------------------------------------------------------------
 #ifndef __VIDEO_H__
 #define __VIDEO_H__
@@ -50,8 +50,14 @@ inline void V_Clear(void)
     SDL_RenderClear(renderer);
 }
 
+inline void V_ClearRGB(u8 r, u8 g, u8 b)
+{
+    SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+    SDL_RenderClear(renderer);
+}
+
 /// Present any rendering that was done since the previous call.
-inline void V_Present(void)
+inline void V_Refresh(void)
 {
     SDL_RenderPresent(renderer);
 }
@@ -118,5 +124,37 @@ inline void V_DrawTextureFlip
 
 /// Create an SDL_Texture with that can be used as a rendering target.
 SDL_Texture * V_CreateTexture(int w, int h);
+
+// -----------------------------------------------------------------------------
+// Text
+//  TODO: handle sprite sheet fonts?
+// -----------------------------------------------------------------------------
+
+typedef enum {
+    FONT_ATARI_4X8,
+    FONT_CP437_8X16,
+    FONT_CP437_8X8,
+    FONT_NES_16X16
+} font_t;
+
+void V_SetFont(font_t font);
+void V_SetTextScale(float x, float y);
+void V_SetTabSize(int size);
+
+/// Get the current font character scaled width in pixels.
+int V_CharWidth(void);
+
+/// Get the current font character scaled height in pixels.
+int V_CharHeight(void);
+
+/// Render ASCII character at pixel coordinate (x, y) using current renderer
+/// color.
+void V_PrintChar(int x, int y, unsigned char character);
+
+///  Render string at pixel coordinate (x, y) using current renderer color.
+///
+///  The control characters \n and \t are handled as expected.
+void V_PrintString(int x, int y, const char * format, ...);
+
 
 #endif /* __VIDEO_H__ */

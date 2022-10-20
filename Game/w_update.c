@@ -185,7 +185,10 @@ void UpdateWorld(world_t * world, input_state_t * input_state, float dt)
         world->lighting.z = 255;
     }
 
-    LoadChunksAroundPlayer(world);
+    // load chunks around the player
+    actor_t * player = GetActorType(world->actors, ACTOR_PLAYER);
+    LoadChunkInRegion(world, player->pos, CHUNK_LOAD_RADIUS_TILES);
+
     UpdateTiles(world); // lighting
     UpdateActors(world, input_state, dt);
 

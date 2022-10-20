@@ -7,7 +7,6 @@
 
 #include "menu.h"
 #include "g_game.h"
-#include "mylib/text.h"
 #include "mylib/video.h"
 #include "w_world.h"
 
@@ -158,12 +157,12 @@ void M_Render(game_t * game)
         return;
     }
 
-    int h = CharHeight();
+    int h = V_CharHeight();
     int x = 32;
     int y = 32;
 
     V_SetRGBA(0, 255, 255, 255);
-    Print(x, y, "%s", menu->title);
+    V_PrintString(x, y, "%s", menu->title);
     y += h * 2;
 
     for ( int i = 0; i < menu->num_items; i++ ) {
@@ -173,7 +172,7 @@ void M_Render(game_t * game)
             V_SetGray(255);
         }
 
-        Print(x, y, "%s", menu->items[i].name);
+        V_PrintString(x, y, "%s", menu->items[i].name);
         y += h + 8;
     }
 }

@@ -9,7 +9,6 @@
 #include "g_game.h"
 #include "w_world.h"
 #include "mylib/video.h"
-#include "mylib/text.h"
 #include "mylib/input.h"
 
 // Debug info, toggled by function keys.
@@ -43,17 +42,17 @@ void DisplayScreenGeometry(void)
 void DisplayGeneralInfo(world_t * world)
 {
     V_SetGray(255);
-    int h = CharHeight();
+    int h = V_CharHeight();
     int row = 0;
 
-    Print(0, row++ * h, "Frame time: %2d ms", frame_ms);
-    Print(0, row++ * h, "- Render time: %2d ms", render_ms);
-    Print(0, row++ * h, "- Update time: %2d ms", update_ms);
-    Print(0, row++ * h, "- dt: %.3f ms", debug_dt);
-    Print(0, row++ * h, "Camera Tile: %.2f, %.2f",
+    V_PrintString(0, row++ * h, "Frame time: %2d ms", frame_ms);
+    V_PrintString(0, row++ * h, "- Render time: %2d ms", render_ms);
+    V_PrintString(0, row++ * h, "- Update time: %2d ms", update_ms);
+    V_PrintString(0, row++ * h, "- dt: %.3f ms", debug_dt);
+    V_PrintString(0, row++ * h, "Camera Tile: %.2f, %.2f",
           world->camera.x / SCALED_TILE_SIZE,
           world->camera.y / SCALED_TILE_SIZE);
-    Print(0, row++ * h, "%2d:%02d %s",
+    V_PrintString(0, row++ * h, "%2d:%02d %s",
           debug_hours > 12 ? debug_hours - 12 : debug_hours,
           debug_minutes,
           debug_hours < 12 ? "AM" : "PM" );
@@ -68,7 +67,7 @@ void DisplayTileInfo(world_t * world, vec2_t mouse_position)
     mouse_tile = Vec2Scale(mouse_coord, 1.0f / SCALED_TILE_SIZE);
     tile_t * tile = GetTile(world->tiles, mouse_tile.x, mouse_tile.y);
 
-    Print(GAME_WIDTH * 0.5, 0,
+    V_PrintString(GAME_WIDTH * 0.5, 0,
           "Mouse Tile: %d, %d\n"
           "- Tile light: %.1f, %.1f, %.1f",
           (int)mouse_tile.x, (int)mouse_tile.y,
@@ -83,17 +82,17 @@ void DisplayPlayerInventory(array_t * actors)
     inventory_t * inventory = player->info.player.inventory;
 
     int row = 0;
-    int h = CharHeight();
+    int h = V_CharHeight();
     V_SetGray(255);
-    Print(0, h*row++, "Player Inventory (%d items)", inventory->num_items);
+    V_PrintString(0, h*row++, "Player Inventory (%d items)", inventory->num_items);
 
     for ( int i = 0; i < inventory->num_items; i++ ) {
-        Print(0, h*row++, "%d: %s", i, ActorName(inventory->items[i].type));
+        V_PrintString(0, h*row++, "%d: %s", i, ActorName(inventory->items[i].type));
     }
 
     for ( int y = 0; y < inventory->grid_height; y++ ) {
         for ( int x = 0; x < inventory->grid_width; x++ ) {
-            Print(x * CharWidth() * 2, h * row, "%02X", inventory->grid[y][x]);
+            V_PrintString(x * V_CharWidth() * 2, h * row, "%02X", inventory->grid[y][x]);
         }
         row++;
     }

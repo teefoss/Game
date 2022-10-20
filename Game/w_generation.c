@@ -373,23 +373,20 @@ void LoadChunkIfNeeded(world_t * world, chunk_coord_t chunk_coord)
     printf("loaded chunk %d, %d\n", chunk_coord.x, chunk_coord.y);
 }
 
-void LoadChunksAroundPlayer(world_t * world)
+void LoadChunkInRegion(world_t * world, position_t center, int tile_radius)
 {
-    // TODO: multiple players?
-    actor_t * player = GetActorType(world->actors, ACTOR_PLAYER);
-
-    tile_coord_t player_tile = PositionToTile(player->pos);
+    tile_coord_t center_tile = PositionToTile(center);
 
     // Upper left corner of load region.
     tile_coord_t min_tile = {
-        player_tile.x - CHUNK_LOAD_RADIUS_TILES,
-        player_tile.y - CHUNK_LOAD_RADIUS_TILES
+        center_tile.x - tile_radius,
+        center_tile.y - tile_radius
     };
 
     // Lower right corner of load region.
     tile_coord_t max_tile = {
-        player_tile.x + CHUNK_LOAD_RADIUS_TILES,
-        player_tile.y + CHUNK_LOAD_RADIUS_TILES
+        center_tile.x + tile_radius,
+        center_tile.y + tile_radius
     };
 
     chunk_coord_t min_chunk = TileToChunk(min_tile);
@@ -417,43 +414,14 @@ world_t * CreateWorld(void)
     world->actors = NewArray(0, sizeof(actor_t));
     world->pending_actors = NewArray(0, sizeof(actor_t));
 
-    PROFILE_START(generate_terrain);
-
-//    GenerateTerrain(world);
-
+    // Generate tiles near the center of the world.
+    PROFILE_START(spawn_generation);
     initial_generation = true;
     num_grass_tiles = 0;
-    int spawn_area = 64; // w and h of region in which player spawns
-
     tile_coord_t center_tile = { WORLD_WIDTH / 2, WORLD_HEIGHT / 2 };
-
-    tile_coord_t upper_left = {
-        .x = center_tile.x - spawn_area / 2,
-        .y = center_tile.y - spawn_area / 2
-    };
-
-    tile_coord_t lower_right = {
-        .x = upper_left.x + spawn_area,
-        .y = upper_left.y + spawn_area,
-    };
-
-    chunk_coord_t chunk_start = TileToChunk(upper_left);
-    chunk_coord_t chunk_end = TileToChunk(lower_right);
-
-    chunk_coord_t chunk;
-    for ( chunk.y = chunk_start.y; chunk.y < chunk_end.y; chunk.y++ ) {
-        for ( chunk.x = chunk_start.x; chunk.x < chunk_end.x; chunk.x++ ) {
-            LoadChunkIfNeeded(world, chunk);
-        }
-    }
-
+    LoadChunkInRegion(world, TileToPosition(center_tile), 32);
     initial_generation = false;
-
-    PROFILE_END(generate_terrain);
-
-//    PROFILE_START(render_all_grass);
-//    RenderAllGrassTextures(world->tiles); // TODO: Justin
-//    PROFILE_END(render_all_grass);
+    PROFILE_END(spawn_generation);
 
     SpawnPlayer(world);
 

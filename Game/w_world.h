@@ -90,9 +90,12 @@ void RenderGrassEffectTexture
 void DestroyWorld(world_t * world); // maybe FreeWorld would be more positive?
 void UpdateWorld(world_t * world, input_state_t * input_state, float dt);
 
+// TODO: move to debug.c
 void UpdateDebugMap(tile_t * tiles,  SDL_Texture ** debug_map, vec2_t camera);
 
+// w_generation.c
+
 void LoadChunkIfNeeded(world_t * world, chunk_coord_t chunk_coord);
-void LoadChunksAroundPlayer(world_t * world);
+void LoadChunkInRegion(world_t * world, position_t center, int tile_radius);
 
 #endif /* world_h */

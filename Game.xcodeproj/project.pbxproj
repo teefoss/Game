@@ -10,7 +10,6 @@
 		56CA3EB828C69FFD00AE2DD5 /* g_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 56CA3EB728C69FFD00AE2DD5 /* g_main.c */; };
 		56CA3EB928C6AA7E00AE2DD5 /* genlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076643328C68FB200CD99E5 /* genlib.c */; };
 		56CA3EBB28C6AA7E00AE2DD5 /* mathlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076643E28C68FB200CD99E5 /* mathlib.c */; };
-		56CA3EBC28C6AA7E00AE2DD5 /* text.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076643C28C68FB200CD99E5 /* text.c */; };
 		56CA3EBD28C6AA7E00AE2DD5 /* texture.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076643828C68FB200CD99E5 /* texture.c */; };
 		56CA3EBE28C6AA7E00AE2DD5 /* video.c in Sources */ = {isa = PBXBuildFile; fileRef = 6076643628C68FB200CD99E5 /* video.c */; };
 		603B178128CEC94C00CF0E8A /* w_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 603B178028CEC94C00CF0E8A /* w_main.c */; };
@@ -70,13 +69,11 @@
 		6076642A28C68F8400CD99E5 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		6076643128C68F9900CD99E5 /* Game.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Game.entitlements; sourceTree = "<group>"; };
 		6076643328C68FB200CD99E5 /* genlib.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = genlib.c; sourceTree = "<group>"; };
-		6076643528C68FB200CD99E5 /* text.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = text.h; sourceTree = "<group>"; };
 		6076643628C68FB200CD99E5 /* video.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = video.c; sourceTree = "<group>"; };
 		6076643728C68FB200CD99E5 /* mathlib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mathlib.h; sourceTree = "<group>"; };
 		6076643828C68FB200CD99E5 /* texture.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = texture.c; sourceTree = "<group>"; };
 		6076643928C68FB200CD99E5 /* genlib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = genlib.h; sourceTree = "<group>"; };
 		6076643B28C68FB200CD99E5 /* video.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = video.h; sourceTree = "<group>"; };
-		6076643C28C68FB200CD99E5 /* text.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = text.c; sourceTree = "<group>"; };
 		6076643D28C68FB200CD99E5 /* texture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = texture.h; sourceTree = "<group>"; };
 		6076643E28C68FB200CD99E5 /* mathlib.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = mathlib.c; sourceTree = "<group>"; };
 		6076644028C68FB200CD99E5 /* atari_4x8.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = atari_4x8.h; sourceTree = "<group>"; };
@@ -202,8 +199,6 @@
 				60E0BDC628D0244200413F7B /* sprite.c */,
 				6052685E28FDB2EF0032599F /* stack.h */,
 				6052685F28FDB2EF0032599F /* stack.c */,
-				6076643528C68FB200CD99E5 /* text.h */,
-				6076643C28C68FB200CD99E5 /* text.c */,
 				6076643D28C68FB200CD99E5 /* texture.h */,
 				6076643828C68FB200CD99E5 /* texture.c */,
 				60E498AD28DCB27600F4A322 /* vector.h */,
@@ -291,7 +286,6 @@
 				56CA3EBB28C6AA7E00AE2DD5 /* mathlib.c in Sources */,
 				60E0BDCA28D0264A00413F7B /* sprites.c in Sources */,
 				60E06B2328E256AD0077F607 /* inventory.c in Sources */,
-				56CA3EBC28C6AA7E00AE2DD5 /* text.c in Sources */,
 				60E0BDC428D021EA00413F7B /* a_main.c in Sources */,
 				6052685828FCA23B0032599F /* g_state.c in Sources */,
 				604ABB5728E226DD007A9DD4 /* w_tile.c in Sources */,

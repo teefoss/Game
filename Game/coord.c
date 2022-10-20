@@ -18,6 +18,16 @@ tile_coord_t PositionToTile(position_t position)
     return tile;
 }
 
+position_t TileToPosition(tile_coord_t tile_coord)
+{
+    position_t position = {
+        .x = (float)tile_coord.x * SCALED_TILE_SIZE,
+        .y = (float)tile_coord.y * SCALED_TILE_SIZE
+    };
+
+    return position;
+}
+
 chunk_coord_t TileToChunk(tile_coord_t tile_coord)
 {
     chunk_coord_t chunk = {

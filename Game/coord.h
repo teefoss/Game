@@ -21,6 +21,7 @@ typedef COORD chunk_coord_t;
 
 tile_coord_t ChunkToTile(chunk_coord_t chunk);
 tile_coord_t PositionToTile(position_t position);
+position_t TileToPosition(tile_coord_t tile_coord);
 chunk_coord_t PositionToChunk(position_t position);
 chunk_coord_t TileToChunk(tile_coord_t tile_coord);
 

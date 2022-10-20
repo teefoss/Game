@@ -11,9 +11,7 @@
 
 #include "mylib/genlib.h"
 #include "mylib/video.h"
-#include "mylib/text.h"
 #include "mylib/texture.h"
-#include "mylib/input.h"
 #include "mylib/input.h"
 
 #include <SDL.h>
@@ -53,6 +51,19 @@ static void G_DoFrame(game_t * game, float dt )
                         break;
                 }
                 break;
+            case SDL_WINDOWEVENT:
+                switch ( event.window.event ) {
+                    case SDL_WINDOWEVENT_RESIZED: {
+                        float scale_x, scale_y;
+                        SDL_RenderGetScale(renderer, &scale_x, &scale_y);
+                        printf("scale after resize: %f, %f\n", scale_x, scale_y);
+                        //V_SetTextScale(scale_x * DRAW_SCALE, scale_y * DRAW_SCALE);
+                        break;
+                    }
+                    default:
+                        break;
+                }
+                break;
             default:
                 break;
         }
@@ -65,13 +76,12 @@ static void G_DoFrame(game_t * game, float dt )
         G_Update(game, game->input_state, dt);
     }
 
-    V_SetGray(0);
-    V_Clear();
+    V_ClearRGB(0, 0, 0);
     G_Render(game);
     UI_Render(game);
 
     DisplayDebugInfo(game->world, IN_GetMousePosition(game->input_state));
-    V_Present();
+    V_Refresh();
 
     // debug
     static int max_render = 0;
@@ -126,8 +136,8 @@ void G_Main(void)
     SDL_DisableScreenSaver();
     SDL_RenderSetLogicalSize(renderer, GAME_WIDTH, GAME_HEIGHT);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-    SetTextRenderer(renderer);
-    SetTextScale(2.0f, 2.0f);
+    V_SetFont(FONT_CP437_8X8);
+    V_SetTextScale(DRAW_SCALE, DRAW_SCALE);
 
     game_t * game = calloc(1, sizeof(*game));
     game->input_state = IN_Initialize();
