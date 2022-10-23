@@ -210,7 +210,7 @@ static void PlayerStrike(actor_t * player)
 }
 
 void PlayerHandleInput
- (   actor_t * player,
+ (  actor_t * player,
     const control_state_t * control_state,
     float dt )
 {

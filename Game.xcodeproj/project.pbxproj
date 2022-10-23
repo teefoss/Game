@@ -65,6 +65,7 @@
 		6052685C28FDB1CC0032599F /* ui_screen.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ui_screen.c; sourceTree = "<group>"; };
 		6052685E28FDB2EF0032599F /* stack.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stack.h; sourceTree = "<group>"; };
 		6052685F28FDB2EF0032599F /* stack.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = stack.c; sourceTree = "<group>"; };
+		6071397B2904E5AB0069226D /* a_info.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = a_info.h; sourceTree = "<group>"; };
 		6076642728C68F8400CD99E5 /* Game */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Game; sourceTree = BUILT_PRODUCTS_DIR; };
 		6076642A28C68F8400CD99E5 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		6076643128C68F9900CD99E5 /* Game.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Game.entitlements; sourceTree = "<group>"; };
@@ -146,6 +147,7 @@
 				6076643228C68FB200CD99E5 /* mylib */,
 				6076643128C68F9900CD99E5 /* Game.entitlements */,
 				60E0BDC228D021EA00413F7B /* a_actor.h */,
+				6071397B2904E5AB0069226D /* a_info.h */,
 				60E4987028D37D6100F4A322 /* a_types.h */,
 				60E4986C28D3707300F4A322 /* a_definitions.c */,
 				60E0BDC328D021EA00413F7B /* a_main.c */,

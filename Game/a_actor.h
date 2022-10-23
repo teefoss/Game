@@ -9,6 +9,7 @@
 #define actor_h
 
 #include "a_types.h"
+#include "a_info.h"
 #include "cardinal.h"
 #include "mylib/array.h"
 #include "mylib/mathlib.h"
@@ -44,43 +45,6 @@ typedef enum {
 
     ACTOR_FLAG_CASTS_SHADOW     = 0x0200,
 } actor_flags_t;
-
-typedef struct inventory inventory_t;
-
-typedef struct {
-    inventory_t * inventory;
-
-    /// No movement buttons are pressed.
-    bool stopping_x;
-    bool stopping_y;
-    bool strike_button_down;
-} player_info_t;
-
-typedef struct {
-    // Size in inventory cells
-    int width;
-    int height;
-
-    bool sideways; // If true, width <-> height
-    sprite_t * sprite; // inventory sprite
-} item_info_t;
-
-typedef struct {
-    u8 level; // damage "rating", e.g. hand = 0 (weak)
-    u8 amount;
-} damage_t;
-
-typedef struct {
-    u8 amount;
-
-    // what damage level or greater is required to affect health
-    u8 minimum_damage_level;
-} health_t;
-
-typedef struct {
-    u8 quantity;
-    actor_type_t actor_type;
-} drop_t;
 
 #define MAX_DROPS 10
 
