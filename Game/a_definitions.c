@@ -211,14 +211,14 @@ static void PlayerStrike(actor_t * player)
 
 void PlayerHandleInput
  (   actor_t * player,
-  const control_state_t * control_state,
-  float dt )
+    const control_state_t * control_state,
+    float dt )
 {
     player_info_t * info = &player->info.player;
     info->stopping_x = true;
     info->stopping_y = true;
 
-    // Start of with the value from the stick
+    // Start off with the value from the stick.
     vec2_t move_dir = control_state->left_stick;
 
     // Check the keyboard too.
@@ -242,7 +242,7 @@ void PlayerHandleInput
         player->facing = EAST;
     }
 
-    // Stick: make it easier to go exactly east/west and north/south
+    // Stick: make it easier to go exactly east/west and north/south.
     {
         const float minimum = 0.2f;
 
@@ -266,7 +266,7 @@ void PlayerHandleInput
     vec2_t vel = Vec2Scale(move_dir, PLAYER_VELOCITY);
     Vec2Lerp(&player->vel, &vel, dt * 10);
 
-    // Set player facing according to right controller stick
+    // Set player facing according to right controller stick.
     {
         // TODO: figure out keyboard control for this
 
@@ -287,33 +287,6 @@ void PlayerHandleInput
             info->strike_button_down = false;
         }
     }
-
-    // keyboard
-
-//    float factor = 4.0f;
-//    if ( control_state->controls[CONTROL_PLAYER_MOVE_LEFT] ) {
-//        player->vel.x = Lerp(player->vel.x, -PLAYER_VELOCITY, dt * factor);
-//        info->stopping_x = false;
-//        player->facing = WEST;
-//    }
-//
-//    if ( control_state->controls[CONTROL_PLAYER_MOVE_RIGHT] ) {
-//        player->vel.x = Lerp(player->vel.x, PLAYER_VELOCITY, dt * factor);
-//        info->stopping_x = false;
-//        player->facing = EAST;
-//    }
-//
-//    if ( control_state->controls[CONTROL_PLAYER_MOVE_UP] ) {
-//        player->vel.y = Lerp(player->vel.y, -PLAYER_VELOCITY, dt * factor);
-//        info->stopping_y = false;
-//        player->facing = NORTH;
-//    }
-//
-//    if ( control_state->controls[CONTROL_PLAYER_MOVE_DOWN] ) {
-//        player->vel.y = Lerp(player->vel.y, PLAYER_VELOCITY, dt * factor);
-//        info->stopping_y = false;
-//        player->facing = SOUTH;
-//    }
 }
 
 #pragma mark - UPDATE FUNCTIONS
