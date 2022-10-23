@@ -9,7 +9,7 @@
 #define coord_h
 
 #include "cardinal.h"
-#include "mylib/genlib.h"
+#include "mylib/types.h"
 #include "mylib/vector.h"
 
 typedef vec2_t position_t; // location in world pixels

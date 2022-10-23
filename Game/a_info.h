@@ -8,7 +8,7 @@
 #ifndef a_info_h
 #define a_info_h
 
-#include "mylib/genlib.h"
+#include "mylib/types.h"
 #include "mylib/sprite.h"
 
 typedef struct inventory inventory_t;

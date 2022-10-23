@@ -8,6 +8,7 @@
 
 #include "genlib.h"
 #include "vector.h"
+#include "types.h"
 #include <stdbool.h>
 
 #define RANDOM_MAX          0xFFFFFFFF

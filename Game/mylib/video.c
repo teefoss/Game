@@ -1,6 +1,8 @@
 #include "video.h"
 
 #include "genlib.h"
+#include "types.h"
+
 #include "fonts/cp437_8x8.h"
 #include "fonts/cp437_8x16.h"
 #include "fonts/atari_4x8.h"

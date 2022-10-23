@@ -10,6 +10,7 @@
 
 #include "cardinal.h"
 #include "mylib/genlib.h"
+#include "mylib/types.h"
 #include "mylib/vector.h"
 #include <SDL.h>
 

@@ -7,6 +7,8 @@
 #define __VIDEO_H__
 
 #include "genlib.h"
+#include "types.h"
+
 #include <SDL.h>
 
 typedef struct {            // default value:

@@ -82,22 +82,6 @@ extern "C" {
 #define PUSH(stack, value)      APPEND(stack, value)
 #define POP(stack)              stack.data[--s.count]
 
-//
-// Integer Types
-//
-
-#define U32_MAX 0xFFFFFFFF
-
-typedef int8_t      s8;
-typedef int16_t     s16;
-typedef int32_t     s32;
-typedef int64_t     s64;
-typedef uint8_t     u8;
-typedef uint16_t    u16;
-typedef uint32_t    u32;
-typedef uint64_t    u64;
-
-
 #define PRINT_DECL(func, T) void func(const char * name, T value)
 PRINT_DECL(print_uchar, unsigned char);
 PRINT_DECL(print_int, int);

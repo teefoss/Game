@@ -2,7 +2,9 @@
 #define SPRITE_H
 
 #include "genlib.h"
+#include "types.h"
 #include "vector.h"
+
 #include <stdbool.h>
 
 // A Sprite / Sprite Sheet and relavent data
