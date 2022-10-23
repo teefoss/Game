@@ -107,10 +107,7 @@ void RenderGrassEffectTexture
     int tile_x,
     int tile_y )
 {
-    // < 0.1 ms
-//    PROFILE_START(create_texture);
     tile->effect = V_CreateTexture(TILE_SIZE, TILE_SIZE);
-//    PROFILE_END(create_texture);
     SDL_SetTextureBlendMode(tile->effect, SDL_BLENDMODE_BLEND);
     SDL_SetRenderTarget(renderer, tile->effect);
 
@@ -223,8 +220,7 @@ void RenderGrassEffectTexture
 static void RenderGrass
 (   tile_t * tile,
     tile_t ** adjacent_tiles,
-    int tile_x,
-    int tile_y,
+    tile_coord_t tile_coord,
     SDL_Rect * dst )
 {
     SetSpriteColorMod(&sprites[SPRITE_GRASS], tile->lighting);
@@ -242,7 +238,7 @@ static void RenderGrass
 
     // Generate effect texture for this tile if needed.
     if ( tile->effect == NULL ) {
-        RenderGrassEffectTexture(tile, adjacent_tiles, tile_x, tile_y);
+        RenderGrassEffectTexture(tile, adjacent_tiles, tile_coord.x, tile_coord.y);
     }
 
     // overlay the effect texture
@@ -265,16 +261,17 @@ static void RenderVisibleTerrain(world_t * world)
     SDL_Point min, max;
     GetVisibleTileRange(world, &min, &max);
 
-    for ( int tile_y = min.y; tile_y <= max.y; tile_y++ ) {
-        for ( int tile_x = min.x; tile_x <= max.x; tile_x++ ) {
-            tile_t * tile = GetTile(world->tiles, tile_x, tile_y);
+    tile_coord_t tile_coord;
+    for ( tile_coord.y = min.y; tile_coord.y <= max.y; tile_coord.y++ ) {
+        for ( tile_coord.x = min.x; tile_coord.x <= max.x; tile_coord.x++ ) {
+            tile_t * tile = GetTile(world->tiles, tile_coord.x, tile_coord.y);
 
             tile_t * adjacent_tiles[NUM_DIRECTIONS];
-            GetAdjacentTiles(tile_x, tile_y, world->tiles, adjacent_tiles);
+            GetAdjacentTiles(tile_coord.x, tile_coord.y, world->tiles, adjacent_tiles);
 
             src.x = TILE_SIZE * (tile->variety % 4); // TODO: #define 4
-            dst.x = tile_x * SCALED_TILE_SIZE - visible_rect.x;
-            dst.y = tile_y * SCALED_TILE_SIZE - visible_rect.y;
+            dst.x = tile_coord.x * SCALED_TILE_SIZE - visible_rect.x;
+            dst.y = tile_coord.y * SCALED_TILE_SIZE - visible_rect.y;
 //            dst.x /= DRAW_SCALE; dst.x *= DRAW_SCALE;
 //            dst.y /= DRAW_SCALE; dst.y *= DRAW_SCALE;
 
@@ -300,12 +297,7 @@ static void RenderVisibleTerrain(world_t * world)
                 case TERRAIN_GRASS:
                 case TERRAIN_FOREST:
                 case TERRAIN_DARK_FOREST:
-                    RenderGrass
-                    (   tile,
-                        adjacent_tiles,
-                        tile_x,
-                        tile_y,
-                        &dst );
+                    RenderGrass(tile, adjacent_tiles, tile_coord, &dst);
                     break;
                 default:
                     break;
@@ -313,7 +305,7 @@ static void RenderVisibleTerrain(world_t * world)
 
             // debug: highlight tile under mouse
             if (show_debug_info
-                && ((int)mouse_tile.x == tile_x && (int)mouse_tile.y == tile_y) )
+                && ((int)mouse_tile.x == tile_coord.x && (int)mouse_tile.y == tile_coord.y) )
             {
                 V_SetRGBA(255, 90, 90, 255);
                 V_DrawRect(&dst);

@@ -19,6 +19,8 @@ typedef enum {
 typedef enum {
     SPRITE_PLAYER_STAND,
     SPRITE_PLAYER_WALK,
+    SPRITE_PLAYER_SWING, // strike wind up
+    SPRITE_PLAYER_STRIKE, // delivered a blow
     SPRITE_SHALLOW_WATER,
     SPRITE_SHALLOW_WATER_EDGE,
     SPRITE_GRASS,

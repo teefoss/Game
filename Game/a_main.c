@@ -102,6 +102,26 @@ void DamageActor(actor_t * attacker, actor_t * target)
     }
 }
 
+void ChangeActorState(actor_t * actor, actor_state_t * new_state)
+{
+    if ( actor->state && actor->state->on_exit ) {
+        actor->state->on_exit(actor);
+    }
+
+    if ( new_state == NULL ) {
+        KillActor(actor);
+        return;
+    }
+
+    actor->state = new_state;
+
+    if ( actor->state->on_enter ) {
+        actor->state->on_enter(actor);
+    }
+
+    actor->state_timer = actor->state->length;
+}
+
 void UpdateActor(actor_t * actor, float dt)
 {
     if ( actor->facing == NO_DIRECTION ) {
@@ -135,6 +155,13 @@ void UpdateActor(actor_t * actor, float dt)
     }
 
     if ( actor->state ) {
+        // Do state machine.
+        if ( actor->state->length ) {
+            if ( --actor->state_timer <= 0 ) {
+                ChangeActorState(actor, actor->state->next_state);
+            }
+        }
+
         if ( actor->state->update ) {
             actor->state->update(actor, dt);
         }

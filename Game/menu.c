@@ -193,17 +193,7 @@ static void M_MoveDown(menu_t * menu)
     }
 }
 
-bool M_ProcessInput(game_t * game)
-{
-    menu_t * menu = M_GetCurrentMenu(game);
-    if ( menu == NULL ) {
-        return false;
-    }
-
-    return false;
-}
-
-bool M_ProcessEvent(game_t * game, const SDL_Event * event)
+bool M_ProcessControls(game_t * game)
 {
     menu_t * menu = M_GetCurrentMenu(game);
     if ( menu == NULL ) {
@@ -212,63 +202,20 @@ bool M_ProcessEvent(game_t * game, const SDL_Event * event)
 
     menu_item_t * item = &menu->items[menu->selected_item];
 
-    switch ( event->type ) {
-        case SDL_KEYDOWN: {
-            switch ( event->key.keysym.sym ) {
-                case SDLK_ESCAPE:
-                    M_Action_Close(game, 0);
-                    return true;
-                case SDLK_DOWN:
-                    M_MoveDown(menu);
-                    return true;
-                case SDLK_UP:
-                    M_MoveUp(menu);
-                    return true;
-                case SDLK_RETURN:
-                    if ( item->action && item->action_type == ACTION_SELECT ) {
-                        item->action(game, item->destination);
-                    }
-                    return true;
-                default:
-                    break;
-            }
-            break;
+    if ( game->control_state.controls[CONTROL_MENU_TOGGLE] ) {
+        M_Action_Close(game, 0);
+        return true;
+    } else if ( game->control_state.controls[CONTROL_MENU_UP] ) {
+        M_MoveUp(menu);
+        return true;
+    } else if ( game->control_state.controls[CONTROL_MENU_DOWN] ) {
+        M_MoveDown(menu);
+        return true;
+    } else if ( game->control_state.controls[CONTROL_MENU_SELECT] ) {
+        if ( item->action && item->action_type == ACTION_SELECT ) {
+            item->action(game, item->destination);
         }
-        case SDL_CONTROLLERBUTTONDOWN: {
-            switch ( event->cbutton.button ) {
-                case SDL_CONTROLLER_BUTTON_DPAD_UP:
-                    M_MoveUp(menu);
-                    return true;
-                case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-                    M_MoveDown(menu);
-                    return true;
-                case SDL_CONTROLLER_BUTTON_A:
-                    if ( item->action && item->action_type == ACTION_SELECT ) {
-                        item->action(game, item->destination);
-                    }
-                    return true;
-                default:
-                    break;
-            }
-            break;
-        }
-            // TODO: fix this
-#if 0
-        case SDL_CONTROLLERAXISMOTION: {
-            if ( event->caxis.axis == SDL_CONTROLLER_AXIS_LEFTY ) {
-                if ( event->caxis.value < 0 ) {
-                    M_MoveUp(menu);
-                    return true;
-                } else if ( event->caxis.value > 0 ) {
-                    M_MoveDown(menu);
-                    return true;
-                }
-            }
-            break;
-        }
-#endif
-        default:
-            break;
+        return true;
     }
 
     return false;

@@ -32,7 +32,10 @@ static void UpdateTiles(world_t * world)
     }
 }
 
-static void UpdateActors(world_t * world, input_state_t * input_state, float dt)
+static void UpdateActors
+(   world_t * world,
+    const control_state_t * control_state,
+    float dt )
 {
     const int max_active = 1000;
     actor_t * active_actors[max_active] = { 0 };
@@ -69,10 +72,10 @@ static void UpdateActors(world_t * world, input_state_t * input_state, float dt)
     world->updating_actors = true;
 
     // Let any actors that respond to input do so.
-    if ( input_state ) {
+    if ( control_state ) {
         for ( actor_t ** actor = active_actors; *actor; actor++ ) {
             if ( (*actor)->state && (*actor)->state->handle_input ) {
-                (*actor)->state->handle_input(*actor, input_state, dt);
+                (*actor)->state->handle_input(*actor, control_state, dt);
             }
         }
     }
@@ -151,7 +154,10 @@ static void UpdateActors(world_t * world, input_state_t * input_state, float dt)
     }
 }
 
-void UpdateWorld(world_t * world, input_state_t * input_state, float dt)
+void UpdateWorld
+(   world_t * world,
+    const control_state_t * control_state,
+    float dt )
 {
     int update_start = SDL_GetTicks(); // debug
 
@@ -190,7 +196,10 @@ void UpdateWorld(world_t * world, input_state_t * input_state, float dt)
     LoadChunkInRegion(world, player->pos, CHUNK_LOAD_RADIUS_TILES);
 
     UpdateTiles(world); // lighting
-    UpdateActors(world, input_state, dt);
+    UpdateActors(world, control_state, dt);
+
+    // Update camera
+    PlayerUpdateCamera(GetActorType(world->actors, ACTOR_PLAYER), dt);
 
     update_ms = SDL_GetTicks() - update_start; // debug
 }

@@ -31,31 +31,50 @@
 typedef struct world world_t;
 typedef struct input_state input_state_t;
 typedef struct game game_t;
+typedef struct control_state control_state_t;
 
 typedef struct {
     SDL_GameControllerButton button;
     SDL_Scancode key;
+    button_state_t state;
 } control_t;
 
 typedef enum {
     CONTROL_INVENTORY_TOGGLE,
+
     CONTROL_MENU_TOGGLE,
     CONTROL_MENU_UP,
     CONTROL_MENU_DOWN,
     CONTROL_MENU_SELECT,
+
+    CONTROL_PLAYER_MOVE_UP,
+    CONTROL_PLAYER_MOVE_DOWN,
+    CONTROL_PLAYER_MOVE_LEFT,
+    CONTROL_PLAYER_MOVE_RIGHT,
+
     NUM_CONTROLS,
 } control_id_t;
+
+struct control_state {
+    bool controls[NUM_CONTROLS];
+
+    vec2_t left_stick;
+    vec2_t right_stick;
+    float left_trigger;
+    float right_trigger;
+
+    bool menu_direction_pressed;
+};
 
 typedef enum {
     GAME_STATE_TITLE,
     GAME_STATE_PLAY,
-    GAME_STATE_INVENTORY,
     NUM_GAME_STATES
 } game_state_id_t;
 
 typedef struct {
-    bool (* process_event)(game_t * game, const SDL_Event * event);
-    void (* update)(game_t * game, input_state_t * input, float dt);
+    bool (* process_control)(game_t * game);
+    void (* update)(game_t * game, float dt);
     void (* render)(game_t * game);
 } game_state_t;
 
@@ -77,7 +96,9 @@ struct game {
     int num_screens;
 
     int ticks;
-    input_state_t * input_state;
+    bool controls_processed;
+    control_state_t control_state;
+
     world_t * world;
 };
 
@@ -92,17 +113,14 @@ void M_Action_ReturnToMainMenu(game_t * game, int action_type);
 
 void G_PushState(game_t * game, game_state_id_t state);
 void G_PopState(game_t * game);
-void G_ProcessInput(game_t * game);
-bool G_ProcessEvent(game_t * game, const SDL_Event * event);
-void G_Update(game_t * game, input_state_t * input, float dt);
+
+bool G_ProcessControl(game_t * game);
+void G_Update(game_t * game, float dt);
 void G_Render(game_t * game);
 
 // g_controls.c
 
-// TODO: put this somewhere
-extern bool control_state[NUM_CONTROLS];
-
-bool G_ControlPressed(input_state_t * input,  control_id_t control);
-void G_UpdateControlState(input_state_t * input);
+void G_UpdateControlState(input_state_t * input, control_state_t * state);
+bool G_ControlPressed(const control_state_t * control_state, control_id_t id);
 
 #endif /* g_game_h */

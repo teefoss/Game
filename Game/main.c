@@ -11,8 +11,6 @@
  RESOURCES
  https://www.gamedeveloper.com/programming/dynamic-2d-character-lighting
 
- TODO: Merge text into video.c
- TODO: Debug info is UI screen
  TODO: Left stick to navigate menu
  TODO: stop using floating point clock
  TODO: update to use coord types instead of int x, y everywhere

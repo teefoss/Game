@@ -61,8 +61,8 @@ extern menu_t play_menu;
 
 void M_PushMenu(game_t * game, menu_id_t id);
 void M_PopMenu(game_t * game);
-bool M_ProcessInput(game_t * game);
-bool M_ProcessEvent(game_t * game, const SDL_Event * event);
+
+bool M_ProcessControls(game_t * game);
 void M_Render(game_t * game);
 void M_Action_Close(game_t * game, int unused);
 

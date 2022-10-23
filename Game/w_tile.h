@@ -45,6 +45,5 @@ struct tile {
 };
 
 void GetTileNoise(int tile_x, int tile_y, float out[TILE_SIZE][TILE_SIZE]);
-vec2_t GetAdjacentTile(vec2_t position, cardinal_t direction);
 
 #endif /* w_tile_h */

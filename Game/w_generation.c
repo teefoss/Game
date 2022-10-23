@@ -110,51 +110,6 @@ static void GenerateTerrainInChunk(world_t * world, chunk_coord_t chunk_coord)
     }
 }
 
-// Used by CreateWorld() to generate all terrain.
-static void GenerateTerrain(world_t * world)
-{
-    RandomizeNoise(0);
-
-    float half_width = WORLD_WIDTH / 2.0f;
-    float half_height = WORLD_HEIGHT / 2.0f;
-
-    num_grass_tiles = 0;
-    for ( int y = 0; y < WORLD_HEIGHT; y++ ) {
-        for ( int x = 0; x < WORLD_WIDTH; x++ ) {
-
-            // get distance from this point to center of world
-            float distance = DISTANCE(half_width, half_height, x, y);
-
-            // Use a gradient to apply a circular mask to the world.
-            // Its radius is equal to WORLD_HEIGHT / 2.
-            float gradient;
-
-            float noise;
-
-            // set noise and gradient
-            if ( distance < half_height ) {
-                // A gradient is applied around the world center: the farther
-                // out a tile is, the more it's elevation is lowered.
-                gradient = MAP(distance, 0.0f, half_height, 0.0f, 1.0f);
-                noise = Noise2(x, y, 1.0f, 0.01f, 6, 1.0f, 0.5f, 2.0f) - gradient;
-            } else {
-                // Outside the circular mask, land is removed entirely.
-                noise = -1.0f;
-            }
-
-            tile_t * tile = GetTile(world->tiles, x, y);
-            SetUpTile(tile, noise);
-
-            if ( tile->terrain >= TERRAIN_GRASS ) {
-                grass_tiles[num_grass_tiles].tile = tile;
-                grass_tiles[num_grass_tiles].x = x;
-                grass_tiles[num_grass_tiles].y = y;
-                num_grass_tiles++;
-            }
-        }
-    }
-}
-
 // track occupied tiles during generation
 static bool occupied[WORLD_HEIGHT][WORLD_WIDTH];
 
@@ -172,8 +127,7 @@ void SpawnPlayer(world_t * world)
 
     int num_potentials = 0;
     struct potential_tile {
-        int x;
-        int y;
+        tile_coord_t tile_coord;
         int distance;
     } potentials[WORLD_WIDTH * WORLD_HEIGHT];
 
@@ -183,8 +137,8 @@ void SpawnPlayer(world_t * world)
         for ( int x = 0; x < WORLD_WIDTH; x++ ) {
             tile_t * tile = GetTile(world->tiles, x, y);
             if ( tile->terrain == TERRAIN_GRASS ) {
-                potentials[num_potentials].x = x;
-                potentials[num_potentials].y = y;
+                potentials[num_potentials].tile_coord.x = x;
+                potentials[num_potentials].tile_coord.y = y;
                 potentials[num_potentials].distance
                     = DISTANCE(x, y, center_x, center_y);
                 num_potentials++;
@@ -209,9 +163,9 @@ void SpawnPlayer(world_t * world)
     // Select one of the 50 grass tiles closest to the center of world.
     Randomize();
     int i = Random(0, spawn_tile_count - 1);
-    occupied[potentials[i].y][potentials[i].x] = true;
+    occupied[potentials[i].tile_coord.y][potentials[i].tile_coord.x] = true;
 
-    vec2_t position = GetTileCenter(potentials[i].x, potentials[i].y);
+    position_t position = GetTileCenter(potentials[i].tile_coord);
     SpawnActor(ACTOR_PLAYER, position, world);
     world->player = (actor_t *)GetElement(world->actors, 0);
     world->camera = position;
@@ -236,7 +190,7 @@ void SpawnActorsInChunk(world_t * world, chunk_coord_t chunk_coord)
             }
 
             tile_t * tile = GetTile(world->tiles, tile_coord.x, tile_coord.y);
-            vec2_t v = GetTileCenter(tile_coord.x, tile_coord.y);
+            position_t v = GetTileCenter(tile_coord);
             float r = SCALED_TILE_SIZE / 3;
             v.x += RandomFloat(-r, r);
             v.y += RandomFloat(-r, r);
@@ -245,7 +199,7 @@ void SpawnActorsInChunk(world_t * world, chunk_coord_t chunk_coord)
                 case TERRAIN_GRASS:
                     // butterflies
                     if ( Chance(1.0f / 80.0f) ) {
-                        vec2_t p = GetTileCenter(tile_coord.x, tile_coord.y);
+                        vec2_t p = GetTileCenter(tile_coord);
                         actor_t * actor = SpawnActor(ACTOR_BUTTERFLY, p, world);
                         actor->z = 16;
                         continue;
@@ -281,46 +235,48 @@ void SpawnActorsInChunk(world_t * world, chunk_coord_t chunk_coord)
 
 void SpawnActors(world_t * world)
 {
-    for ( int y = 0; y < WORLD_HEIGHT; y++ ) {
-        for ( int x = 0; x < WORLD_WIDTH; x++ ) {
-            if ( occupied[y][x] ) {
+    tile_coord_t tile_coord;
+    for ( tile_coord.y = 0; tile_coord.y < WORLD_HEIGHT; tile_coord.y++ ) {
+        for ( tile_coord.x = 0; tile_coord.x < WORLD_WIDTH; tile_coord.x++ ) {
+            if ( occupied[tile_coord.y][tile_coord.x] ) {
                 continue;
             }
 
-            tile_t * tile = GetTile(world->tiles, x, y);
-            vec2_t v = GetTileCenter(x, y);
+            tile_t * tile = GetTile(world->tiles, tile_coord.x, tile_coord.y);
+            position_t tile_center = GetTileCenter(tile_coord);
+
             float r = SCALED_TILE_SIZE / 3;
-            v.x += RandomFloat(-r, r);
-            v.y += RandomFloat(-r, r);
+            position_t rand_pt = tile_center;
+            rand_pt.x += RandomFloat(-r, r);
+            rand_pt.y += RandomFloat(-r, r);
 
             switch ( tile->terrain ) {
                 case TERRAIN_GRASS:
                     // butterflies
                     if ( Chance(1.0f / 80.0f) ) {
-                        vec2_t p = GetTileCenter(x, y);
-                        actor_t * actor = SpawnActor(ACTOR_BUTTERFLY, p, world);
-                        actor->z = 16;
+                        actor_t * actor = SpawnActor(ACTOR_BUTTERFLY, rand_pt, world);
+                        actor->z = Random(12, 16);
                         continue;
                     }
 
                     // trees
                     if ( Chance(1.0f / 100.0f) ) {
-                        SpawnActor(ACTOR_TREE, v, world);
-                        occupied[y][x] = true;
+                        SpawnActor(ACTOR_TREE, rand_pt, world);
+                        occupied[tile_coord.y][tile_coord.x] = true;
                         continue;
                     }
 
                     // bushes
                     if ( Chance(1.0f / 50.0f) ) {
-                        SpawnActor(ACTOR_BUSH, v, world);
-                        occupied[y][x] = true;
+                        SpawnActor(ACTOR_BUSH, rand_pt, world);
+                        occupied[tile_coord.y][tile_coord.x] = true;
                         continue;
                     }
                     break;
                 case TERRAIN_FOREST:
                     if ( Chance(1.0f / 3.0f) ) {
-                        SpawnActor(ACTOR_TREE, v, world);
-                        occupied[y][x] = true;
+                        SpawnActor(ACTOR_TREE, rand_pt, world);
+                        occupied[tile_coord.y][tile_coord.x] = true;
                         continue;
                     }
                     break;

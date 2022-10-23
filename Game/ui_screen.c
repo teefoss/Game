@@ -7,12 +7,13 @@
 
 #include "ui_screen.h"
 #include "g_game.h"
+#include "inventory.h"
 #include "menu.h"
 
 screen_t screens[UI_NUM_SCREENS] = {
-    [UI_MENU]       = { M_ProcessEvent, M_ProcessInput, NULL, M_Render },
-    [UI_HUD]        = { NULL, NULL, NULL, NULL },
-    [UI_INVENTORY]  = { NULL, NULL, NULL, NULL },
+    [UI_MENU]       = { M_ProcessControls, NULL, M_Render },
+    [UI_HUD]        = { NULL, NULL, NULL },
+    [UI_INVENTORY]  = { InventoryProcessControls, NULL, InventoryRender },
 };
 
 static inline screen_t * CurrentScreen(game_t * game)
@@ -52,23 +53,12 @@ void UI_Render(game_t * game)
     }
 }
 
-bool UI_ProcessInput(game_t * game)
+bool UI_ProcessControls(game_t * game)
 {
     screen_t * screen = CurrentScreen(game);
 
-    if ( screen && screen->process_input ) {
-        return screen->process_input(game);
-    }
-
-    return false;
-}
-
-bool UI_ProcessEvent(game_t * game, const SDL_Event * event)
-{
-    screen_t * screen = CurrentScreen(game);
-
-    if ( screen && screen->process_event ) {
-        return screen->process_event(game, event);
+    if ( screen && screen->process_controls ) {
+        return screen->process_controls(game);
     }
 
     return false;

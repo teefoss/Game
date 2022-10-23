@@ -15,11 +15,12 @@
 
 #define PLAYER_VELOCITY (2.5f * SCALED_TILE_SIZE)
 
-void PlayerHandleInput(actor_t * player, input_state_t * input_state, float dt);
+void PlayerHandleInput(actor_t * player, const control_state_t * control_state, float dt);
 
 void PlayerStandUpdate(actor_t * player, float dt);
 void PlayerWalkUpdate(actor_t * player, float dt);
 void ButterflyUpdate(actor_t * actor, float dt);
+static void PlayerStrike(actor_t * player);
 
 void PlayerContact(actor_t * player, actor_t * hit);
 void PlayerStrikeContact(actor_t *, actor_t *);
@@ -45,20 +46,33 @@ static actor_state_t state_butterfly = {
     .update = ButterflyUpdate,
 };
 
+static actor_state_t player_strike = {
+    .length = MS2TICKS(400, FPS),
+    .next_state = &player_stand,
+    .sprite = &sprites[SPRITE_PLAYER_STRIKE],
+    .on_exit = PlayerStrike,
+};
+
+static actor_state_t player_wind_up = {
+    .length = MS2TICKS(400, FPS),
+    .next_state = &player_strike,
+    .sprite = &sprites[SPRITE_PLAYER_SWING],
+};
+
 static actor_t actor_definitions[NUM_ACTOR_TYPES] = {
     [ACTOR_NONE] = {
         0
     },
     [ACTOR_PLAYER] = {
         .flags =    ACTOR_FLAG_DIRECTIONAL |
-                    ACTOR_FLAG_ANIMATED |
-                    ACTOR_FLAG_CAN_BE_DAMAGED |
-                    ACTOR_FLAG_CASTS_SHADOW,
-        .state = &player_stand,
-        .hitbox_width = 5,
-        .hitbox_height = 4,
-        .draw = DrawPlayer,
-        .health = { .amount = 100, .minimum_damage_level = 0 },
+        ACTOR_FLAG_ANIMATED |
+        ACTOR_FLAG_CAN_BE_DAMAGED |
+        ACTOR_FLAG_CASTS_SHADOW,
+            .state = &player_stand,
+            .hitbox_width = 5,
+            .hitbox_height = 4,
+            .draw = DrawPlayer,
+            .health = { .amount = 100, .minimum_damage_level = 0 },
     },
     [ACTOR_HAND_STRIKE] = {
         .flags = ACTOR_FLAG_REMOVE,
@@ -70,35 +84,35 @@ static actor_t actor_definitions[NUM_ACTOR_TYPES] = {
     },
     [ACTOR_TREE] = {
         .flags =    ACTOR_FLAG_SOLID |
-                    ACTOR_FLAG_CAN_BE_DAMAGED |
-                    ACTOR_DROPS_ITEMS |
-                    ACTOR_FLAG_CASTS_SHADOW,
-        .sprite = &sprites[SPRITE_TREE],
-        .hitbox_width = 4,
-        .hitbox_height = 4,
-        .health = { .amount = 30, .minimum_damage_level = 0 },
-        .info.drops = {
-            { 1, ACTOR_LOG },
-            { 2, ACTOR_STICKS, },
-            { 3, ACTOR_LEAVES },
-        },
+        ACTOR_FLAG_CAN_BE_DAMAGED |
+        ACTOR_DROPS_ITEMS |
+        ACTOR_FLAG_CASTS_SHADOW,
+            .sprite = &sprites[SPRITE_TREE],
+            .hitbox_width = 4,
+            .hitbox_height = 4,
+            .health = { .amount = 30, .minimum_damage_level = 0 },
+            .info.drops = {
+                { 1, ACTOR_LOG },
+                { 2, ACTOR_STICKS, },
+                { 3, ACTOR_LEAVES },
+            },
     },
     [ACTOR_BUSH] = {
         .flags =    ACTOR_FLAG_SOLID |
-                    ACTOR_FLAG_CAN_BE_DAMAGED |
-                    ACTOR_DROPS_ITEMS |
-                    ACTOR_FLAG_CASTS_SHADOW,
-        .sprite = &sprites[SPRITE_BUSH],
-        .hitbox_width = 4,
-        .hitbox_height = 4,
-        .health = { .amount = 30, .minimum_damage_level = 0 },
+        ACTOR_FLAG_CAN_BE_DAMAGED |
+        ACTOR_DROPS_ITEMS |
+        ACTOR_FLAG_CASTS_SHADOW,
+            .sprite = &sprites[SPRITE_BUSH],
+            .hitbox_width = 4,
+            .hitbox_height = 4,
+            .health = { .amount = 30, .minimum_damage_level = 0 },
     },
     [ACTOR_BUTTERFLY] = {
         .flags =    ACTOR_FLAG_ANIMATED |
-                    ACTOR_FLAG_FLY |
-                    ACTOR_FLAG_NONINTERACTIVE |
-                    ACTOR_FLAG_CASTS_SHADOW,
-        .state = &state_butterfly,
+        ACTOR_FLAG_FLY |
+        ACTOR_FLAG_NONINTERACTIVE |
+        ACTOR_FLAG_CASTS_SHADOW,
+            .state = &state_butterfly,
     },
     [ACTOR_LOG] = {
         .flags = ACTOR_FLAG_COLLETIBLE,
@@ -147,7 +161,7 @@ actor_t GetActorDefinition(actor_type_t type)
 
  Basically:
  New Velocity = old_velocity *
-    (1 - dt * transition_speed) + desired_velocity * (dt * transition_speed)
+ (1 - dt * transition_speed) + desired_velocity * (dt * transition_speed)
  (we're just lerping here)
 
  transition_speed is one of a few constants (based on terrain type) largely
@@ -186,27 +200,52 @@ static void PlayerStrike(actor_t * player)
         facing = player->facing;
     }
 
-    vec2_t tile = GetAdjacentTile(player->pos, facing);
+    tile_coord_t tile_coord = GetAdjacentTile(player->pos, facing);
 
     // upper left corner
-    vec2_t coord = GetTileCenter(tile.x, tile.y);
+    position_t coord = GetTileCenter(tile_coord);
     coord.y += SCALED_TILE_SIZE / 2; // actor position is at the bottom
 
     SpawnActor(ACTOR_HAND_STRIKE, coord, player->world);
 }
 
-void PlayerHandleInput(actor_t * player, input_state_t * input_state, float dt)
+void PlayerHandleInput
+ (   actor_t * player,
+  const control_state_t * control_state,
+  float dt )
 {
     player_info_t * info = &player->info.player;
     info->stopping_x = true;
     info->stopping_y = true;
 
-#if 1
-    if ( IN_IsControllerConnected(input_state) ) {
-        vec2_t move_dir = IN_GetStickDirection(input_state, SIDE_LEFT);
+    // Start of with the value from the stick
+    vec2_t move_dir = control_state->left_stick;
 
-        // Make it easier to go exactly east/west and north/south
+    // Check the keyboard too.
+    if ( G_ControlPressed(control_state, CONTROL_PLAYER_MOVE_UP) ) {
+        move_dir.y = -1.0f;
+        player->facing = NORTH;
+    }
+
+    if ( G_ControlPressed(control_state, CONTROL_PLAYER_MOVE_DOWN) ) {
+        move_dir.y = 1.0f;
+        player->facing = SOUTH;
+    }
+
+    if ( G_ControlPressed(control_state, CONTROL_PLAYER_MOVE_LEFT) ) {
+        move_dir.x = -1.0f;
+        player->facing = WEST;
+    }
+
+    if ( G_ControlPressed(control_state, CONTROL_PLAYER_MOVE_RIGHT) ) {
+        move_dir.x = 1.0f;
+        player->facing = EAST;
+    }
+
+    // Stick: make it easier to go exactly east/west and north/south
+    {
         const float minimum = 0.2f;
+
         if ( fabsf(move_dir.x) < minimum ) {
             move_dir.x = 0.0f;
         }
@@ -214,64 +253,67 @@ void PlayerHandleInput(actor_t * player, input_state_t * input_state, float dt)
         if ( fabsf(move_dir.y) < minimum ) {
             move_dir.y = 0.0f;
         }
+    }
 
-        if ( move_dir.x ) {
-            info->stopping_x = false;
-        }
+    if ( move_dir.x ) {
+        info->stopping_x = false;
+    }
 
-        if ( move_dir.y ) {
-            info->stopping_y = false;
-        }
+    if ( move_dir.y ) {
+        info->stopping_y = false;
+    }
 
-        vec2_t vel = Vec2Scale(move_dir, PLAYER_VELOCITY);
-        Vec2Lerp(&player->vel, &vel, dt * 10);
+    vec2_t vel = Vec2Scale(move_dir, PLAYER_VELOCITY);
+    Vec2Lerp(&player->vel, &vel, dt * 10);
 
-        // Set player facing according to right controller stick
-        vec2_t facing = IN_GetStickDirection(input_state, SIDE_RIGHT);
+    // Set player facing according to right controller stick
+    {
+        // TODO: figure out keyboard control for this
+
+        vec2_t facing = control_state->right_stick;
         player->facing = VectorToCardinal(facing);
+    }
 
-        float left_trigger = IN_GetTriggerState(input_state, SIDE_RIGHT);
+    // Hit stuff?
+    {
+        float right_trigger = control_state->right_trigger;
 
-        if ( !info->strike_button_down && left_trigger > 0.0f ) {
-            PlayerStrike(player);
+        if ( !info->strike_button_down && right_trigger > 0.0f ) {
+            player->vel = (vec2_t){ 0 };
+            ChangeActorState(player, &player_wind_up);
         }
 
-        if ( left_trigger == 0.0f ) {
+        if ( right_trigger == 0.0f ) {
             info->strike_button_down = false;
         }
     }
-    else
-#endif
-    {
-        float factor = 4.0f;
-        if ( IN_IsKeyDown(input_state, SDL_SCANCODE_A) ) {
-            player->vel.x = Lerp(player->vel.x, -PLAYER_VELOCITY, dt * factor);
-            info->stopping_x = false;
-            player->facing = WEST;
-        }
 
-        if ( IN_IsKeyDown(input_state, SDL_SCANCODE_D) ) {
-            player->vel.x = Lerp(player->vel.x, PLAYER_VELOCITY, dt * factor);
-            info->stopping_x = false;
-            player->facing = EAST;
-        }
+    // keyboard
 
-        if ( IN_IsKeyDown(input_state, SDL_SCANCODE_W) ) {
-            player->vel.y = Lerp(player->vel.y, -PLAYER_VELOCITY, dt * factor);
-            info->stopping_y = false;
-            player->facing = NORTH;
-        }
-
-        if ( IN_IsKeyDown(input_state, SDL_SCANCODE_S) ) {
-            player->vel.y = Lerp(player->vel.y, PLAYER_VELOCITY, dt * factor);
-            info->stopping_y = false;
-            player->facing = SOUTH;
-        }
-
-        if ( IN_GetKeyState(input_state, SDL_SCANCODE_SPACE) == IN_PRESSED ) {
-            PlayerStrike(player);
-        }
-    }
+//    float factor = 4.0f;
+//    if ( control_state->controls[CONTROL_PLAYER_MOVE_LEFT] ) {
+//        player->vel.x = Lerp(player->vel.x, -PLAYER_VELOCITY, dt * factor);
+//        info->stopping_x = false;
+//        player->facing = WEST;
+//    }
+//
+//    if ( control_state->controls[CONTROL_PLAYER_MOVE_RIGHT] ) {
+//        player->vel.x = Lerp(player->vel.x, PLAYER_VELOCITY, dt * factor);
+//        info->stopping_x = false;
+//        player->facing = EAST;
+//    }
+//
+//    if ( control_state->controls[CONTROL_PLAYER_MOVE_UP] ) {
+//        player->vel.y = Lerp(player->vel.y, -PLAYER_VELOCITY, dt * factor);
+//        info->stopping_y = false;
+//        player->facing = NORTH;
+//    }
+//
+//    if ( control_state->controls[CONTROL_PLAYER_MOVE_DOWN] ) {
+//        player->vel.y = Lerp(player->vel.y, PLAYER_VELOCITY, dt * factor);
+//        info->stopping_y = false;
+//        player->facing = SOUTH;
+//    }
 }
 
 #pragma mark - UPDATE FUNCTIONS
@@ -298,7 +340,7 @@ void PlayerStandUpdate(actor_t * player, float dt)
         player->state = &player_run;
     }
 
-    PlayerUpdateCamera(player, dt);
+    //PlayerUpdateCamera(player, dt);
 }
 
 void PlayerWalkUpdate(actor_t * player, float dt)
@@ -320,7 +362,7 @@ void PlayerWalkUpdate(actor_t * player, float dt)
         player->state = &player_stand;
     }
 
-    PlayerUpdateCamera(player, dt);
+    //PlayerUpdateCamera(player, dt);
 }
 
 void ButterflyUpdate(actor_t * actor, float dt)
@@ -363,19 +405,19 @@ void DrawPlayer(actor_t * player, int x, int y)
         SDL_Rect visible_rect = GetVisibleRect(player->world->camera);
 
         // Center the reticle on the center of tile adjacent to the player
-        vec2_t tile = GetAdjacentTile(player->pos, player->facing);
-        vec2_t ret_pos = GetTileCenter(tile.x, tile.y);
+        tile_coord_t tile = GetAdjacentTile(player->pos, player->facing);
+        position_t ret_pos = GetTileCenter(tile);
         ret_pos.x -= (spr->location.w * DRAW_SCALE) / 2.0f;
         ret_pos.y -= (spr->location.h * DRAW_SCALE) / 2.0f;
 
         DrawSprite
         (   spr,
-            0,
-            0,
-            ret_pos.x - visible_rect.x,
-            ret_pos.y - visible_rect.y,
-            DRAW_SCALE,
-            0 );
+         0,
+         0,
+         ret_pos.x - visible_rect.x,
+         ret_pos.y - visible_rect.y,
+         DRAW_SCALE,
+         0 );
     }
 
     DrawActorSprite(player, GetActorSprite(player), x, y);

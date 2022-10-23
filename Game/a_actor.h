@@ -87,6 +87,7 @@ typedef struct {
 typedef struct actor actor_t;
 typedef struct actor_state actor_state_t;
 typedef struct world world_t;
+typedef struct control_state control_state_t;
 typedef void (* update_func_t)(actor_t *, float);
 typedef void (* contact_func_t)(actor_t *, actor_t *);
 
@@ -102,7 +103,7 @@ struct actor {
 
     actor_flags_t flags;
     cardinal_t direction;
-    cardinal_t facing;
+    cardinal_t facing; // made to face a certain direction via controller
 
     health_t health;
     damage_t damage;
@@ -142,14 +143,17 @@ struct actor_state {
     actor_state_t * next_state;
     sprite_t * sprite; // &sprites[id]
 
-    void (* handle_input)(actor_t * self, input_state_t *, float dt);
+    void (* handle_input)(actor_t * self, const control_state_t *, float dt);
     update_func_t update;
     contact_func_t contact;
+    void (* on_enter)(actor_t * self);
+    void (* on_exit)(actor_t * self);
 };
 
 // -----------------------------------------------------------------------------
 // a_main.c
 
+void ChangeActorState(actor_t * actor, actor_state_t * new_state);
 actor_t * SpawnActor(actor_type_t type, vec2_t position, world_t * world);
 sprite_t * GetActorSprite(const actor_t * actor);
 void DamageActor(actor_t * attacker, actor_t * target);

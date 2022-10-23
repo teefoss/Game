@@ -16,26 +16,15 @@
 
 #include <SDL.h>
 
-static void G_DoFrame(game_t * game, float dt )
+static void G_DoFrame(game_t * game, input_state_t * input, float dt )
 {
-    IN_StartFrame(game->input_state);
+    IN_StartFrame(input);
 
     SDL_Event event;
     while ( SDL_PollEvent(&event) ) {
 
-        IN_ProcessEvent(game->input_state, event);
-
-        if ( UI_ProcessEvent(game, &event) ) {
-            continue;
-        }
-
-        if ( G_ProcessEvent(game, &event) ) {
-            continue;
-        }
-
-        if ( ProcessDebugEvent(game, &event) ) {
-            continue;
-        }
+        IN_ProcessEvent(input, event);
+        ProcessDebugEvent(game, &event);
 
         // Handle any "universal" events
         switch ( event.type ) {
@@ -57,7 +46,6 @@ static void G_DoFrame(game_t * game, float dt )
                         float scale_x, scale_y;
                         SDL_RenderGetScale(renderer, &scale_x, &scale_y);
                         printf("scale after resize: %f, %f\n", scale_x, scale_y);
-                        //V_SetTextScale(scale_x * DRAW_SCALE, scale_y * DRAW_SCALE);
                         break;
                     }
                     default:
@@ -69,18 +57,23 @@ static void G_DoFrame(game_t * game, float dt )
         }
     }
 
-    IN_Update(game->input_state);
-    G_UpdateControlState(game->input_state);
+    IN_Update(input);
+    G_UpdateControlState(input, &game->control_state);
 
-    if ( !UI_ProcessInput(game) && !game->paused ) {
-        G_Update(game, game->input_state, dt);
+    game->controls_processed = UI_ProcessControls(game);
+    if ( !game->controls_processed ) {
+        game->controls_processed = G_ProcessControl(game);
+    }
+
+    if ( !game->paused ) {
+        G_Update(game, dt);
     }
 
     V_ClearRGB(0, 0, 0);
     G_Render(game);
     UI_Render(game);
 
-    DisplayDebugInfo(game->world, IN_GetMousePosition(game->input_state));
+    DisplayDebugInfo(game->world, IN_GetMousePosition(input));
     V_Refresh();
 
     // debug
@@ -97,7 +90,7 @@ static void G_DoFrame(game_t * game, float dt )
     frame++;
 }
 
-static void G_GameLoop(game_t * game)
+static void G_GameLoop(game_t * game, input_state_t * input)
 {
     float old_time = ProgramTime();
     while ( game->is_running ) {
@@ -113,7 +106,7 @@ static void G_GameLoop(game_t * game)
         debug_dt = dt;
 
         int frame_start = SDL_GetTicks();
-        G_DoFrame(game, dt);
+        G_DoFrame(game, input, dt);
         frame_ms = SDL_GetTicks() - frame_start;
 
         if ( (float)frame_ms > 1000.0f / FPS ) {
@@ -140,7 +133,7 @@ void G_Main(void)
     V_SetTextScale(DRAW_SCALE, DRAW_SCALE);
 
     game_t * game = calloc(1, sizeof(*game));
-    game->input_state = IN_Initialize();
+    input_state_t * input = IN_Initialize();
     game->is_running = true;
 
     M_PushMenu(game, MENU_MAIN);
@@ -153,7 +146,7 @@ void G_Main(void)
     printf("- world data size: %zu bytes\n", sizeof(world_t));
     printf("- actor size: %zu bytes\n", sizeof(actor_t));
 
-    G_GameLoop(game);
+    G_GameLoop(game, input);
 
     // clean up
     FreeAllTextures();
@@ -161,7 +154,7 @@ void G_Main(void)
         DestroyWorld(game->world);
     }
     
-    free(game->input_state);
+    free(input);
     free(game);
     SDL_EnableScreenSaver();
 }

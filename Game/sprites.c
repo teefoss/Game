@@ -10,17 +10,30 @@
 #define SPRITE_DIR "Assets/"
 #define HELD_ITEM_ICON_ALPHA 128
 
+#define PLAYER_SPRITE_WIDTH 8
+#define PLAYER_SPRITE_HEIGHT 24
+
 sprite_t sprites[NUM_SPRITES] = {
     [SPRITE_PLAYER_STAND] = {
         .texture_name = ""SPRITE_DIR"player.png",
-        .location = { 0, 0, 8, 24 },
+        .location = { 0, 0, PLAYER_SPRITE_WIDTH, PLAYER_SPRITE_HEIGHT },
         .num_frames = 1,
     },
     [SPRITE_PLAYER_WALK] = {
         .texture_name = ""SPRITE_DIR"player.png",
-        .location = { 8, 0, 8, 24 },
+        .location = { 8, 0, PLAYER_SPRITE_WIDTH, PLAYER_SPRITE_HEIGHT },
         .num_frames = 2,
         .fps = 6,
+    },
+    [SPRITE_PLAYER_SWING] = {
+        .texture_name = SPRITE_DIR"player.png",
+        .location = { 24, 0, PLAYER_SPRITE_WIDTH, PLAYER_SPRITE_HEIGHT },
+        .num_frames = 1,
+    },
+    [SPRITE_PLAYER_STRIKE] = {
+        .texture_name = SPRITE_DIR"player.png",
+        .location = { 32, 0, PLAYER_SPRITE_WIDTH, PLAYER_SPRITE_HEIGHT },
+        .num_frames = 1,
     },
     [SPRITE_SHALLOW_WATER] = {
         .texture_name = ""SPRITE_DIR"shallow-water.png",

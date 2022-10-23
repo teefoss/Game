@@ -70,7 +70,6 @@ typedef struct world {
 world_t * CreateWorld(void);
 
 tile_t * GetTile(tile_t * tiles, int x, int y);
-vec2_t GetTileCenter(int x, int y);
 void GetVisibleTileRange(world_t * world, SDL_Point * min, SDL_Point * max);
 SDL_Rect GetVisibleRect(vec2_t camera);
 
@@ -88,7 +87,13 @@ void RenderGrassEffectTexture
     int tile_y );
 
 void DestroyWorld(world_t * world); // maybe FreeWorld would be more positive?
-void UpdateWorld(world_t * world, input_state_t * input_state, float dt);
+
+/// Update world clock, lighting, tiles, and actors.
+void UpdateWorld
+(   world_t * world,
+    const control_state_t * control_state,
+    float dt );
+
 
 // TODO: move to debug.c
 void UpdateDebugMap(tile_t * tiles,  SDL_Texture ** debug_map, vec2_t camera);
@@ -97,5 +102,7 @@ void UpdateDebugMap(tile_t * tiles,  SDL_Texture ** debug_map, vec2_t camera);
 
 void LoadChunkIfNeeded(world_t * world, chunk_coord_t chunk_coord);
 void LoadChunkInRegion(world_t * world, position_t center, int tile_radius);
+
+void PlayerUpdateCamera(actor_t * player, float dt);
 
 #endif /* world_h */

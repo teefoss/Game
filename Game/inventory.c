@@ -6,6 +6,9 @@
 //
 
 #include "inventory.h"
+#include "g_game.h"
+#include "w_world.h"
+#include "mylib/video.h"
 
 bool InventoryInsertItemInSlot(inventory_t * inventory, actor_t * item, int x, int y)
 {
@@ -94,4 +97,42 @@ bool InventoryGetGridCell(inventory_t * inventory, int item_index, int * x, int 
     }
 
     return false;
+}
+
+bool InventoryProcessControls(game_t * game)
+{
+    if ( game->control_state.controls[CONTROL_INVENTORY_TOGGLE] ) {
+        UI_PopScreen(game);
+        return true;
+    }
+
+    return false;
+}
+
+void InventoryRender(game_t * game)
+{
+    // commence hack version:
+
+    actor_t * player = GetActorType(game->world->actors, ACTOR_PLAYER);
+    inventory_t * inv = player->info.player.inventory;
+
+    // draw grid
+    int size = 12 * DRAW_SCALE;
+    for ( int y = 0; y < inv->grid_height; y++ ) {
+        for ( int x = 0; x < inv->grid_width; x++ ) {
+            V_SetGray(255);
+            SDL_Rect r = { x * size, y * size, size, size };
+            V_DrawRect(&r);
+        }
+    }
+
+    for ( int i = 0; i < inv->num_items; i++ ) {
+        int x, y;
+        if ( InventoryGetGridCell(inv, i, &x, &y) ) {
+            actor_t * item = &inv->items[i];
+            int dst_x = x * size;
+            int dst_y = y * size;
+            DrawSprite(item->info.item.sprite, 0, 0, dst_x, dst_y, DRAW_SCALE, 0);
+        }
+    }
 }
