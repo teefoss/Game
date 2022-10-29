@@ -20,7 +20,7 @@ static void CleanUp(void)
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
 }
 
-void InitWindow(window_info_t * info) {
+void V_Init(video_info_t * info) {
     if ( !SDL_WasInit(SDL_INIT_VIDEO) ) {
         if ( SDL_InitSubSystem(SDL_INIT_VIDEO) != 0 ) {
             Error("could not init SDL video subsystem: %s", SDL_GetError());
@@ -29,14 +29,14 @@ void InitWindow(window_info_t * info) {
 
     atexit(CleanUp);
 
-    window_info_t _info;
+    video_info_t _info;
     if ( info == NULL ) {
-        _info = (window_info_t){
+        _info = (video_info_t){
             .title = "",
-            .x = SDL_WINDOWPOS_CENTERED,
-            .y = SDL_WINDOWPOS_CENTERED,
-            .width = 640,
-            .height = 480,
+            .window_x = SDL_WINDOWPOS_CENTERED,
+            .window_y = SDL_WINDOWPOS_CENTERED,
+            .window_width = 640,
+            .window_height = 480,
             .window_flags = 0,
             .render_flags = 0
         };
@@ -46,10 +46,10 @@ void InitWindow(window_info_t * info) {
 
     window = SDL_CreateWindow
     (   _info.title,
-        _info.x == 0 ? SDL_WINDOWPOS_CENTERED : _info.x,
-        _info.y == 0 ? SDL_WINDOWPOS_CENTERED : _info.y,
-        _info.width == 0 ? 640 : _info.width,
-        _info.height == 0 ? 480 : _info.height,
+        _info.window_x == 0 ? SDL_WINDOWPOS_CENTERED : _info.window_x,
+        _info.window_y == 0 ? SDL_WINDOWPOS_CENTERED : _info.window_y,
+        _info.window_width == 0 ? 640 : _info.window_width,
+        _info.window_height == 0 ? 480 : _info.window_height,
         _info.window_flags );
 
     if ( window == NULL ) {
@@ -63,37 +63,37 @@ void InitWindow(window_info_t * info) {
     }
 }
 
-window_info_t WindowInfo(void)
+video_info_t V_GetInfo(void)
 {
-    window_info_t info;
+    video_info_t info;
     info.title = SDL_GetWindowTitle(window);
-    SDL_GetWindowPosition(window, &info.x, &info.y);
-    SDL_GetWindowSize(window, &info.width, &info.height);
+    SDL_GetWindowPosition(window, &info.window_x, &info.window_y);
+    SDL_GetWindowSize(window, &info.window_width, &info.window_height);
     info.window_flags = SDL_GetWindowFlags(window);
 
     return info;
 }
 
-void GoFullscreen(fullscreen_t mode)
+void V_GoFullscreen(fullscreen_t mode)
 {
     SDL_SetWindowFullscreen(window, mode);
 }
 
-void GoWindowed(void)
+void V_GoWindowed(void)
 {
     SDL_SetWindowFullscreen(window, 0);
 }
 
-void ToggleFullscreen(fullscreen_t mode)
+void V_ToggleFullscreen(fullscreen_t mode)
 {
     u32 flags = SDL_GetWindowFlags(window);
 
     if (   flags & SDL_WINDOW_FULLSCREEN
         || flags & SDL_WINDOW_FULLSCREEN_DESKTOP )
     {
-        GoWindowed();
+        V_GoWindowed();
     } else {
-        GoFullscreen(mode);
+        V_GoFullscreen(mode);
     }
 }
 

@@ -13,13 +13,13 @@
 
 typedef struct {            // default value:
     const char * title;     // ""
-    int x;                  // SDL_WINDOWPOS_CENTERED
-    int y;                  // SDL_WINDOWPOS_CENTERED
-    int width;              // 640
-    int height;             // 480
+    int window_x;           // SDL_WINDOWPOS_CENTERED
+    int window_y;           // SDL_WINDOWPOS_CENTERED
+    int window_width;       // 640
+    int window_height;      // 480
     int window_flags;       // 0
     int render_flags;       // 0
-} window_info_t;
+} video_info_t;
 
 typedef enum {
     // old-school fullscreen, change desktop resolution
@@ -35,14 +35,14 @@ extern SDL_Renderer * renderer;
 /// Initialize window and renderer with options specified in `info`.
 /// - Parameter info: `NULL` or Zero values indicate default values
 ///   should be used.
-void InitWindow(window_info_t * info);
+void V_Init(video_info_t * info);
 
 /// Get current information about the window.
-window_info_t WindowInfo(void);
+video_info_t V_GetInfo(void);
 
-void GoFullscreen(fullscreen_t mode);
-void GoWindowed(void);
-void ToggleFullscreen(fullscreen_t mode);
+void V_GoFullscreen(fullscreen_t mode);
+void V_GoWindowed(void);
+void V_ToggleFullscreen(fullscreen_t mode);
 
 void V_DrawCircle (int x0, int y0, int radius);
 

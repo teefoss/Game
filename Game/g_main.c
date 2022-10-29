@@ -45,7 +45,7 @@ static void G_DoFrame(game_t * game, input_state_t * input, float dt )
             case SDL_KEYDOWN:
                 switch ( event.key.keysym.sym ) {
                     case SDLK_BACKSLASH:
-                        ToggleFullscreen(DESKTOP);
+                        V_ToggleFullscreen(DESKTOP);
                         break;
                     default:
                         break;
@@ -130,13 +130,13 @@ static void G_GameLoop(game_t * game, input_state_t * input)
 
 void G_Main(void)
 {
-    window_info_t info = {
-        .width = GAME_WIDTH,
-        .height = GAME_HEIGHT,
+    video_info_t info = {
+        .window_width = GAME_WIDTH,
+        .window_height = GAME_HEIGHT,
         .window_flags = SDL_WINDOW_RESIZABLE,
         .render_flags = SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC
     };
-    InitWindow(&info);
+    V_Init(&info);
     SDL_DisableScreenSaver();
     SDL_RenderSetLogicalSize(renderer, GAME_WIDTH, GAME_HEIGHT);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
