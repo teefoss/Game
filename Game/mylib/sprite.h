@@ -23,8 +23,15 @@ typedef struct {
     u8 alpha;
 } sprite_t;
 
-/// Draw sprite at pixel coordinate `dst_x`, `dst_y` using spritesheet
-/// cell cell_x, cell_y.
+// TODO: dst_ -> window_coord_t
+/// Draw sprite in spritesheet cell and at pixel coordinate.
+///
+/// - Parameter cell_x: Horizontal spritesheet cell offset.
+/// - Parameter cell_y: Vertical spritesheet cell offset.
+/// - Parameter dst_x: The horizontal window coordinate at which to draw.
+/// - Parameter dst_y: The vertical window coordinate at which to draw.
+/// - Parameter scale: The draw scale to use.
+/// - Parameter flip: which flip axis to use.
 void DrawSprite
 (   sprite_t * sprite,
     int cell_x,

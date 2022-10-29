@@ -6,6 +6,7 @@
 //
 
 #include "g_game.h"
+#include "mylib/video.h"
 
 // TODO: load from file or something
 // TODO: use mapping
@@ -13,6 +14,11 @@ const control_t controls[NUM_CONTROLS] = {
     [CONTROL_INVENTORY_TOGGLE] = {
         .button = SDL_CONTROLLER_BUTTON_Y,
         .key = SDL_SCANCODE_TAB,
+        .state = IN_PRESSED,
+    },
+    [CONTROL_INVENTORY_SELECT] = {
+        .button = SDL_CONTROLLER_BUTTON_A,
+        .mouse_button = SDL_BUTTON_LEFT,
         .state = IN_PRESSED,
     },
     [CONTROL_MENU_TOGGLE] = {
@@ -55,7 +61,26 @@ const control_t controls[NUM_CONTROLS] = {
         .key = SDL_SCANCODE_D,
         .state = IN_HELD,
     },
-
+    [CONTROL_PLAYER_STRIKE_UP] = {
+        .button = SDL_CONTROLLER_BUTTON_INVALID,
+        .key = SDL_SCANCODE_I,
+        .state = IN_PRESSED
+    },
+    [CONTROL_PLAYER_STRIKE_DOWN] = {
+        .button = SDL_CONTROLLER_BUTTON_INVALID,
+        .key = SDL_SCANCODE_K,
+        .state = IN_PRESSED
+    },
+    [CONTROL_PLAYER_STRIKE_LEFT] = {
+        .button = SDL_CONTROLLER_BUTTON_INVALID,
+        .key = SDL_SCANCODE_J,
+        .state = IN_PRESSED
+    },
+    [CONTROL_PLAYER_STRIKE_RIGHT] = {
+        .button = SDL_CONTROLLER_BUTTON_INVALID,
+        .key = SDL_SCANCODE_L,
+        .state = IN_PRESSED
+    },
 };
 
 bool control_state[NUM_CONTROLS];
@@ -67,7 +92,8 @@ static bool ControlPressed(input_state_t * input,  control_id_t control_id)
 
     return
     IN_GetControllerButtonState(input, ctrl.button) == state ||
-    IN_GetKeyState(input, ctrl.key) == state;
+    IN_GetKeyState(input, ctrl.key) == state ||
+    IN_GetMouseButtonState(input, ctrl.mouse_button) == state;
 }
 
 void G_UpdateControlState(input_state_t * input, control_state_t * state)
@@ -96,6 +122,19 @@ void G_UpdateControlState(input_state_t * input, control_state_t * state)
     } else if ( fabsf(state->left_stick.y) < a ) {
         state->menu_direction_pressed = false;
     }
+
+    // Update game cursor position from real mouse position.
+
+    vec2_t mouse_position = IN_GetMousePosition(input);
+
+    float scale_x;
+    float scale_y;
+    SDL_RenderGetScale(renderer, &scale_x, &scale_y);
+    mouse_position.x /= scale_x;
+    mouse_position.y /= scale_y;
+
+    state->cursor_x = (int)mouse_position.x;
+    state->cursor_y = (int)mouse_position.y;
 }
 
 bool G_ControlPressed(const control_state_t * control_state, control_id_t id)

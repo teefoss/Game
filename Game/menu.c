@@ -150,7 +150,7 @@ void M_Action_ReturnToMainMenu(game_t * game, int action_type)
 
 #pragma mark -
 
-void M_Render(game_t * game)
+void M_Render(game_t * game, screen_t * screen)
 {
     menu_t * menu = M_GetCurrentMenu(game);
     if ( menu == NULL ) {
@@ -193,7 +193,7 @@ static void M_MoveDown(menu_t * menu)
     }
 }
 
-bool M_ProcessControls(game_t * game)
+bool M_ProcessControls(game_t * game, screen_t * screen)
 {
     menu_t * menu = M_GetCurrentMenu(game);
     if ( menu == NULL ) {

@@ -16,6 +16,7 @@ typedef vec2_t position_t; // location in world pixels
 
 #define COORD struct { s16 x, y; }
 
+typedef COORD coord_t; // all-purpose integer coordinate
 typedef COORD window_coord_t;
 typedef COORD tile_coord_t;
 typedef COORD chunk_coord_t;

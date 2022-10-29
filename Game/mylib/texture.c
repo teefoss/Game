@@ -101,3 +101,24 @@ void FreeAllTextures(void)
         }
     }
 }
+
+SDL_Rect GetScaledTextureSize(SDL_Texture * texture, int draw_scale)
+{
+    float scale_x;
+    float scale_y;
+    SDL_RenderGetScale(renderer, &scale_x, &scale_y);
+    printf("scale: %f, %f\n", scale_x, scale_y);
+
+    int width;
+    int height;
+    SDL_QueryTexture(texture, NULL, NULL, &width, &height);
+
+    SDL_Rect result = {
+        0,
+        0,
+        width * scale_x * draw_scale,
+        height * scale_y * draw_scale
+    };
+
+    return result;
+}

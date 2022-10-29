@@ -47,14 +47,14 @@ static actor_state_t state_butterfly = {
 };
 
 static actor_state_t player_strike = {
-    .length = MS2TICKS(400, FPS),
+    .length = MS2TICKS(100, FPS),
     .next_state = &player_stand,
     .sprite = &sprites[SPRITE_PLAYER_STRIKE],
     .on_exit = PlayerStrike,
 };
 
 static actor_state_t player_wind_up = {
-    .length = MS2TICKS(400, FPS),
+    .length = MS2TICKS(200, FPS),
     .next_state = &player_strike,
     .sprite = &sprites[SPRITE_PLAYER_SWING],
 };
@@ -286,6 +286,26 @@ void PlayerHandleInput
         if ( right_trigger == 0.0f ) {
             info->strike_button_down = false;
         }
+
+        if ( control_state->controls[CONTROL_PLAYER_STRIKE_UP] ) {
+            player->facing = NORTH;
+            ChangeActorState(player, &player_wind_up);
+        }
+
+        if ( control_state->controls[CONTROL_PLAYER_STRIKE_DOWN] ) {
+            player->facing = SOUTH;
+            ChangeActorState(player, &player_wind_up);
+        }
+
+        if ( control_state->controls[CONTROL_PLAYER_STRIKE_LEFT] ) {
+            player->facing = WEST;
+            ChangeActorState(player, &player_wind_up);
+        }
+
+        if ( control_state->controls[CONTROL_PLAYER_STRIKE_RIGHT] ) {
+            player->facing = EAST;
+            ChangeActorState(player, &player_wind_up);
+        }
     }
 }
 
@@ -357,7 +377,7 @@ void ButterflyUpdate(actor_t * actor, float dt)
 void PlayerContact(actor_t * player, actor_t * hit)
 {
     if ( hit->flags & ACTOR_FLAG_COLLETIBLE ) {
-        if ( InventoryInsertItem(hit, player->info.player.inventory) ) {
+        if ( INV_InsertItem(hit, player->info.player.inventory) ) {
             hit->flags |= ACTOR_FLAG_REMOVE;
         }
     }
@@ -385,12 +405,12 @@ void DrawPlayer(actor_t * player, int x, int y)
 
         DrawSprite
         (   spr,
-         0,
-         0,
-         ret_pos.x - visible_rect.x,
-         ret_pos.y - visible_rect.y,
-         DRAW_SCALE,
-         0 );
+            0,
+            0,
+            ret_pos.x - visible_rect.x,
+            ret_pos.y - visible_rect.y,
+            DRAW_SCALE,
+            0 );
     }
 
     DrawActorSprite(player, GetActorSprite(player), x, y);

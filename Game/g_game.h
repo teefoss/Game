@@ -8,6 +8,7 @@
 #ifndef g_game_h
 #define g_game_h
 
+#include "coord.h"
 #include "inventory.h"
 #include "menu.h"
 #include "ui_screen.h"
@@ -28,6 +29,8 @@
 #define GAME_WIDTH  (480 * DRAW_SCALE)
 #define GAME_HEIGHT (270 * DRAW_SCALE)
 
+#define SPRITE_DIR "Assets/"
+
 typedef struct world world_t;
 typedef struct input_state input_state_t;
 typedef struct game game_t;
@@ -36,11 +39,13 @@ typedef struct control_state control_state_t;
 typedef struct {
     SDL_GameControllerButton button;
     SDL_Scancode key;
+    int mouse_button;
     button_state_t state;
 } control_t;
 
 typedef enum {
     CONTROL_INVENTORY_TOGGLE,
+    CONTROL_INVENTORY_SELECT,
 
     CONTROL_MENU_TOGGLE,
     CONTROL_MENU_UP,
@@ -51,6 +56,10 @@ typedef enum {
     CONTROL_PLAYER_MOVE_DOWN,
     CONTROL_PLAYER_MOVE_LEFT,
     CONTROL_PLAYER_MOVE_RIGHT,
+    CONTROL_PLAYER_STRIKE_UP,
+    CONTROL_PLAYER_STRIKE_DOWN,
+    CONTROL_PLAYER_STRIKE_LEFT,
+    CONTROL_PLAYER_STRIKE_RIGHT,
 
     NUM_CONTROLS,
 } control_id_t;
@@ -62,6 +71,9 @@ struct control_state {
     vec2_t right_stick;
     float left_trigger;
     float right_trigger;
+
+    int cursor_x;
+    int cursor_y;
 
     bool menu_direction_pressed;
 };
@@ -98,6 +110,7 @@ struct game {
     int ticks;
     bool controls_processed;
     control_state_t control_state;
+    window_coord_t cursor;
 
     world_t * world;
 };
@@ -108,6 +121,7 @@ void G_Main(void);
 void M_Action_NewGame(game_t * game, int action_type); // TODO: move to menu
 void M_Action_QuitGame(game_t * game, int action_type);
 void M_Action_ReturnToMainMenu(game_t * game, int action_type);
+SDL_Rect G_TextureSize(SDL_Texture * texture);
 
 // g_state.c
 

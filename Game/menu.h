@@ -8,6 +8,7 @@
 #ifndef menu_h
 #define menu_h
 
+#include "ui_screen.h"
 #include "mylib/array.h"
 #include <stdbool.h>
 #include <SDL.h>
@@ -62,8 +63,8 @@ extern menu_t play_menu;
 void M_PushMenu(game_t * game, menu_id_t id);
 void M_PopMenu(game_t * game);
 
-bool M_ProcessControls(game_t * game);
-void M_Render(game_t * game);
+bool M_ProcessControls(game_t * game, screen_t * screen);
+void M_Render(game_t * game, screen_t * screen);
 void M_Action_Close(game_t * game, int unused);
 
 #endif /* menu_h */

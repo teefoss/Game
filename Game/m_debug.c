@@ -48,7 +48,7 @@ void DisplayGeneralInfo(world_t * world)
     V_PrintString(0, row++ * h, "Frame time: %2d ms", frame_ms);
     V_PrintString(0, row++ * h, "- Render time: %2d ms", render_ms);
     V_PrintString(0, row++ * h, "- Update time: %2d ms", update_ms);
-    V_PrintString(0, row++ * h, "- dt: %.3f ms", debug_dt);
+    V_PrintString(0, row++ * h, "- dt: %.3f sec", debug_dt);
     V_PrintString(0, row++ * h, "Camera Tile: %.2f, %.2f",
           world->camera.x / SCALED_TILE_SIZE,
           world->camera.y / SCALED_TILE_SIZE);
@@ -76,7 +76,7 @@ void DisplayTileInfo(world_t * world, vec2_t mouse_position)
           tile->lighting.z);
 }
 
-void DisplayPlayerInventory(array_t * actors)
+void DisplayPlayerINV_(array_t * actors)
 {
     actor_t * player = GetActorType(actors, ACTOR_PLAYER);
     inventory_t * inventory = player->info.player.inventory;
@@ -84,7 +84,7 @@ void DisplayPlayerInventory(array_t * actors)
     int row = 0;
     int h = V_CharHeight();
     V_SetGray(255);
-    V_PrintString(0, h*row++, "Player Inventory (%d items)", inventory->num_items);
+    V_PrintString(0, h*row++, "Player INV_ (%d items)", inventory->num_items);
 
     for ( int i = 0; i < inventory->num_items; i++ ) {
         V_PrintString(0, h*row++, "%d: %s", i, ActorName(inventory->items[i].type));
@@ -158,7 +158,7 @@ void DisplayDebugInfo(world_t * world, vec2_t mouse_position)
     }
 
     if ( show_inventory ) {
-        DisplayPlayerInventory(world->actors);
+        DisplayPlayerINV_(world->actors);
     }
 
     if ( show_chunk_map ) {

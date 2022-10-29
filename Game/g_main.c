@@ -6,6 +6,7 @@
 //
 
 #include "g_game.h"
+
 #include "w_world.h"
 #include "m_debug.h"
 
@@ -15,6 +16,16 @@
 #include "mylib/input.h"
 
 #include <SDL.h>
+
+SDL_Rect G_TextureSize(SDL_Texture * texture)
+{
+    SDL_Rect size = { 0 };
+    SDL_QueryTexture(texture, NULL, NULL, &size.w, &size.h);
+    size.w *= DRAW_SCALE;
+    size.h *= DRAW_SCALE;
+
+    return size;
+}
 
 static void G_DoFrame(game_t * game, input_state_t * input, float dt )
 {
@@ -132,14 +143,20 @@ void G_Main(void)
     V_SetFont(FONT_CP437_8X8);
     V_SetTextScale(DRAW_SCALE, DRAW_SCALE);
 
+    //SDL_ShowCursor(SDL_DISABLE);
+
     game_t * game = calloc(1, sizeof(*game));
     input_state_t * input = IN_Initialize();
     game->is_running = true;
 
-    M_PushMenu(game, MENU_MAIN);
-    UI_PushScreen(game, UI_MENU);
+//    M_PushMenu(game, MENU_MAIN);
+//    UI_PushScreen(game, UI_MENU);
     game->state_top = -1;
-    G_PushState(game, GAME_STATE_TITLE);
+//    G_PushState(game, GAME_STATE_TITLE);
+
+    // TODO: temp (skip the title screen)
+    G_PushState(game, GAME_STATE_PLAY);
+    M_Action_NewGame(game, 0);
 
     // debug: check things aren't getting too big
     printf("- tile data size: %zu bytes\n", sizeof(tile_t));

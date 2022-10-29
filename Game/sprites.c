@@ -6,8 +6,9 @@
 //
 
 #include "sprites.h"
+#include "g_game.h"
+#include "inventory.h"
 
-#define SPRITE_DIR "Assets/"
 #define HELD_ITEM_ICON_ALPHA 128
 
 #define PLAYER_SPRITE_WIDTH 8
@@ -102,23 +103,23 @@ sprite_t sprites[NUM_SPRITES] = {
     },
     [SPRITE_LOG_WORLD] = {
         .texture_name = ""SPRITE_DIR"items.png",
-        .location = { 0, 0, 12, 12 }
+        .location = { 0, 0, SLOT_SIZE, SLOT_SIZE }
     },
     [SPRITE_LOG_INVENTORY] = {
         .texture_name = ""SPRITE_DIR"items.png",
-        .location = { 0, 12, 24, 24 }
+        .location = { 0, 16, SLOT_SIZE * 2, SLOT_SIZE * 2 }
     },
     [SPRITE_LEAVES] = {
         .texture_name = ""SPRITE_DIR"items.png",
-        .location = { 24, 0, 12, 12 }
+        .location = { 16, 0, SLOT_SIZE, SLOT_SIZE }
     },
     [SPRITE_STICKS_WORLD] = {
         .texture_name = ""SPRITE_DIR"items.png",
-        .location = { 36, 0, 12, 12 }
+        .location = { 32, 0, SLOT_SIZE, SLOT_SIZE }
     },
     [SPRITE_STICKS_INVENTORY] = {
         .texture_name = ""SPRITE_DIR"items.png",
-        .location = { 36, 12, 24, 24 }
+        .location = { 32, 16, SLOT_SIZE, SLOT_SIZE * 2 }
     },
     [SPRITE_ICON_NO_ITEM] = {
         .texture_name = ""SPRITE_DIR"icons.png",

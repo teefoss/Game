@@ -22,6 +22,8 @@ void LoadTextures(const char * directory_name, const char * file_extension);
 ///   the program is terminated via a cell of `Error()`.
 SDL_Texture * GetTexture(const char * key);
 
+SDL_Rect GetScaledTextureSize(SDL_Texture * texture, int draw_scale);
+
 void FreeAllTextures(void);
 void PrintTextureHashTable(void);
 
